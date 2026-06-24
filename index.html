@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIB - Arbeitszeugnis Einsendung</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --border-color: #475569;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            border-top: 4px solid var(--accent-color);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            color: var(--text-color);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            background-color: #0f172a;
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .file-input-wrapper {
+            margin-top: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .preview-area {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #0f172a;
+            border-left: 3px solid var(--accent-color);
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>FEDERAL INVESTIGATION BUREAU</h2>
+    <div class="subtitle">Arbeitszeugnis Einsendung</div>
+    
+    <form id="azForm">
+        <div class="form-group">
+            <label for="name">Vor- u. Nachname:</label>
+            <input type="text" id="name" placeholder="z.B. John Doe" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="pass">Reisepassnr.:</label>
+            <input type="text" id="pass" placeholder="z.B. 12345" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="rang">Rang:</label>
+            <input type="text" id="rang" placeholder="z.B. Special Agent" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="datum">Datum der Kündigung:</label>
+            <input type="date" id="datum" required>
+        </div>
+
+        <div class="form-group">
+            <label for="file">Arbeitszeugnis (Anhang):</label>
+            <div class="file-input-wrapper">
+                <input type="text" id="file" placeholder="Link zum Zeugnis (z.B. Imgur/Discord-Link)">
+            </div>
+        </div>
+        
+        <button type="button" onclick="generateOutput()">Text generieren & kopieren</button>
+    </form>
+
+    <div class="preview-area" id="preview"></div>
+</div>
+
+<script>
+    function generateOutput() {
+        const name = document.getElementById('name').value || '__________';
+        const pass = document.getElementById('pass').value || '__________';
+        const rang = document.getElementById('rang').value || '__________';
+        const file = document.getElementById('file').value || '(Kein Anhang beigefügt)';
+        
+        // Datum formatieren
+        const rawDate = document.getElementById('datum').value;
+        let formattedDate = '__________';
+        if(rawDate) {
+            const dateObj = new Date(rawDate);
+            formattedDate = dateObj.toLocaleDateString('de-DE');
+        }
+
+        // Vorlage zusammenbauen
+        const outputText = `Das Federal Investigation Bureau (FIB),
+übermittelt hiermit das Arbeitszeugnis von:
+
+**Vor- u. Nachname:** ${name}
+**Reisepassnr.:** ${pass}
+**Rang:** ${rang}
+**Datum der Kündigung:** ${formattedDate}
+
+(Arbeitszeugnis wird als Anhang beigefügt: ${file})`;
+
+        // Vorschau anzeigen
+        const previewDiv = document.getElementById('preview');
+        previewDiv.innerText = outputText;
+        previewDiv.style.display = 'block';
+
+        // In Zwischenablage kopieren
+        navigator.clipboard.writeText(outputText).then(() => {
+            alert('Text wurde erfolgreich generiert und in die Zwischenablage kopiert!');
+        }).catch(err => {
+            alert('Fehler beim Kopieren. Du kannst den Text manuell aus der Vorschau kopieren.');
+        });
+    }
+</script>
+
+</body>
+</html>
