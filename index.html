@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FIB Department Panel · GrandRP</title>
+  <title>FIB HQ CyberPanel · GrandRP</title>
   <style>
     :root {
       --bg-main: #060913;
       --bg-gradient: linear-gradient(135deg, #060814 0%, #0b112c 100%);
-      --sidebar-bg: rgba(10, 15, 30, 0.8);
+      --sidebar-bg: rgba(10, 15, 30, 0.85);
       --card-bg: rgba(30, 41, 59, 0.4);
       --card-border: rgba(255, 255, 255, 0.06);
       --input-bg: rgba(5, 8, 22, 0.6);
@@ -113,7 +113,6 @@
       background: rgba(59, 130, 246, 0.1);
       color: #60a5fa;
       border: 1px solid rgba(59, 130, 246, 0.2);
-      box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.05);
     }
 
     /* --- HAUPTBEREICH & STATUSBAR --- */
@@ -121,7 +120,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
+      overflow: hidden;
     }
 
     .top-statusbar {
@@ -132,6 +131,7 @@
       gap: 20px;
       color: var(--text-muted);
       background: rgba(6, 9, 19, 0.4);
+      flex-shrink: 0;
     }
 
     .status-online {
@@ -150,11 +150,10 @@
       box-shadow: 0 0 10px var(--success-color);
     }
 
-    .content-body {
+    .content-container {
+      flex: 1;
       padding: 40px;
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
+      overflow-y: auto;
     }
 
     .module-header {
@@ -176,15 +175,7 @@
       letter-spacing: -0.5px;
     }
 
-    /* --- WORKSPACE GRID & KARTEN --- */
-    .workspace-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      align-items: start;
-    }
-
-    .glass-card {
+    .panel-card {
       background: var(--card-bg);
       backdrop-filter: var(--blur-effect);
       -webkit-backdrop-filter: var(--blur-effect);
@@ -192,6 +183,14 @@
       border-radius: 14px;
       padding: 28px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    /* --- WORKSPACE GRID FÜR AZ --- */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: start;
     }
 
     .card-header-area {
@@ -206,7 +205,6 @@
       align-items: center;
     }
 
-    /* --- FORMULAR ELEMENTE --- */
     .input-wrapper {
       margin-bottom: 20px;
     }
@@ -218,7 +216,6 @@
       margin-bottom: 8px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .input-wrapper input {
@@ -236,10 +233,8 @@
     .input-wrapper input:focus {
       border-color: var(--accent-color);
       box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
-      background: rgba(5, 8, 22, 0.8);
     }
 
-    /* --- UTILITY BUTTONS & LIVE PREVIEW --- */
     .copy-btn {
       background: var(--accent-color);
       color: white;
@@ -249,15 +244,11 @@
       font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
       transition: all 0.2s;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
 
     .copy-btn:hover {
       background: #2563eb;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
     }
 
     .code-output-box {
@@ -267,16 +258,60 @@
       border-radius: 8px;
       min-height: 300px;
       font-family: "Courier New", Courier, monospace;
-      font-size: 0.95rem;
       white-space: pre-wrap;
       line-height: 1.6;
-      color: #e2e8f0;
     }
 
-    .hint-text {
-      font-size: 0.75rem;
+    /* --- TABELLEN & VERZEICHNIS STYLING --- */
+    .search-bar {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      padding: 14px;
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      margin-bottom: 20px;
+      outline: none;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      max-height: 500px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 14px;
+      font-weight: 600;
+      color: #60a5fa;
+      border-bottom: 2px solid var(--card-border);
+      position: sticky;
+      top: 0;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      color: #cbd5e1;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .loading-status {
+      text-align: center;
+      padding: 30px;
       color: var(--text-muted);
-      margin-top: 14px;
+      font-style: italic;
     }
   </style>
 </head>
@@ -292,91 +327,177 @@
     </div>
 
     <div class="nav-category">Daten & Übersicht</div>
-    <div class="nav-link">📊 Übersicht</div>
+    <div class="nav-link active" onclick="switchModule('verzeichnis', this)">📂 Mitarbeiterverzeichnis</div>
     <div class="nav-link">📈 Statistiken</div>
 
     <div class="nav-category">Dokumente</div>
+    <div class="nav-link" onclick="switchModule('az-generator', this)">📄 Arbeitszeugnis</div>
     <div class="nav-link">📝 Einstellung</div>
     <div class="nav-link">❌ Kündigung</div>
-    <div class="nav-link active">📄 Arbeitszeugnis</div>
-    <div class="nav-link">⚖️ Sanktion</div>
   </aside>
 
   <main>
     <div class="top-statusbar">
       <div class="status-online">
         <div class="status-dot"></div>
-        <span>Verbindung sicher (Encrypted)</span>
+        <span id="sheet-status">Live mit Google Sheets verbunden</span>
       </div>
       <span>//</span>
       <span>GrandRP DE01 · Federal Investigation Bureau</span>
     </div>
 
-    <div class="content-body">
-      <div class="module-header">
-        <p>Human Resources · Vorlagen-Generator</p>
-        <h2>Arbeitszeugnis (AZ) erstellen</h2>
-      </div>
-
-      <div class="workspace-grid">
-        <div class="glass-card">
-          <div class="card-header-area">Personalien eintragen</div>
-          
-          <div class="input-wrapper">
-            <label for="f-name">Vor- u. Nachname</label>
-            <input type="text" id="f-name" placeholder="z. B. John Doe">
-          </div>
-
-          <div class="input-wrapper">
-            <label for="f-pass">Reisepassnummer</label>
-            <input type="text" id="f-pass" placeholder="z. B. 154820">
-          </div>
-
-          <div class="input-wrapper">
-            <label for="f-rang">Letzter Rang</label>
-            <input type="text" id="f-rang" placeholder="z. B. Special Agent in Charge">
-          </div>
-
-          <div class="input-wrapper">
-            <label for="f-date">Datum der Kündigung</label>
-            <input type="date" id="f-date">
-          </div>
-
-          <div class="input-wrapper">
-            <label for="f-link">Arbeitszeugnis Dokumenten-Link</label>
-            <input type="text" id="f-link" placeholder="Link (z. B. Imgur, Lightshot, Discord)">
-          </div>
+    <div class="content-container">
+      
+      <div id="module-verzeichnis">
+        <div class="module-header">
+          <p>Human Resources · Datenbank</p>
+          <h2>Mitarbeiterverzeichnis (Live)</h2>
         </div>
 
-        <div class="glass-card">
-          <div class="card-header-area">
-            <span>Discord Rohtext-Vorschau</span>
-            <button class="copy-btn" onclick="copyTextToClipboard()">Kopieren</button>
-          </div>
+        <div class="panel-card">
+          <input type="text" id="search-input" class="search-bar" placeholder="Nach Name, Dienstnummer oder Rang suchen..." oninput="filterTable()">
           
-          <div class="code-output-box" id="live-az-preview"></div>
-          <p class="hint-text">Der Text wird live beim Tippen formatiert. Mit dem Button oben rechts kopierst du ihn direkt fertig für Discord heraus.</p>
+          <div class="table-responsive">
+            <table id="employee-table">
+              <thead>
+                <tr id="table-headers">
+                  <th>Lade Tabellenstruktur...</th>
+                </tr>
+              </thead>
+              <tbody id="table-body">
+                <tr>
+                  <td class="loading-status">Rufe Daten aus Google Sheets ab...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+
+      <div id="module-az-generator" style="display: none;">
+        <div class="module-header">
+          <p>Human Resources · Vorlagen-Generator</p>
+          <h2>Arbeitszeugnis (AZ) erstellen</h2>
+        </div>
+
+        <div class="workspace-grid">
+          <div class="panel-card">
+            <div class="card-header-area">Personalien eintragen</div>
+            
+            <div class="input-wrapper"><label>Vor- u. Nachname</label><input type="text" id="f-name" placeholder="z. B. Tim Chessee"></div>
+            <div class="input-wrapper"><label>Reisepassnummer</label><input type="text" id="f-pass" placeholder="z. B. 264694"></div>
+            <div class="input-wrapper"><label>Letzter Rang</label><input type="text" id="f-rang" placeholder="z. B. Assistant Director"></div>
+            <div class="input-wrapper"><label>Datum der Kündigung</label><input type="date" id="f-date"></div>
+            <div class="input-wrapper"><label>Arbeitszeugnis Link</label><input type="text" id="f-link" placeholder="Link (z. B. Imgur/Discord)"></div>
+          </div>
+
+          <div class="panel-card">
+            <div class="card-header-area">
+              <span>Discord Rohtext-Vorschau</span>
+              <button class="copy-btn" onclick="copyTextToClipboard()">Kopieren</button>
+            </div>
+            <div class="code-output-box" id="live-az-preview"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 
   <script>
-    function updatePreview() {
+    // Konfiguration für dein Google Sheet (Tab: Mitarbeiter)
+    const SHEET_ID = '1uzAA-_O2JtDBs3bpRG9Mqbva67dqh45LPDjPEf8-njQ';
+    const GID = '1591796957'; 
+    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+
+    let employeeData = [];
+
+    // Module umschalten (Sidebar Klick)
+    function switchModule(moduleId, element) {
+      document.getElementById('module-verzeichnis').style.display = 'none';
+      document.getElementById('module-az-generator').style.display = 'none';
+      
+      document.getElementById(`module-${moduleId}`).style.display = 'block';
+      
+      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    // Google Sheets CSV einlesen
+    async function loadGoogleSheet() {
+      try {
+        const response = await fetch(CSV_URL);
+        if (!response.ok) throw new Error('Netzwerk-Fehler beim Abruf');
+        const data = await response.text();
+        
+        // CSV Zeilen parsen
+        const rows = data.split('\n').map(row => parseCSVRow(row));
+        if (rows.length === 0) return;
+
+        const headers = rows[0];
+        employeeData = rows.slice(1).filter(row => row.length > 1 && row[0].trim() !== "");
+
+        // Header bauen
+        const headerRow = document.getElementById('table-headers');
+        headerRow.innerHTML = headers.map(h => `<th>${h.replace(/"/g, '')}</th>`).join('');
+
+        // Tabelle befüllen
+        renderTable(employeeData);
+        document.getElementById('sheet-status').innerText = "Live-Daten erfolgreich geladen";
+      } catch (error) {
+        console.error(error);
+        document.getElementById('table-body').innerHTML = `<tr><td class="loading-status" style="color: #ef4444;">Fehler beim Laden der Live-Daten. Stelle sicher, dass die Tabelle freigegeben ist.</td></tr>`;
+      }
+    }
+
+    // Hilfsfunktion für sauberes CSV Parsing (beachtet Anführungszeichen)
+    function parseCSVRow(text) {
+      let p = '', r = [];
+      let q = false;
+      for (let i = 0; i < text.length; i++) {
+        let c = text[i];
+        if (c === '"') { q = !q; }
+        else if (c === ',' && !q) { r.push(p); p = ''; }
+        else { p += c; }
+      }
+      r.push(p);
+      return r;
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('table-body');
+      if(data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="loading-status">Keine passenden Einträge gefunden.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.map(row => {
+        return `<tr>${row.map(cell => `<td>${cell.replace(/"/g, '')}</td>`).join('')}</tr>`;
+      }).join('');
+    }
+
+    // Live-Filter für die Suchleiste
+    function filterTable() {
+      const searchVal = document.getElementById('search-input').value.toLowerCase();
+      const filtered = employeeData.filter(row => {
+        return row.some(cell => cell.toLowerCase().includes(searchVal));
+      });
+      renderTable(filtered);
+    }
+
+    /* --- DOKUMENTEN GENERATOR LOGIK --- */
+    function updateAZPreview() {
       const name = document.getElementById('f-name').value || '__________';
       const pass = document.getElementById('f-pass').value || '__________';
       const rang = document.getElementById('f-rang').value || '__________';
       const link = document.getElementById('f-link').value || '__________';
-      
       const rawDate = document.getElementById('f-date').value;
       let cleanDate = '__________';
       
       if (rawDate) {
-        const parsedDate = new Date(rawDate);
-        cleanDate = parsedDate.toLocaleDateString('de-DE');
+        cleanDate = new Date(rawDate).toLocaleDateString('de-DE');
       }
 
-      const textTemplate = `Das Federal Investigation Bureau (FIB),
+      document.getElementById('live-az-preview').innerText = `Das Federal Investigation Bureau (FIB),
 übermittelt hiermit das Arbeitszeugnis von:
 
 **Vor- u. Nachname:** ${name}
@@ -385,29 +506,22 @@
 **Datum der Kündigung:** ${cleanDate}
 
 (Arbeitszeugnis wird als Anhang beigefügt: ${link})`;
-
-      document.getElementById('live-az-preview').innerText = textTemplate;
     }
 
     function copyTextToClipboard() {
-      const outputText = document.getElementById('live-az-preview').innerText;
-      navigator.clipboard.writeText(outputText).then(() => {
-        alert('Arbeitszeugnis-Text erfolgreich kopiert! Du kannst ihn jetzt in Discord einfügen.');
-      }).catch(err => {
-        console.error('Fehler beim Kopieren: ', err);
+      navigator.clipboard.writeText(document.getElementById('live-az-preview').innerText).then(() => {
+        alert('Arbeitszeugnis erfolgreich kopiert!');
       });
     }
 
-    // Event Listener an alle Inputs binden für verzögerungsfreie Live-Updates
-    document.getElementById('f-name').addEventListener('input', updatePreview);
-    document.getElementById('f-pass').addEventListener('input', updatePreview);
-    document.getElementById('f-rang').addEventListener('input', updatePreview);
-    document.getElementById('f-date').addEventListener('input', updatePreview);
-    document.getElementById('f-link').addEventListener('input', updatePreview);
+    // Event Listener initialisieren
+    ['f-name', 'f-pass', 'f-rang', 'f-date', 'f-link'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateAZPreview);
+    });
 
-    // Initialer Start beim Seitenaufruf
-    updatePreview();
+    // Start-Aktionen
+    updateAZPreview();
+    loadGoogleSheet();
   </script>
-
 </body>
 </html>
