@@ -1,399 +1,396 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GrandRP DE01 · FIB Personalabteilung</title>
-    <style>
-        :root {
-            --bg-color: #0b0f19;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --sidebar-bg: #0f172a;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --border-color: rgba(71, 85, 105, 0.5);
-            --glass-blur: blur(12px);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIB - Internes Panel</title>
+  <style>
+    :root {
+      --bg-gradient-start: #060814;
+      --bg-gradient-end: #0b112c;
+      --sidebar-bg: rgba(10, 15, 36, 0.75);
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.05);
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --accent-blue: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.3);
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        /* Sidebar Styling */
-        nav {
-            width: 260px;
-            background-color: var(--sidebar-bg);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+    body {
+      font-family: var(--font-family);
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
 
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
+    /* Sidebar Area */
+    .sidebar {
+      width: 260px;
+      background: var(--sidebar-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+    }
 
-        .logo-icon {
-            font-size: 24px;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
 
-        .logo-text p {
-            margin: 0;
-        }
-        .logo-text p:first-child {
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        .logo-text p:last-child {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-blue);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
 
-        nav p {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin: 20px 0 10px 0;
-        }
+    .brand-name h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-            margin-bottom: 4px;
-        }
+    .brand-name p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
 
-        .nav-item:hover, .nav-item.active {
-            background-color: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-        }
+    .nav-section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin: 20px 0 8px 4px;
+      font-weight: 600;
+    }
 
-        /* Main Content Styling */
-        .main-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
-        }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #94a3b8;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
 
-        .top-bar {
-            padding: 15px 30px;
-            background-color: rgba(15, 23, 42, 0.5);
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-main);
+    }
 
-        .top-bar b {
-            color: var(--text-color);
-        }
+    .nav-item.active {
+      background: rgba(59, 130, 246, 0.1);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.15);
+    }
 
-        section.module {
-            padding: 40px 30px;
-            max-width: 1200px;
-            width: 100%;
-            box-sizing: border-box;
-            margin: 0 auto;
-        }
+    /* Main Content Area */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
 
-        header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
+    .statusbar {
+      padding: 16px 40px;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 0.8rem;
+      display: flex;
+      gap: 20px;
+      color: var(--text-muted);
+    }
 
-        .header-icon {
-            font-size: 32px;
-            background: rgba(59, 130, 246, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
+    .statusbar-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #10b981;
+    }
 
-        header h1 {
-            margin: 0 0 5px 0;
-            font-size: 1.8rem;
-        }
+    .statusbar-dot {
+      width: 6px;
+      height: 6px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+    }
 
-        header p {
-            margin: 0;
-            font-size: 0.9rem;
-        }
-        header p:first-child {
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-        }
+    .content-pane {
+      padding: 40px;
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+    }
 
-        .module-grid {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
-            border-collapse: separate;
-            border-spacing: 20px 0;
-        }
+    .page-header {
+      margin-bottom: 32px;
+    }
 
-        .input-panel, .preview-panel {
-            display: table-cell;
-            vertical-align: top;
-            background: var(--card-bg);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 25px;
-            box-sizing: border-box;
-        }
+    .page-header p {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--accent-blue);
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
 
-        .panel-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-top: 0;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
-            color: #60a5fa;
-        }
+    .page-header h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
+    /* Grid Layout */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
+    .panel-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+    }
 
-        input[type="text"], input[type="date"] {
-            width: 100%;
-            padding: 12px;
-            background-color: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: white;
-            box-sizing: border-box;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-        }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        input[type="text"]:focus, input[type="date"]:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
+    /* Form Styles */
+    .field-group {
+      margin-bottom: 16px;
+    }
 
-        /* Preview Box & Button */
-        .preview-container {
-            position: relative;
-        }
+    .field-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
 
-        .btn-transfer {
-            position: absolute;
-            top: -50px;
-            right: 0;
-            background-color: var(--accent-color);
-            color: white;
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            border: none;
-        }
+    .field-group input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--card-border);
+      padding: 12px;
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
 
-        .btn-transfer:hover {
-            background-color: var(--accent-hover);
-        }
+    .field-group input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
+    }
 
-        .preview-box {
-            background-color: rgba(15, 23, 42, 0.8);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 20px;
-            min-height: 250px;
-            font-family: 'Courier New', Courier, monospace;
-            white-space: pre-wrap;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            color: #e2e8f0;
-        }
+    /* Button and Copy Box */
+    .action-btn {
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
 
-        .preview-note {
-            margin-top: 15px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
+    .action-btn:hover {
+      background: #2563eb;
+    }
 
-        footer {
-            margin-top: auto;
-            padding: 20px 30px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border-color);
-            text-align: center;
-        }
-    </style>
+    .live-preview {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--card-border);
+      padding: 20px;
+      border-radius: 8px;
+      min-height: 280px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+
+    .footer-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+  </style>
 </head>
 <body>
 
-<nav>
-    <div class="logo-section">
-        <div class="logo-icon">🦅</div>
-        <div class="logo-text">
-            <p>FIB</p>
-            <p>Personalabteilung</p>
-        </div>
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">F</div>
+      <div class="brand-name">
+        <h1>FIB Panel</h1>
+        <p>Personalverwaltung</p>
+      </div>
     </div>
 
-    <p>Module</p>
-    <div class="nav-item"><span>📊</span> <span>Übersicht</span></div>
-    <div class="nav-item"><span>📈</span> <span>Rangverteilung</span></div>
+    <div class="nav-section-title">Module</div>
+    <div class="nav-item">📊 Übersicht</div>
+    <div class="nav-item">📈 Statistiken</div>
 
-    <p>Vorlagen</p>
-    <div class="nav-item"><span>📋</span> <span>Ranganpassung</span></div>
-    <div class="nav-item"><span>📝</span> <span>Einstellung</span></div>
-    <div class="nav-item"><span>❌</span> <span>Kündigung</span></div>
-    <div class="nav-item"><span>⚖️</span> <span>Sanktion</span></div>
-    <div class="nav-item active"><span>📄</span> <span>Arbeitszeugnis</span></div>
+    <div class="nav-section-title">Vorlagen</div>
+    <div class="nav-item">📝 Einstellung</div>
+    <div class="nav-item">❌ Kündigung</div>
+    <div class="nav-item active">📄 Arbeitszeugnis</div>
+    <div class="nav-item">⚖️ Sanktion</div>
+  </div>
 
-    <p>System</p>
-    <div class="nav-item"><span>⚙️</span> <span>Einstellungen</span></div>
-</nav>
-
-<div class="main-container">
-    <div class="top-bar">
-        <span>● Verbunden</span>
-        <span> // </span>
-        <b>GrandRP DE01 · FIB Personalabteilung</b>
+  <!-- MAIN SECTION -->
+  <div class="main-wrapper">
+    <div class="statusbar">
+      <div class="statusbar-indicator">
+        <div class="statusbar-dot"></div>
+        <span>System verschlüsselt & online</span>
+      </div>
+      <span>//</span>
+      <span>GrandRP DE01 · Federal Investigation Bureau</span>
     </div>
 
-    <section class="module" id="az-system">
-        <header>
-            <div class="header-icon">📄</div>
-            <div>
-                <p>Federal Investigation Bureau · Personalverwaltung</p>
-                <h1>Arbeitszeugnis</h1>
-                <p>Arbeitszeugnis-Eintrag erstellen, prüfen, kopieren.</p>
-            </div>
-        </header>
+    <div class="content-pane">
+      <div class="page-header">
+        <p>Vorlagenverwaltung</p>
+        <h2>Arbeitszeugnis ausstellen</h2>
+      </div>
 
-        <div class="module-grid">
-            <div class="input-panel">
-                <p class="panel-title">Eingabe</p>
-                
-                <div class="form-group">
-                    <label for="az-name">Vor- u. Nachname:</label>
-                    <input type="text" id="az-name" placeholder="z.B. John Doe" required>
-                </div>
+      <div class="workspace-grid">
+        <!-- Input Form (Left) -->
+        <div class="panel-card">
+          <div class="card-title">Stammdaten eingeben</div>
+          
+          <div class="field-group">
+            <label for="az-name">Vor- u. Nachname:</label>
+            <input type="text" id="az-name" placeholder="z.B. Tim Chessee">
+          </div>
 
-                <div class="form-group">
-                    <label for="az-pass">Reisepassnr.:</label>
-                    <input type="text" id="az-pass" placeholder="z.B. 12345" required>
-                </div>
+          <div class="field-group">
+            <label for="az-pass">Reisepassnr.:</label>
+            <input type="text" id="az-pass" placeholder="z.B. 264694">
+          </div>
 
-                <div class="form-group">
-                    <label for="az-rang">Rang:</label>
-                    <input type="text" id="az-rang" placeholder="z.B. Special Agent" required>
-                </div>
+          <div class="field-group">
+            <label for="az-rang">Rang beim FIB:</label>
+            <input type="text" id="az-rang" placeholder="z.B. Assistant Director">
+          </div>
 
-                <div class="form-group">
-                    <label for="az-datum">Datum der Kündigung:</label>
-                    <input type="date" id="az-datum" required>
-                </div>
+          <div class="field-group">
+            <label for="az-date">Datum der Kündigung:</label>
+            <input type="date" id="az-date">
+          </div>
 
-                <div class="form-group">
-                    <label for="az-link">Arbeitszeugnis (Anhang-Link):</label>
-                    <input type="text" id="az-link" placeholder="z.B. Imgur- oder Discord-Link">
-                </div>
-            </div>
-
-            <div class="preview-panel">
-                <div class="preview-container">
-                    <p class="panel-title">Vorschau</p>
-                    <button class="btn-transfer" onclick="copyAZText()">KOPIEREN</button>
-                    
-                    <div class="preview-box" id="az-preview"></div>
-                    <p class="preview-note">Kopiert wird der Discord-Rohtext inkl. ** Formatierung.</p>
-                </div>
-            </div>
+          <div class="field-group">
+            <label for="az-link">Arbeitszeugnis (Anhang-Link):</label>
+            <input type="text" id="az-link" placeholder="z.B. Imgur- oder Discord-Link">
+          </div>
         </div>
-    </section>
 
-    <footer>GrandRP DE01 · FIB Personalabteilung</footer>
-</div>
+        <!-- Live Preview (Right) -->
+        <div class="panel-card">
+          <div class="card-title">
+            <span>Live-Vorschau (Discord Rohtext)</span>
+            <button class="action-btn" onclick="copyToClipboard()">Kopieren</button>
+          </div>
+          
+          <div class="live-preview" id="az-preview-box"></div>
+          <p class="footer-note">Der Text aktualisiert sich automatisch bei jeder Eingabe.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<script>
-    function updateAZPreview() {
-        const name = document.getElementById('az-name').value || '__________';
-        const pass = document.getElementById('az-pass').value || '__________';
-        const rang = document.getElementById('az-rang').value || '__________';
-        const link = document.getElementById('az-link').value || '__________';
-        
-        const rawDate = document.getElementById('az-datum').value;
-        let formattedDate = '__________';
-        if (rawDate) {
-            const dateObj = new Date(rawDate);
-            formattedDate = dateObj.toLocaleDateString('de-DE');
-        }
+  <!-- LOGIC SCRIPT -->
+  <script>
+    function renderPreview() {
+      const name = document.getElementById('az-name').value || '__________';
+      const pass = document.getElementById('az-pass').value || '__________';
+      const rang = document.getElementById('az-rang').value || '__________';
+      const link = document.getElementById('az-link').value || '__________';
+      
+      const dateField = document.getElementById('az-date').value;
+      let cleanDate = '__________';
+      
+      if (dateField) {
+        const d = new Date(dateField);
+        cleanDate = d.toLocaleDateString('de-DE');
+      }
 
-        const template = `Das Federal Investigation Bureau (FIB),
+      const generatedTemplate = `Das Federal Investigation Bureau (FIB),
 übermittelt hiermit das Arbeitszeugnis von:
 
 **Vor- u. Nachname:** ${name}
 **Reisepassnr.:** ${pass}
 **Rang:** ${rang}
-**Datum der Kündigung:** ${formattedDate}
+**Datum der Kündigung:** ${cleanDate}
 
 (Arbeitszeugnis wird als Anhang beigefügt: ${link})`;
 
-        document.getElementById('az-preview').innerText = template;
+      document.getElementById('az-preview-box').innerText = generatedTemplate;
     }
 
-    function copyAZText() {
-        const text = document.getElementById('az-preview').innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Arbeitszeugnis erfolgreich in die Zwischenablage kopiert!');
-        }).catch(err => {
-            console.error('Fehler beim Kopieren: ', err);
-        });
+    function copyToClipboard() {
+      const content = document.getElementById('az-preview-box').innerText;
+      navigator.clipboard.writeText(content).then(() => {
+        alert('Text erfolgreich für Discord kopiert!');
+      }).catch(err => {
+        console.error('Fehler beim Kopieren: ', err);
+      });
     }
 
-    // Event-Listener für Live-Update bei jeder Eingabe
-    document.querySelectorAll('#az-system input').forEach(input => {
-        input.addEventListener('input', updateAZPreview);
-    });
+    // Event Listeners für die automatische Live-Aktualisierung
+    document.getElementById('az-name').addEventListener('input', renderPreview);
+    document.getElementById('az-pass').addEventListener('input', renderPreview);
+    document.getElementById('az-rang').addEventListener('input', renderPreview);
+    document.getElementById('az-date').addEventListener('input', renderPreview);
+    document.getElementById('az-link').addEventListener('input', renderPreview);
 
-    // Initiales Generieren beim Laden der Seite
-    updateAZPreview();
-</script>
+    // Initialer Aufruf
+    renderPreview();
+  </script>
 
 </body>
 </html>
