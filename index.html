@@ -15,6 +15,7 @@
       --text-primary: #f8fafc;
       --text-muted: #64748b;
       --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
       --accent-glow: rgba(59, 130, 246, 0.3);
       --success-color: #10b981;
       --blur-effect: blur(16px);
@@ -36,7 +37,7 @@
       overflow: hidden;
     }
 
-    /* --- SIDEBAR LOGO & NAV --- */
+    /* --- SIDEBAR --- */
     aside {
       width: 260px;
       background: var(--sidebar-bg);
@@ -46,6 +47,7 @@
       display: flex;
       flex-direction: column;
       padding: 24px;
+      flex-shrink: 0;
     }
 
     .brand-header {
@@ -115,7 +117,7 @@
       border: 1px solid rgba(59, 130, 246, 0.2);
     }
 
-    /* --- HAUPTBEREICH & STATUSBAR --- */
+    /* --- MAIN BERG --- */
     main {
       flex: 1;
       display: flex;
@@ -183,9 +185,10 @@
       border-radius: 14px;
       padding: 28px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      margin-bottom: 25px;
     }
 
-    /* --- WORKSPACE GRID FÜR AZ --- */
+    /* --- GRID FÜR GENERATOR --- */
     .workspace-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -248,7 +251,7 @@
     }
 
     .copy-btn:hover {
-      background: #2563eb;
+      background: var(--accent-hover);
     }
 
     .code-output-box {
@@ -262,7 +265,7 @@
       line-height: 1.6;
     }
 
-    /* --- TABELLEN & VERZEICHNIS STYLING --- */
+    /* --- TABLE STYLING --- */
     .search-bar {
       width: 100%;
       background: var(--input-bg);
@@ -277,7 +280,9 @@
 
     .table-responsive {
       overflow-x: auto;
-      max-height: 500px;
+      max-height: 550px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
     }
 
     table {
@@ -288,35 +293,57 @@
     }
 
     th {
-      background: rgba(15, 23, 42, 0.6);
-      padding: 14px;
+      background: #0f172a;
+      padding: 16px 14px;
       font-weight: 600;
       color: #60a5fa;
       border-bottom: 2px solid var(--card-border);
       position: sticky;
       top: 0;
+      z-index: 10;
+      white-space: nowrap;
     }
 
     td {
-      padding: 12px 14px;
+      padding: 14px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.03);
       color: #cbd5e1;
+      white-space: nowrap;
     }
 
-    tr:hover td {
-      background: rgba(255, 255, 255, 0.02);
+    .clickable-row {
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .clickable-row:hover {
+      background: rgba(59, 130, 246, 0.15) !!important;
+    }
+
+    .clickable-row:hover td {
+      color: #fff;
     }
 
     .loading-status {
       text-align: center;
-      padding: 30px;
+      padding: 40px;
       color: var(--text-muted);
       font-style: italic;
+    }
+    
+    .action-badge {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
+  <!-- SIDEBAR NAVIGATION -->
   <aside>
     <div class="brand-header">
       <div class="brand-badge">F</div>
@@ -327,20 +354,21 @@
     </div>
 
     <div class="nav-category">Daten & Übersicht</div>
-    <div class="nav-link active" onclick="switchModule('verzeichnis', this)">📂 Mitarbeiterverzeichnis</div>
+    <div id="link-verzeichnis" class="nav-link active" onclick="switchModule('verzeichnis')">📂 Mitarbeiterverzeichnis</div>
     <div class="nav-link">📈 Statistiken</div>
 
     <div class="nav-category">Dokumente</div>
-    <div class="nav-link" onclick="switchModule('az-generator', this)">📄 Arbeitszeugnis</div>
+    <div id="link-az" class="nav-link" onclick="switchModule('az-generator')">📄 Arbeitszeugnis</div>
     <div class="nav-link">📝 Einstellung</div>
     <div class="nav-link">❌ Kündigung</div>
   </aside>
 
+  <!-- MAIN AREA -->
   <main>
     <div class="top-statusbar">
       <div class="status-online">
         <div class="status-dot"></div>
-        <span id="sheet-status">Live mit Google Sheets verbunden</span>
+        <span id="sheet-status">Synchronisiere mit Dienstblatt...</span>
       </div>
       <span>//</span>
       <span>GrandRP DE01 · Federal Investigation Bureau</span>
@@ -348,6 +376,7 @@
 
     <div class="content-container">
       
+      <!-- MODULE 1: MITARBEITERVERZEICHNIS -->
       <div id="module-verzeichnis">
         <div class="module-header">
           <p>Human Resources · Datenbank</p>
@@ -355,18 +384,18 @@
         </div>
 
         <div class="panel-card">
-          <input type="text" id="search-input" class="search-bar" placeholder="Nach Name, Dienstnummer oder Rang suchen..." oninput="filterTable()">
+          <input type="text" id="search-input" class="search-bar" placeholder="Nach Name, ID, Abteilung oder Dienstgrad filtern..." oninput="filterTable()">
           
           <div class="table-responsive">
             <table id="employee-table">
               <thead>
                 <tr id="table-headers">
-                  <th>Lade Tabellenstruktur...</th>
+                  <th>Lade Tabellen-Struktur...</th>
                 </tr>
               </thead>
               <tbody id="table-body">
                 <tr>
-                  <td class="loading-status">Rufe Daten aus Google Sheets ab...</td>
+                  <td class="loading-status">Verbindung zu Google Sheets wird aufgebaut...</td>
                 </tr>
               </tbody>
             </table>
@@ -374,6 +403,7 @@
         </div>
       </div>
 
+      <!-- MODULE 2: ARBEITSZEUGNIS GENERATOR -->
       <div id="module-az-generator" style="display: none;">
         <div class="module-header">
           <p>Human Resources · Vorlagen-Generator</p>
@@ -405,52 +435,56 @@
   </main>
 
   <script>
-    // Konfiguration für dein Google Sheet (Tab: Mitarbeiter)
+    // Deine exakte Tabellenkonfiguration via Google-API Proxy (verhindert GID-Sperren)
     const SHEET_ID = '1uzAA-_O2JtDBs3bpRG9Mqbva67dqh45LPDjPEf8-njQ';
     const GID = '1591796957'; 
-    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+    // Nutzen den tqx=out:csv um den exakten Tabellen-Reiter zu erzwingen
+    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
 
     let employeeData = [];
+    let headers = [];
 
-    // Module umschalten (Sidebar Klick)
-    function switchModule(moduleId, element) {
-      document.getElementById('module-verzeichnis').style.display = 'none';
-      document.getElementById('module-az-generator').style.display = 'none';
+    // Navigation umschalten
+    function switchModule(moduleId) {
+      document.getElementById('module-verzeichnis').style.display = moduleId === 'verzeichnis' ? 'block' : 'none';
+      document.getElementById('module-az-generator').style.display = moduleId === 'az-generator' ? 'block' : 'none';
       
-      document.getElementById(`module-${moduleId}`).style.display = 'block';
-      
-      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-      element.classList.add('active');
+      document.getElementById('link-verzeichnis').classList.toggle('active', moduleId === 'verzeichnis');
+      document.getElementById('link-az').classList.toggle('active', moduleId === 'az-generator');
     }
 
-    // Google Sheets CSV einlesen
+    // Google Sheets sauber laden & parsen
     async function loadGoogleSheet() {
       try {
         const response = await fetch(CSV_URL);
-        if (!response.ok) throw new Error('Netzwerk-Fehler beim Abruf');
-        const data = await response.text();
+        if (!response.ok) throw new Error('Proxy-Fehler beim Abruf');
+        const text = await response.text();
         
-        // CSV Zeilen parsen
-        const rows = data.split('\n').map(row => parseCSVRow(row));
+        // Zeilen parsen
+        const rows = text.split('\n').map(row => parseCSVRow(row));
         if (rows.length === 0) return;
 
-        const headers = rows[0];
-        employeeData = rows.slice(1).filter(row => row.length > 1 && row[0].trim() !== "");
+        // Header zuweisen (Entfernt Anführungszeichen)
+        headers = rows[0].map(h => h.replace(/^"|"$/g, '').trim());
+        
+        // Datenzeilen filtern (Keine leeren Zeilen)
+        employeeData = rows.slice(1)
+          .map(row => row.map(cell => cell.replace(/^"|"$/g, '').trim()))
+          .filter(row => row.length > 1 && row[0] !== "");
 
-        // Header bauen
+        // Setze Headers in die HTML Tabelle + Extra Spalte für Aktionen
         const headerRow = document.getElementById('table-headers');
-        headerRow.innerHTML = headers.map(h => `<th>${h.replace(/"/g, '')}</th>`).join('');
+        headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('') + `<th>Aktion</th>`;
 
-        // Tabelle befüllen
         renderTable(employeeData);
-        document.getElementById('sheet-status').innerText = "Live-Daten erfolgreich geladen";
+        document.getElementById('sheet-status').innerText = "Personalblatt erfolgreich synchronisiert";
       } catch (error) {
         console.error(error);
-        document.getElementById('table-body').innerHTML = `<tr><td class="loading-status" style="color: #ef4444;">Fehler beim Laden der Live-Daten. Stelle sicher, dass die Tabelle freigegeben ist.</td></tr>`;
+        document.getElementById('table-body').innerHTML = `<tr><td class="loading-status" style="color: #ef4444;">Fehler beim Laden! Bitte prüfe, ob die Google Tabelle auf 'Jeder der den Link hat: Betrachter' steht.</td></tr>`;
       }
     }
 
-    // Hilfsfunktion für sauberes CSV Parsing (beachtet Anführungszeichen)
+    // Erweitertes CSV-Parsing für Google Sheets (Berücksichtigt Kommas innerhalb von Anführungszeichen)
     function parseCSVRow(text) {
       let p = '', r = [];
       let q = false;
@@ -464,18 +498,21 @@
       return r;
     }
 
+    // Tabelle rendern
     function renderTable(data) {
       const tbody = document.getElementById('table-body');
-      if(data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="loading-status">Keine passenden Einträge gefunden.</td></tr>`;
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${headers.length + 1}" class="loading-status">Keine passenden Agenten gefunden.</td></tr>`;
         return;
       }
-      tbody.innerHTML = data.map(row => {
-        return `<tr>${row.map(cell => `<td>${cell.replace(/"/g, '')}</td>`).join('')}</tr>`;
+
+      tbody.innerHTML = data.map((row, index) => {
+        const rowCells = row.map(cell => `<td>${cell}</td>`).join('');
+        return `<tr class="clickable-row" onclick="selectEmployee(${index})">${rowCells}<td><span class="action-badge">Auswählen</span></td></tr>`;
       }).join('');
     }
 
-    // Live-Filter für die Suchleiste
+    // Such-Filter (Durchsucht alle Spalten)
     function filterTable() {
       const searchVal = document.getElementById('search-input').value.toLowerCase();
       const filtered = employeeData.filter(row => {
@@ -484,7 +521,26 @@
       renderTable(filtered);
     }
 
-    /* --- DOKUMENTEN GENERATOR LOGIK --- */
+    // Automatische Übernahme in den AZ-Generator bei Klick auf eine Zeile
+    function selectEmployee(index) {
+      const row = employeeData[index];
+      
+      // Suche dynamisch nach den richtigen Spaltennamen in deinem Google Sheet
+      const nameIndex = headers.findIndex(h => h.toLowerCase().includes('name'));
+      const idIndex = headers.findIndex(h => h.toLowerCase().includes('id') || h.toLowerCase().includes('pass') || h.toLowerCase().includes('nummer'));
+      const rangIndex = headers.findIndex(h => h.toLowerCase().includes('rang') || h.toLowerCase().includes('dienstgrad'));
+
+      // Werte eintragen falls Spalte gefunden, sonst Standard-Fallback
+      if (nameIndex !== -1) document.getElementById('f-name').value = row[nameIndex];
+      if (idIndex !== -1) document.getElementById('f-pass').value = row[idIndex];
+      if (rangIndex !== -1) document.getElementById('f-rang').value = row[rangIndex];
+
+      // Formular-Vorschau aktualisieren und zum Generator springen
+      updateAZPreview();
+      switchModule('az-generator');
+    }
+
+    /* --- ARBEITSZEUGNIS LOGIK --- */
     function updateAZPreview() {
       const name = document.getElementById('f-name').value || '__________';
       const pass = document.getElementById('f-pass').value || '__________';
@@ -510,16 +566,16 @@
 
     function copyTextToClipboard() {
       navigator.clipboard.writeText(document.getElementById('live-az-preview').innerText).then(() => {
-        alert('Arbeitszeugnis erfolgreich kopiert!');
+        alert('Arbeitszeugnis erfolgreich in die Zwischenablage kopiert!');
       });
     }
 
-    // Event Listener initialisieren
+    // Inputs überwachen
     ['f-name', 'f-pass', 'f-rang', 'f-date', 'f-link'].forEach(id => {
       document.getElementById(id).addEventListener('input', updateAZPreview);
     });
 
-    // Start-Aktionen
+    // Initialisierung beim Start
     updateAZPreview();
     loadGoogleSheet();
   </script>
