@@ -90,6 +90,9 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 .abtitle{font-size:10px;color:var(--bl);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--gd);}
 @media(max-width:768px){.sb{width:46px;}.ni span,.nl,.sb-title,.sb-sub{display:none;}.sb-emblem{width:30px;height:30px;font-size:10px;}.sb-logo{padding:7px 4px;}.srow{grid-template-columns:1fr 1fr;}.mg{grid-template-columns:1fr;}.ir{grid-template-columns:1fr;}.ir3{grid-template-columns:1fr 1fr;}.topbar-brand{font-size:9px;letter-spacing:.05em;}}
+.tpl-tab{opacity:.6;transition:.15s;}
+.tpl-tab:hover{opacity:1;}
+.act-tab{opacity:1;background:var(--gg)!important;border-color:var(--g)!important;}
 </style>
 </head>
 <body>
@@ -118,6 +121,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <div class="ni" onclick="sv('pa',this)"><i class="ti ti-id-badge"></i><span>Personalakte</span></div>
   </div>
   <div class="nv"><div class="nl">System</div>
+    <div class="ni" onclick="sv('tpl',this)"><i class="ti ti-template"></i><span>Vorlagen-Editor</span></div>
     <div class="ni" onclick="sv('cfg',this)"><i class="ti ti-settings"></i><span>Einstellungen</span></div>
   </div>
 </div>
@@ -332,9 +336,6 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div><div class="fl">Rang</div><input class="fi" id="az-rang" placeholder="z.B. 17. Commander" oninput="upAz()"></div>
       <div><div class="fl">Datum der Kundigung</div><input class="fi" type="date" id="az-datum" oninput="upAz()"></div>
     </div>
-    <div style="margin-bottom:11px;"><div class="fl">Abteilungen / Notizen (optional)</div>
-      <input class="fi" id="az-abt" placeholder="z.B. CIRG, Human Resources ..." oninput="upAz()">
-    </div>
     <div class="pl">Vorschau -- Discord-Nachricht</div>
     <div class="ob" id="az-pre" style="min-height:90px;">Felder ausfullen ...</div>
     <div class="brow">
@@ -410,6 +411,53 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div class="pl">Vorschau</div>
       <div class="ob" id="pa-pre" style="min-height:80px;">Felder ausfullen ...</div>
       <div class="brow"><button class="btn" onclick="cp('pa-pre')"><i class="ti ti-copy"></i> Kurzformat kopieren</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- VORLAGEN-EDITOR -->
+<div class="view" id="v-tpl">
+  <div class="mh"><h1>Vorlagen-Editor</h1><div class="badge">ALLE MODULE</div></div>
+  <div style="font-size:11px;color:var(--mu);background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;line-height:1.8;">
+    Passe den kompletten Nachrichtentext jedes Moduls frei an. Verwende Platzhalter die automatisch ersetzt werden:<br>
+    <span style="color:var(--g)">{dn}</span> Dienstnummer &nbsp;·&nbsp;
+    <span style="color:var(--g)">{name}</span> Name &nbsp;·&nbsp;
+    <span style="color:var(--g)">{rang}</span> Rang &nbsp;·&nbsp;
+    <span style="color:var(--g)">{datum}</span> Heutiges Datum &nbsp;·&nbsp;
+    <span style="color:var(--g)">{grund}</span> Begründung &nbsp;·&nbsp;
+    <span style="color:var(--g)">{abteilung}</span> Abteilung &nbsp;·&nbsp;
+    <span style="color:var(--g)">{alter_rang}</span> Alter Rang &nbsp;·&nbsp;
+    <span style="color:var(--g)">{neuer_rang}</span> Neuer Rang &nbsp;·&nbsp;
+    <span style="color:var(--g)">{pass}</span> Reisepassnr. &nbsp;·&nbsp;
+    <span style="color:var(--g)">{absender}</span> Absender-Zeile &nbsp;·&nbsp;
+    <span style="color:var(--g)">{sanktion}</span> Sanktionsart &nbsp;·&nbsp;
+    <span style="color:var(--g)">{eintritt}</span> Eintrittsdatum
+  </div>
+
+  <!-- TAB-LEISTE -->
+  <div style="display:flex;gap:4px;flex-wrap:wrap;" id="tpl-tabs">
+    <button class="btn sm tpl-tab act-tab" onclick="showTplTab('rang',this)"><i class="ti ti-award"></i> Ranganpassung</button>
+    <button class="btn sm tpl-tab" onclick="showTplTab('ein',this)"><i class="ti ti-user-plus"></i> Einstellung</button>
+    <button class="btn sm tpl-tab" onclick="showTplTab('kue',this)"><i class="ti ti-user-minus"></i> Kündigung</button>
+    <button class="btn sm tpl-tab" onclick="showTplTab('az',this)"><i class="ti ti-file-certificate"></i> AZ-System</button>
+    <button class="btn sm tpl-tab" onclick="showTplTab('san',this)"><i class="ti ti-gavel"></i> Sanktion</button>
+    <button class="btn sm tpl-tab" onclick="showTplTab('pa',this)"><i class="ti ti-id-badge"></i> Personalakte</button>
+  </div>
+
+  <div class="pan">
+    <div class="pan-h" id="tpl-pan-title">
+      <div class="pan-t">[ Ranganpassung — Vorlage bearbeiten ]</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn sm ng" onclick="resetTpl(curTplKey)"><i class="ti ti-refresh"></i> Standard</button>
+        <button class="btn sm ok" onclick="saveTpl()"><i class="ti ti-device-floppy"></i> Speichern</button>
+      </div>
+    </div>
+    <div class="pan-b">
+      <div class="fl" style="margin-bottom:5px;">Vorlagentext — frei bearbeitbar</div>
+      <textarea class="fi" id="tpl-editor" rows="14" style="resize:vertical;font-size:12px;line-height:1.8;font-family:'Courier New',monospace;" oninput="updateTplPreview()"></textarea>
+      <div class="pl" style="margin-top:12px;">Live-Vorschau (mit Beispieldaten)</div>
+      <div class="ob" id="tpl-preview" style="min-height:80px;"></div>
+      <div class="hint">Änderungen werden beim Klick auf "Speichern" gesichert und sofort in das Modul übernommen. "Standard" setzt diese Vorlage auf den Originaltext zurück.</div>
     </div>
   </div>
 </div>
@@ -738,35 +786,6 @@ function fillFromMA(pfx){
   const fns={ra:upRa,ku:upKu,az:upAz,sa:upSa,pa:upPa};if(fns[pfx])fns[pfx]();
 }
 
-// --- PREVIEWS ---
-function upRa(){
-  const dn=gv('ra-dn')||'XX',n=gv('ra-name')||'Name',o=gv('ra-old')||'Alter Rang',nw=gv('ra-new')||'Neuer Rang',g=gv('ra-grund')||'--';
-  setOb('ra-pre',`-# Ranganpassung . FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${n}\n**Von:** ${o}\n**Nach:** ${nw}\n**Datum:** ${gd()}\n**Begruendung:** ${g}${absLine('rang')}\n\n-# GrandRP DE01 . FIB`);
-}
-function upEs(){
-  const dn=gv('es-dn')||'XX',n=gv('es-name')||'Name',a=gv('es-abt')||'Abteilung',r=gv('es-rang')||'Rang';
-  setOb('es-pre',`-# Einstellung . FIB Personalabteilung\n\n**Dienstnummer:** ${dn}\n**Name:** ${n}\n**Rang:** ${r}\n**Abteilung:** @${a}\n**Einstellungsdatum:** ${gd()}\n\nWillkommen im Federal Investigation Bureau!${absLine('ein')}\n\n-# GrandRP DE01 . FIB`);
-}
-function upKu(){
-  const dn=gv('ku-dn')||'XX',n=gv('ku-name')||'Name',r=gv('ku-rang')||'--',g=gv('ku-grund')||'--';
-  setOb('ku-pre',`-# Kuendigung . FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${n}\n**Rang:** ${r}\n**Datum:** ${gd()}\n**Grund:** ${g}\n\nDer Mitarbeiter wird mit sofortiger Wirkung aus dem Dienst entlassen.${absLine('kue')}\n\n-# GrandRP DE01 . FIB`);
-}
-function upAz(){
-  const n=gv('az-name')||'Vor- u. Nachname',p=gv('az-pass')||'--',r=gv('az-rang')||'--',a=gv('az-abt'),d=fmtD(gv('az-datum'))||'--';
-  let msg=`Das Federal Investigation Bureau (FIB),\nuebermittelt hiermit das Arbeitszeugnis von:\n\n**Vor- u. Nachname:** ${n}\n**Reisepassnr.:** ${p}\n**Rang:** ${r}\n**Datum der Kuendigung:** ${d}`;
-  if(a&&a.trim())msg+=`\n**Abteilungen:** ${a}`;
-  msg+=`\n\n(Arbeitszeugnis wird als Anhang beigefuegt)${absLine('az')}\n\n-# GrandRP DE01 . FIB Personalabteilung`;
-  setOb('az-pre',msg);
-}
-function upSa(){
-  const dn=gv('sa-dn')||'XX',n=gv('sa-name')||'Name',a=gv('sa-art')||'--',g=gv('sa-grund')||'--';
-  setOb('sa-pre',`-# Sanktion . FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${n}\n**Sanktionsart:** ${a}\n**Datum:** ${gd()}\n**Begruendung:** ${g}${absLine('san')}\n\n-# GrandRP DE01 . FIB`);
-}
-function upPa(){
-  const dn=gv('pa-dn')||'XX',n=gv('pa-name')||'Name',r=gv('pa-rang')||'--',a=gv('pa-abt')||'--',d=fmtD(gv('pa-datum'))||gd();
-  setOb('pa-pre',`-# Personalakte . FIB\n\n**Dienstnummer:** ${dn}\n**Name:** ${n}\n**Rang:** ${r}\n**Abteilung:** ${a}\n**Eintrittsdatum:** ${d}\n**Strike:** 0/3\n**Status:** Aktiv${absLine('pa')}\n\n-# GrandRP DE01 . Federal Investigation Bureau`);
-}
-
 // --- UTILS ---
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 function cp(id){const e=document.getElementById(id);if(!e)return;navigator.clipboard.writeText(e.textContent).then(()=>showToast('In Zwischenablage kopiert')).catch(()=>{});}
@@ -791,11 +810,114 @@ function tick(){
   ['clk','bclk'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=s;});
 }
 
+// ===================== VORLAGEN-EDITOR =====================
+const TPL_DEFAULTS = {
+  rang: `-# Ranganpassung . FIB Personalabteilung\n\n**Mitarbeiter:** {dn} | {name}\n**Von:** {alter_rang}\n**Nach:** {neuer_rang}\n**Datum:** {datum}\n**Begruendung:** {grund}{absender}`,
+  ein:  `-# Einstellung . FIB Personalabteilung\n\n**Dienstnummer:** {dn}\n**Name:** {name}\n**Rang:** {rang}\n**Abteilung:** @{abteilung}\n**Einstellungsdatum:** {datum}\n\nWillkommen im Federal Investigation Bureau!{absender}`,
+  kue:  `-# Kuendigung . FIB Personalabteilung\n\n**Mitarbeiter:** {dn} | {name}\n**Rang:** {rang}\n**Datum:** {datum}\n**Grund:** {grund}\n\nDer Mitarbeiter wird mit sofortiger Wirkung aus dem Dienst entlassen.{absender}`,
+  az:   `Das Federal Investigation Bureau (FIB),\nuebermittelt hiermit das Arbeitszeugnis von:\n\n**Vor- u. Nachname:** {name}\n**Reisepassnr.:** {pass}\n**Rang:** {rang}\n**Datum der Kuendigung:** {datum}\n\n(Arbeitszeugnis wird als Anhang beigefuegt){absender}`,
+  san:  `-# Sanktion . FIB Personalabteilung\n\n**Mitarbeiter:** {dn} | {name}\n**Sanktionsart:** {sanktion}\n**Datum:** {datum}\n**Begruendung:** {grund}{absender}`,
+  pa:   `-# Personalakte . FIB\n\n**Dienstnummer:** {dn}\n**Name:** {name}\n**Rang:** {rang}\n**Abteilung:** {abteilung}\n**Eintrittsdatum:** {eintritt}\n**Strike:** 0/3\n**Status:** Aktiv{absender}`,
+};
+const TPL_LABELS = {rang:'Ranganpassung',ein:'Einstellung',kue:'Kündigung',az:'AZ-System',san:'Sanktion',pa:'Personalakte'};
+const TPL_SAMPLE = {dn:'42',name:'Max Mustermann',rang:'17. Commander',alter_rang:'16. Lieutenant Commander',neuer_rang:'17. Commander',datum:gd(),grund:'Herausragende Leistungen im Dienst',abteilung:'Human Resources',pass:'99999',sanktion:'Schriftliche Verwarnung',eintritt:gd(),absender:''};
+
+function loadTpls(){try{const d=localStorage.getItem('fib_tpl');if(d)return JSON.parse(d);}catch(e){}return {};}
+function saveTpls(t){try{localStorage.setItem('fib_tpl',JSON.stringify(t));}catch(e){}}
+
+let TPLS = loadTpls();
+let curTplKey = 'rang';
+
+function getTpl(key){return TPLS[key]!==undefined ? TPLS[key] : TPL_DEFAULTS[key];}
+
+function showTplTab(key, btn){
+  curTplKey = key;
+  document.querySelectorAll('.tpl-tab').forEach(b=>b.classList.remove('act-tab'));
+  if(btn) btn.classList.add('act-tab');
+  const lbl = TPL_LABELS[key]||key;
+  const title = document.getElementById('tpl-pan-title');
+  if(title) title.querySelector('.pan-t').textContent = '[ '+lbl+' — Vorlage bearbeiten ]';
+  const ed = document.getElementById('tpl-editor');
+  if(ed){ ed.value = getTpl(key); updateTplPreview(); }
+}
+
+function applyTplVars(tpl, vars){
+  return tpl.replace(/\{(\w+)\}/g, (_,k)=> vars[k]!==undefined ? vars[k] : '{'+k+'}');
+}
+
+function updateTplPreview(){
+  const ed = document.getElementById('tpl-editor');
+  const pre = document.getElementById('tpl-preview');
+  if(!ed||!pre) return;
+  const sample = {...TPL_SAMPLE};
+  // get real absender if filled
+  const absN = gv('abs-rang-name')||gv('cfg-name')||'';
+  const absR = gv('abs-rang-rang')||gv('cfg-rang')||'';
+  const absA = gv('abs-rang-abt')||gv('cfg-abt')||'';
+  const parts=[];if(absR)parts.push(absR);if(absN)parts.push(absN);if(absA)parts.push('| '+absA);
+  sample.absender = parts.length ? '\n\n-# Ausgestellt von: '+parts.join(' ') : '';
+  pre.textContent = applyTplVars(ed.value, sample);
+}
+
+function saveTpl(){
+  const ed = document.getElementById('tpl-editor');
+  if(!ed) return;
+  TPLS[curTplKey] = ed.value;
+  saveTpls(TPLS);
+  showToast('Vorlage "'+TPL_LABELS[curTplKey]+'" gespeichert');
+  // re-trigger previews so live modules update
+  [upRa,upEs,upKu,upAz,upSa,upPa].forEach(f=>f());
+}
+
+function resetTpl(key){
+  if(!confirm('Vorlage "'+TPL_LABELS[key]+'" auf Standard zurücksetzen?')) return;
+  delete TPLS[key];
+  saveTpls(TPLS);
+  const ed = document.getElementById('tpl-editor');
+  if(ed){ ed.value = TPL_DEFAULTS[key]; updateTplPreview(); }
+  showToast('Standard wiederhergestellt');
+  [upRa,upEs,upKu,upAz,upSa,upPa].forEach(f=>f());
+}
+
+// ---- Override preview functions to use custom templates ----
+function renderTpl(key, vars){
+  const tpl = getTpl(key);
+  return applyTplVars(tpl, vars);
+}
+
+function upRa(){
+  const vars={dn:gv('ra-dn')||'XX',name:gv('ra-name')||'Name',alter_rang:gv('ra-old')||'Alter Rang',neuer_rang:gv('ra-new')||'Neuer Rang',datum:gd(),grund:gv('ra-grund')||'--',rang:gv('ra-old')||'--',abteilung:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine('rang')};
+  setOb('ra-pre', renderTpl('rang',vars).trimEnd());
+}
+function upEs(){
+  const vars={dn:gv('es-dn')||'XX',name:gv('es-name')||'Name',rang:gv('es-rang')||'Rang',abteilung:gv('es-abt')||'Abteilung',datum:gd(),grund:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine('ein')};
+  setOb('es-pre', renderTpl('ein',vars).trimEnd());
+}
+function upKu(){
+  const vars={dn:gv('ku-dn')||'XX',name:gv('ku-name')||'Name',rang:gv('ku-rang')||'--',datum:gd(),grund:gv('ku-grund')||'--',abteilung:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine('kue')};
+  setOb('ku-pre', renderTpl('kue',vars).trimEnd());
+}
+function upAz(){
+  const vars={name:gv('az-name')||'Vor- u. Nachname',pass:gv('az-pass')||'--',rang:gv('az-rang')||'--',datum:fmtD(gv('az-datum'))||'--',dn:'--',abteilung:'--',grund:'--',alter_rang:'--',neuer_rang:'--',sanktion:'--',eintritt:gd(),absender:absLine('az')};
+  setOb('az-pre', renderTpl('az',vars).trimEnd());
+}
+function upSa(){
+  const vars={dn:gv('sa-dn')||'XX',name:gv('sa-name')||'Name',sanktion:gv('sa-art')||'--',datum:gd(),grund:gv('sa-grund')||'--',rang:'--',abteilung:'--',alter_rang:'--',neuer_rang:'--',pass:'--',eintritt:gd(),absender:absLine('san')};
+  setOb('sa-pre', renderTpl('san',vars).trimEnd());
+}
+function upPa(){
+  const vars={dn:gv('pa-dn')||'XX',name:gv('pa-name')||'Name',rang:gv('pa-rang')||'--',abteilung:gv('pa-abt')||'--',eintritt:fmtD(gv('pa-datum'))||gd(),datum:gd(),grund:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',absender:absLine('pa')};
+  setOb('pa-pre', renderTpl('pa',vars).trimEnd());
+}
+// ============================================================
+
 // INIT
 try{const c=localStorage.getItem('fib_color');if(c){setCol(c);document.getElementById('colpick').value=c;}}catch(e){}
 tick();setInterval(tick,1000);
 fillSelects();buildMA();loadAbsIntoFields();
 [upAz,upRa,upEs,upKu,upSa,upPa].forEach(f=>f());
+// init template editor
+showTplTab('rang', document.querySelector('.tpl-tab'));
 </script>
 </body>
 </html>
