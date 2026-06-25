@@ -7,729 +7,795 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --g:#c9a84c;--gd:rgba(201,168,76,0.45);--gg:rgba(201,168,76,0.10);
-  --bg:#0a0c10;--p1:#10141c;--p2:#161b26;--bd:#1e2a3a;
-  --tx:#e8e4d8;--mu:#7a8490;--gr:#2ecc71;--re:#e74c3c;
-}
+:root{--g:#c9a84c;--gd:rgba(201,168,76,0.45);--gg:rgba(201,168,76,0.10);--bg:#0a0c10;--p1:#10141c;--p2:#161b26;--bd:#1e2a3a;--tx:#e8e4d8;--mu:#7a8490;--gr:#2ecc71;--re:#e74c3c;--bl:#3a8fd4;}
 html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;font-size:13px;color:var(--tx);}
-/* LAYOUT */
 .root{display:flex;flex-direction:column;height:100vh;}
-.topbar{background:var(--p1);border-bottom:1px solid var(--gd);padding:8px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar{background:var(--p1);border-bottom:1px solid var(--gd);padding:7px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .topbar-brand{color:var(--g);font-size:11px;letter-spacing:.14em;font-weight:bold;}
 .topbar-right{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--mu);}
-.dot-green{display:inline-block;width:7px;height:7px;background:var(--gr);border-radius:50%;margin-right:4px;}
+.dg{display:inline-block;width:7px;height:7px;background:var(--gr);border-radius:50%;margin-right:4px;}
 .layout{display:flex;flex:1;overflow:hidden;}
-/* SIDEBAR */
-.sb{width:190px;background:var(--p1);border-right:1px solid var(--bd);flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto;}
-.sb-logo{text-align:center;padding:16px 10px 14px;border-bottom:1px solid var(--bd);}
-.sb-emblem{width:46px;height:46px;border:2px solid var(--g);border-radius:50%;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;color:var(--g);}
-.sb-title{font-size:13px;color:var(--g);font-weight:bold;letter-spacing:.1em;}
+.sb{width:192px;background:var(--p1);border-right:1px solid var(--bd);flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto;}
+.sb-logo{text-align:center;padding:14px 10px 12px;border-bottom:1px solid var(--bd);}
+.sb-emblem{width:44px;height:44px;border:2px solid var(--g);border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:bold;color:var(--g);}
+.sb-title{font-size:12px;color:var(--g);font-weight:bold;letter-spacing:.1em;}
 .sb-sub{font-size:10px;color:var(--mu);margin-top:2px;}
-.nav-g{padding:6px 0;}
-.nav-lbl{font-size:10px;color:var(--mu);letter-spacing:.12em;padding:5px 14px;text-transform:uppercase;}
-.ni{padding:7px 14px;cursor:pointer;font-size:12px;color:var(--mu);display:flex;align-items:center;gap:9px;border-left:2px solid transparent;transition:.15s;user-select:none;}
+.nv{padding:5px 0;}.nl{font-size:10px;color:var(--mu);letter-spacing:.12em;padding:4px 13px;text-transform:uppercase;}
+.ni{padding:7px 13px;cursor:pointer;font-size:12px;color:var(--mu);display:flex;align-items:center;gap:8px;border-left:2px solid transparent;transition:.15s;user-select:none;}
 .ni:hover,.ni.act{color:var(--g);background:var(--gg);border-left-color:var(--g);}
-.ni i{font-size:15px;opacity:.75;}
-/* MAIN */
-.main{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px;}
-.mh{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);padding-bottom:10px;}
-.mh h1{font-size:17px;color:var(--g);letter-spacing:.05em;}
-.badge{background:var(--gg);border:1px solid var(--gd);color:var(--g);font-size:10px;padding:3px 9px;border-radius:3px;letter-spacing:.08em;}
-.view{display:none;flex-direction:column;gap:14px;}
-.view.act{display:flex;}
-/* STATS */
-.srow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.sc{background:var(--p1);border:1px solid var(--bd);border-radius:5px;padding:12px 14px;position:relative;overflow:hidden;}
+.ni i{font-size:14px;opacity:.75;}
+.main{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:13px;}
+.mh{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);padding-bottom:9px;}
+.mh h1{font-size:16px;color:var(--g);letter-spacing:.05em;}
+.badge{background:var(--gg);border:1px solid var(--gd);color:var(--g);font-size:10px;padding:2px 8px;border-radius:3px;letter-spacing:.08em;}
+.view{display:none;flex-direction:column;gap:13px;}.view.act{display:flex;}
+.srow{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
+.sc{background:var(--p1);border:1px solid var(--bd);border-radius:5px;padding:11px 13px;position:relative;overflow:hidden;}
 .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gd);}
-.sc .lbl{font-size:10px;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
-.sc .val{font-size:20px;color:var(--g);font-weight:bold;}
-.sc .sub{font-size:10px;color:var(--mu);margin-top:3px;}
-/* PANEL */
+.sc .lbl{font-size:10px;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+.sc .val{font-size:19px;color:var(--g);font-weight:bold;}
+.sc .sub{font-size:10px;color:var(--mu);margin-top:2px;}
 .pan{background:var(--p1);border:1px solid var(--bd);border-radius:6px;overflow:hidden;}
 .pan.gold{border-color:var(--gd);}
-.pan-h{background:var(--p2);border-bottom:1px solid var(--bd);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;}
-.pan-h.gold{background:rgba(201,168,76,0.07);border-bottom-color:var(--gd);}
+.pan-h{background:var(--p2);border-bottom:1px solid var(--bd);padding:7px 13px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px;}
+.pan-h.gold{background:rgba(201,168,76,0.06);border-bottom-color:var(--gd);}
 .pan-t{color:var(--g);font-size:11px;letter-spacing:.1em;text-transform:uppercase;}
-.pan-b{padding:14px;}
-/* TABLE */
+.pan-b{padding:13px;}
 .tbl{width:100%;border-collapse:collapse;font-size:11px;}
-.tbl th{font-size:10px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--bd);padding:6px 8px;text-align:left;}
-.tbl td{padding:7px 8px;border-bottom:1px solid rgba(30,42,58,.4);color:var(--tx);vertical-align:middle;}
+.tbl th{font-size:10px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--bd);padding:5px 7px;text-align:left;white-space:nowrap;}
+.tbl td{padding:6px 7px;border-bottom:1px solid rgba(30,42,58,.4);color:var(--tx);vertical-align:middle;}
 .tbl tr:hover td{background:var(--gg);}
-.rb{display:inline-block;font-size:10px;padding:1px 7px;border-radius:2px;white-space:nowrap;}
+.rb{display:inline-block;font-size:10px;padding:1px 6px;border-radius:2px;white-space:nowrap;}
 .rh{background:rgba(201,168,76,.12);color:var(--g);border:1px solid var(--gd);}
 .rm{background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.3);}
 .rl{background:rgba(122,132,144,.15);color:var(--mu);border:1px solid var(--bd);}
-/* INPUTS */
-.fi{background:var(--p2);border:1px solid var(--bd);color:var(--tx);font-family:'Courier New',monospace;font-size:12px;padding:7px 10px;border-radius:3px;width:100%;transition:.15s;outline:none;}
+.fi{background:var(--p2);border:1px solid var(--bd);color:var(--tx);font-family:'Courier New',monospace;font-size:12px;padding:6px 9px;border-radius:3px;width:100%;transition:.15s;outline:none;}
 .fi:focus{border-color:var(--gd);}
 .fi::placeholder{color:var(--mu);}
-.ir{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-.fl{font-size:10px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;}
-/* OUTPUT */
-.ob{background:#050709;border:1px solid var(--bd);border-radius:3px;padding:10px 13px;font-size:11px;color:#8fb3d4;line-height:1.8;white-space:pre-wrap;min-height:60px;position:relative;}
-.pl{font-size:10px;color:var(--gd);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
-.pl::before{content:'› ';color:var(--g);}
-/* BUTTONS */
-.btn{font-size:11px;padding:5px 10px;border:1px solid var(--gd);background:transparent;color:var(--g);border-radius:3px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:.04em;transition:.15s;display:inline-flex;align-items:center;gap:5px;}
+.fi.bl:focus{border-color:rgba(58,143,212,.6);}
+.ir{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px;}
+.ir3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:9px;}
+.fl{font-size:10px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;}
+.fl.b{color:var(--bl);}
+.ob{background:#050709;border:1px solid var(--bd);border-radius:3px;padding:9px 12px;font-size:11px;color:#8fb3d4;line-height:1.8;white-space:pre-wrap;min-height:55px;}
+.pl{font-size:10px;color:var(--gd);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.pl::before{content:'> ';color:var(--g);}
+.btn{font-size:11px;padding:4px 10px;border:1px solid var(--gd);background:transparent;color:var(--g);border-radius:3px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:.04em;transition:.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
 .btn:hover{background:var(--gg);}
-.btn.success{color:var(--gr);border-color:rgba(46,204,113,.35);}
-.btn.success:hover{background:rgba(46,204,113,.08);}
-.btn.danger{color:var(--re);border-color:rgba(231,76,60,.3);}
-.btn.sm{font-size:10px;padding:3px 8px;}
-.brow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
-.hint{font-size:10px;color:var(--mu);margin-top:6px;line-height:1.6;}
-/* SEARCH */
-.search-wrap{position:relative;}
-.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--mu);pointer-events:none;}
-.search-inp{padding-left:32px!important;}
-/* MODULES GRID */
-.mg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.mc{background:var(--p2);border:1px solid var(--bd);border-radius:5px;padding:13px;cursor:pointer;transition:.15s;}
+.btn.ok{color:var(--gr);border-color:rgba(46,204,113,.35);}.btn.ok:hover{background:rgba(46,204,113,.08);}
+.btn.ng{color:var(--re);border-color:rgba(231,76,60,.3);}.btn.ng:hover{background:rgba(231,76,60,.08);}
+.btn.bl{color:var(--bl);border-color:rgba(58,143,212,.35);}.btn.bl:hover{background:rgba(58,143,212,.08);}
+.btn.sm{font-size:10px;padding:3px 7px;}
+.brow{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;}
+.hint{font-size:10px;color:var(--mu);margin-top:5px;line-height:1.6;}
+.sw{position:relative;}.sw i{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--mu);pointer-events:none;}
+.si{padding-left:30px!important;}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.mc{background:var(--p2);border:1px solid var(--bd);border-radius:5px;padding:12px;cursor:pointer;transition:.15s;}
 .mc:hover{border-color:var(--gd);background:var(--gg);}
-.mc .mt{font-size:12px;color:var(--g);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
-.mc .mt i{font-size:15px;}
-.mc .md{font-size:11px;color:var(--mu);}
-.mc .ma{margin-top:9px;display:flex;gap:6px;}
-/* PAGINATION */
-.pgr{display:flex;align-items:center;gap:5px;justify-content:center;padding:10px 0 4px;}
-.pgr button{font-size:10px;padding:3px 8px;border:1px solid var(--bd);background:transparent;color:var(--mu);border-radius:3px;cursor:pointer;font-family:monospace;transition:.12s;}
-.pgr button.cur{border-color:var(--g);color:var(--g);}
-.pgr button:hover{border-color:var(--gd);color:var(--g);}
-/* BOTTOM */
+.mc .mt{font-size:12px;color:var(--g);margin-bottom:3px;display:flex;align-items:center;gap:5px;}
+.mc .mt i{font-size:14px;}.mc .md{font-size:11px;color:var(--mu);}.mc .ma{margin-top:8px;display:flex;gap:5px;}
+.pgr{display:flex;align-items:center;gap:5px;justify-content:center;padding:9px 0 3px;}
+.pgr button{font-size:10px;padding:2px 7px;border:1px solid var(--bd);background:transparent;color:var(--mu);border-radius:3px;cursor:pointer;font-family:monospace;transition:.12s;}
+.pgr button.cur{border-color:var(--g);color:var(--g);}.pgr button:hover{border-color:var(--gd);color:var(--g);}
 .bottombar{background:var(--p1);border-top:1px solid var(--gd);padding:5px 18px;display:flex;align-items:center;justify-content:space-between;font-size:10px;flex-shrink:0;}
-.bottombar .bl{color:var(--mu);display:flex;align-items:center;gap:5px;}
-/* COPY TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--p2);border:1px solid var(--gd);color:var(--g);font-size:12px;padding:8px 16px;border-radius:4px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+.bottombar .bl2{color:var(--mu);display:flex;align-items:center;gap:5px;}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--p2);border:1px solid var(--gd);color:var(--g);font-size:12px;padding:7px 14px;border-radius:4px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
 .toast.show{opacity:1;}
-/* SCROLLBAR */
-::-webkit-scrollbar{width:5px;height:5px;}
-::-webkit-scrollbar-track{background:var(--bg);}
-::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
-::-webkit-scrollbar-thumb:hover{background:var(--gd);}
-/* RESPONSIVE */
-@media(max-width:768px){
-  .sb{width:48px;}
-  .ni span,.nav-lbl,.sb-title,.sb-sub{display:none;}
-  .sb-emblem{width:32px;height:32px;font-size:11px;}
-  .sb-logo{padding:8px 4px;}
-  .srow{grid-template-columns:1fr 1fr;}
-  .mg{grid-template-columns:1fr;}
-  .ir{grid-template-columns:1fr;}
-  .topbar-brand{font-size:9px;}
-}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;display:none;align-items:center;justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--p1);border:1px solid var(--gd);border-radius:7px;padding:20px;width:min(620px,96vw);max-height:90vh;overflow-y:auto;}
+.modal h2{color:var(--g);font-size:14px;letter-spacing:.08em;margin-bottom:14px;border-bottom:1px solid var(--bd);padding-bottom:8px;}
+.absbox{background:rgba(58,143,212,0.05);border:1px solid rgba(58,143,212,0.25);border-radius:5px;padding:10px 13px;margin-bottom:12px;}
+.abtitle{font-size:10px;color:var(--bl);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--gd);}
+@media(max-width:768px){.sb{width:46px;}.ni span,.nl,.sb-title,.sb-sub{display:none;}.sb-emblem{width:30px;height:30px;font-size:10px;}.sb-logo{padding:7px 4px;}.srow{grid-template-columns:1fr 1fr;}.mg{grid-template-columns:1fr;}.ir{grid-template-columns:1fr;}.ir3{grid-template-columns:1fr 1fr;}.topbar-brand{font-size:9px;letter-spacing:.05em;}}
 </style>
 </head>
 <body>
 <div class="root">
-
-<!-- TOPBAR -->
 <div class="topbar">
-  <div class="topbar-brand">FEDERAL INVESTIGATION BUREAU ✦ GRANDRP DE01 ✦ PERSONALABTEILUNG</div>
-  <div class="topbar-right">
-    <span class="dot-green"></span>
-    <span id="clk">00:00:00</span>
-  </div>
+  <div class="topbar-brand">FEDERAL INVESTIGATION BUREAU &#10022; GRANDRP DE01 &#10022; PERSONALABTEILUNG</div>
+  <div class="topbar-right"><span class="dg"></span><span id="clk">00:00:00</span></div>
 </div>
-
 <div class="layout">
-
-<!-- SIDEBAR -->
 <div class="sb">
   <div class="sb-logo">
     <div class="sb-emblem">FIB</div>
     <div class="sb-title">Personalabt.</div>
     <div class="sb-sub">GrandRP DE01</div>
   </div>
-  <div class="nav-g">
-    <div class="nav-lbl">Übersicht</div>
+  <div class="nv"><div class="nl">Ubersicht</div>
     <div class="ni act" onclick="sv('dash',this)"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></div>
     <div class="ni" onclick="sv('ma',this)"><i class="ti ti-users"></i><span>Mitarbeiterverz.</span></div>
   </div>
-  <div class="nav-g">
-    <div class="nav-lbl">Module</div>
+  <div class="nv"><div class="nl">Module</div>
     <div class="ni" onclick="sv('rang',this)"><i class="ti ti-award"></i><span>Ranganpassung</span></div>
     <div class="ni" onclick="sv('ein',this)"><i class="ti ti-user-plus"></i><span>Einstellung</span></div>
-    <div class="ni" onclick="sv('kue',this)"><i class="ti ti-user-minus"></i><span>Kündigung</span></div>
+    <div class="ni" onclick="sv('kue',this)"><i class="ti ti-user-minus"></i><span>Kundigung</span></div>
     <div class="ni" onclick="sv('az',this)"><i class="ti ti-file-certificate"></i><span>AZ-System</span></div>
     <div class="ni" onclick="sv('san',this)"><i class="ti ti-gavel"></i><span>Sanktion</span></div>
     <div class="ni" onclick="sv('pa',this)"><i class="ti ti-id-badge"></i><span>Personalakte</span></div>
   </div>
-  <div class="nav-g">
-    <div class="nav-lbl">System</div>
+  <div class="nv"><div class="nl">System</div>
     <div class="ni" onclick="sv('cfg',this)"><i class="ti ti-settings"></i><span>Einstellungen</span></div>
   </div>
 </div>
-
-<!-- MAIN CONTENT -->
 <div class="main">
 
-  <!-- DASHBOARD -->
-  <div class="view act" id="v-dash">
-    <div class="mh"><h1>Personalabteilung</h1><div class="badge">ÜBERSICHT & MODULE</div></div>
-    <div style="font-size:11px;color:var(--mu);display:flex;gap:10px;flex-wrap:wrap;">
-      <span style="color:var(--gr)">›</span> Verbindung herstellen
-      <span style="color:var(--gr)">›</span> Anmeldedaten prüfen
-      <span style="color:var(--gr)">›</span> Zugriff autorisiert
-    </div>
-    <div class="srow">
-      <div class="sc"><div class="lbl">Gesamtstärke</div><div class="val">201</div><div class="sub">Agenten</div></div>
-      <div class="sc"><div class="lbl">Abteilungen</div><div class="val">8</div><div class="sub">Aktiv</div></div>
-      <div class="sc"><div class="lbl">Führungsränge</div><div class="val">8</div><div class="sub">Ränge 28–30</div></div>
-      <div class="sc"><div class="lbl">Status</div><div class="val" style="font-size:14px;color:var(--gr);">ONLINE</div><div class="sub">Verbunden</div></div>
-    </div>
-    <div class="mg">
-      <div class="mc" onclick="sv('rang',null)"><div class="mt"><i class="ti ti-award"></i>Ranganpassung</div><div class="md">Beförderungen & Degradierungen mit Discord-Formatierung</div><div class="ma"><button class="btn sm">› Öffnen</button></div></div>
-      <div class="mc" onclick="sv('ein',null)"><div class="mt"><i class="ti ti-user-plus"></i>Einstellung</div><div class="md">Neue Mitarbeiter aufnehmen mit Rollen-Ping & Vorlage</div><div class="ma"><button class="btn sm">› Öffnen</button></div></div>
-      <div class="mc" onclick="sv('kue',null)"><div class="mt"><i class="ti ti-user-minus"></i>Kündigung</div><div class="md">Entlassungen mit Begründung und aktuellem Datum</div><div class="ma"><button class="btn sm">› Öffnen</button></div></div>
-      <div class="mc" onclick="sv('az',null)" style="border-color:var(--gd);"><div class="mt" style="color:var(--g);"><i class="ti ti-file-certificate"></i>AZ-System</div><div class="md">Arbeitszeugnisse für ausscheidende Mitarbeiter</div><div class="ma"><button class="btn sm" style="border-color:var(--g);">› Öffnen</button></div></div>
-      <div class="mc" onclick="sv('san',null)"><div class="mt"><i class="ti ti-gavel"></i>Sanktion</div><div class="md">Verwarnungen & Sanktionen aus dem Katalog</div><div class="ma"><button class="btn sm">› Öffnen</button></div></div>
-      <div class="mc" onclick="sv('pa',null)"><div class="mt"><i class="ti ti-id-badge"></i>Personalakte-Generator</div><div class="md">Vollständige Personalakten erstellen</div><div class="ma"><button class="btn sm">› Öffnen</button></div></div>
-    </div>
-    <div class="pan">
-      <div class="pan-h"><div class="pan-t">[ Abteilungsübersicht ]</div><button class="btn sm" onclick="sv('ma',null)"><i class="ti ti-external-link"></i> Vollansicht</button></div>
-      <div class="pan-b" style="padding:0;">
-        <table class="tbl">
-          <thead><tr><th>Abteilung</th><th>Mitglieder</th><th>Anteil</th></tr></thead>
-          <tbody>
-            <tr><td>Critical Incident Response Group (CIRG)</td><td>43</td><td style="color:var(--g)">21 %</td></tr>
-            <tr><td>Criminal Investigative Division (CID)</td><td>34</td><td style="color:var(--g)">17 %</td></tr>
-            <tr><td>Corruption Office (CO)</td><td>27</td><td style="color:var(--g)">13 %</td></tr>
-            <tr><td>Human Resources (HR)</td><td>16</td><td style="color:var(--g)">8 %</td></tr>
-            <tr><td>Public Relations (PR)</td><td>10</td><td style="color:var(--g)">5 %</td></tr>
-            <tr><td>Training Division (TD)</td><td>6</td><td style="color:var(--g)">3 %</td></tr>
-            <tr><td>Internal Affairs (IA)</td><td>2</td><td style="color:var(--g)">1 %</td></tr>
-            <tr><td>LAW Department</td><td>1</td><td style="color:var(--g)">&lt; 1 %</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<!-- DASHBOARD -->
+<div class="view act" id="v-dash">
+  <div class="mh"><h1>Personalabteilung</h1><div class="badge">UBERSICHT</div></div>
+  <div style="font-size:11px;color:var(--mu);display:flex;gap:10px;flex-wrap:wrap;">
+    <span style="color:var(--gr)">></span> Verbindung herstellen
+    <span style="color:var(--gr)">></span> Anmeldedaten prufen
+    <span style="color:var(--gr)">></span> Zugriff autorisiert
   </div>
-
-  <!-- MITARBEITERVERZEICHNIS -->
-  <div class="view" id="v-ma">
-    <div class="mh"><h1>Mitarbeiterverzeichnis</h1><div class="badge">201 AGENTEN · 139 ABT.-MITGLIEDER</div></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <div class="search-wrap" style="flex:1;min-width:200px;">
-        <i class="ti ti-search"></i>
-        <input class="fi search-inp" id="ma-search" placeholder="Name, ID, Rang oder Abteilung suchen …" oninput="filterMA()">
-      </div>
-      <select class="fi" id="ma-filter" onchange="filterMA()" style="width:auto;min-width:160px;">
-        <option value="">Alle Divisionen</option>
-        <option>Leaderschaft</option>
-        <option>High Command Lead</option>
-        <option>High Command</option>
-        <option>Curator of Division</option>
-        <option>Division Lead</option>
-        <option>Abteilungsrang</option>
-        <option>Command</option>
-      </select>
-    </div>
-    <div class="pan">
-      <div class="pan-h">
-        <div class="pan-t">[ Mitarbeiterliste ]</div>
-        <span style="font-size:10px;color:var(--mu);" id="ma-count">Zeige alle 75 Einträge</span>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="tbl">
-          <thead><tr><th>Reisepass-ID</th><th>Name</th><th>Rang</th><th>DN</th><th>Division</th><th>Abteilung</th><th>Strike</th><th>Eintritt</th></tr></thead>
-          <tbody id="ma-body"></tbody>
-        </table>
-      </div>
-      <div class="pgr" id="ma-pgr"></div>
-    </div>
+  <div class="srow">
+    <div class="sc"><div class="lbl">Gesamtstarke</div><div class="val" id="dash-count">--</div><div class="sub">Agenten</div></div>
+    <div class="sc"><div class="lbl">Abteilungen</div><div class="val">8</div><div class="sub">Aktiv</div></div>
+    <div class="sc"><div class="lbl">Fuhrungsrange</div><div class="val">8</div><div class="sub">Range 28-30</div></div>
+    <div class="sc"><div class="lbl">Status</div><div class="val" style="font-size:13px;color:var(--gr);">ONLINE</div><div class="sub">Verbunden</div></div>
   </div>
-
-  <!-- RANGANPASSUNG -->
-  <div class="view" id="v-rang">
-    <div class="mh"><h1>Ranganpassung</h1><div class="badge">MODUL</div></div>
-    <div class="pan">
-      <div class="pan-h"><div class="pan-t">[ Daten eingeben ]</div></div>
-      <div class="pan-b">
-        <div style="margin-bottom:10px;">
-          <div class="fl">Mitarbeiter aus Liste wählen (optional)</div>
-          <select class="fi" id="ra-sel" onchange="fillFromMA('ra')"><option value="">— Mitarbeiter wählen —</option></select>
-        </div>
-        <div class="ir">
-          <div><div class="fl">Dienstnummer</div><input class="fi" id="ra-dn" placeholder="z.B. 1" oninput="upRa()"></div>
-          <div><div class="fl">Name</div><input class="fi" id="ra-name" placeholder="Vorname Nachname" oninput="upRa()"></div>
-        </div>
-        <div class="ir">
-          <div><div class="fl">Alter Rang</div><select class="fi" id="ra-old" onchange="upRa()"><option value="">— wählen —</option></select></div>
-          <div><div class="fl">Neuer Rang</div><select class="fi" id="ra-new" onchange="upRa()"><option value="">— wählen —</option></select></div>
-        </div>
-        <div><div class="fl">Begründung</div><input class="fi" id="ra-grund" placeholder="Begründung der Ranganpassung …" oninput="upRa()" style="margin-bottom:12px;"></div>
-        <div class="pl">Vorschau — Discord-Nachricht</div>
-        <div class="ob" id="ra-pre">Felder ausfüllen …</div>
-        <div class="brow">
-          <button class="btn" onclick="cp('ra-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
-          <button class="btn success"><i class="ti ti-send"></i> ÜBERTRAGEN</button>
-        </div>
-        <div class="hint">Kopiert wird der Discord-Rohtext inkl. ** und -# Formatierung.</div>
-      </div>
-    </div>
+  <div class="mg">
+    <div class="mc" onclick="sv('rang',null)"><div class="mt"><i class="ti ti-award"></i>Ranganpassung</div><div class="md">Beforderungen &amp; Degradierungen</div><div class="ma"><button class="btn sm">&gt; Offnen</button></div></div>
+    <div class="mc" onclick="sv('ein',null)"><div class="mt"><i class="ti ti-user-plus"></i>Einstellung</div><div class="md">Neue Mitarbeiter aufnehmen</div><div class="ma"><button class="btn sm">&gt; Offnen</button></div></div>
+    <div class="mc" onclick="sv('kue',null)"><div class="mt"><i class="ti ti-user-minus"></i>Kundigung</div><div class="md">Entlassungen mit Begrundung</div><div class="ma"><button class="btn sm">&gt; Offnen</button></div></div>
+    <div class="mc" onclick="sv('az',null)" style="border-color:var(--gd)"><div class="mt"><i class="ti ti-file-certificate"></i>AZ-System</div><div class="md">Arbeitszeugnisse ausstellen</div><div class="ma"><button class="btn sm" style="border-color:var(--g)">&gt; Offnen</button></div></div>
+    <div class="mc" onclick="sv('san',null)"><div class="mt"><i class="ti ti-gavel"></i>Sanktion</div><div class="md">Verwarnungen &amp; Sanktionskatalog</div><div class="ma"><button class="btn sm">&gt; Offnen</button></div></div>
+    <div class="mc" onclick="sv('pa',null)"><div class="mt"><i class="ti ti-id-badge"></i>Personalakte-Generator</div><div class="md">Vollstandige Personalakten</div><div class="ma"><button class="btn sm">&gt; Offnen</button></div></div>
   </div>
-
-  <!-- EINSTELLUNG -->
-  <div class="view" id="v-ein">
-    <div class="mh"><h1>Einstellung</h1><div class="badge">MODUL</div></div>
-    <div class="pan">
-      <div class="pan-h"><div class="pan-t">[ Neue Einstellung ]</div></div>
-      <div class="pan-b">
-        <div class="ir">
-          <div><div class="fl">Dienstnummer</div><input class="fi" id="es-dn" placeholder="XX" oninput="upEs()"></div>
-          <div><div class="fl">Name</div><input class="fi" id="es-name" placeholder="Vorname Nachname" oninput="upEs()"></div>
-        </div>
-        <div class="ir">
-          <div><div class="fl">Abteilung</div>
-            <select class="fi" id="es-abt" onchange="upEs()">
-              <option value="">— wählen —</option>
-              <option>Human Resources</option>
-              <option>Critical Incident Response Group</option>
-              <option>Criminal Investigative Division</option>
-              <option>Corruption Office</option>
-              <option>Public Relations</option>
-              <option>Training Division</option>
-              <option>LAW Department</option>
-              <option>Internal Affairs</option>
-            </select>
-          </div>
-          <div><div class="fl">Einstellungsrang</div>
-            <select class="fi" id="es-rang" onchange="upEs()"><option value="">— wählen —</option></select>
-          </div>
-        </div>
-        <div class="pl">Vorschau — Discord-Nachricht</div>
-        <div class="ob" id="es-pre">Felder ausfüllen …</div>
-        <div class="brow">
-          <button class="btn" onclick="cp('es-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
-          <button class="btn success"><i class="ti ti-send"></i> ÜBERTRAGEN</button>
-        </div>
-        <div class="hint">Abteilung fügt automatisch den Rollen-Ping ein. Die Ping-Zeile ist fest.</div>
-      </div>
-    </div>
+  <div class="pan">
+    <div class="pan-h"><div class="pan-t">[ Abteilungsubersicht ]</div><button class="btn sm" onclick="sv('ma',null)"><i class="ti ti-external-link"></i> Mitarbeiterverz.</button></div>
+    <div style="overflow-x:auto;"><table class="tbl">
+      <thead><tr><th>Abteilung</th><th>Mitglieder</th><th>Anteil</th></tr></thead>
+      <tbody>
+        <tr><td>Critical Incident Response Group (CIRG)</td><td>43</td><td style="color:var(--g)">21 %</td></tr>
+        <tr><td>Criminal Investigative Division (CID)</td><td>34</td><td style="color:var(--g)">17 %</td></tr>
+        <tr><td>Corruption Office (CO)</td><td>27</td><td style="color:var(--g)">13 %</td></tr>
+        <tr><td>Human Resources (HR)</td><td>16</td><td style="color:var(--g)">8 %</td></tr>
+        <tr><td>Public Relations (PR)</td><td>10</td><td style="color:var(--g)">5 %</td></tr>
+        <tr><td>Training Division (TD)</td><td>6</td><td style="color:var(--g)">3 %</td></tr>
+        <tr><td>Internal Affairs (IA)</td><td>2</td><td style="color:var(--g)">1 %</td></tr>
+        <tr><td>LAW Department</td><td>1</td><td style="color:var(--g)">&lt; 1 %</td></tr>
+      </tbody>
+    </table></div>
   </div>
-
-  <!-- KÜNDIGUNG -->
-  <div class="view" id="v-kue">
-    <div class="mh"><h1>Kündigung</h1><div class="badge">MODUL</div></div>
-    <div class="pan">
-      <div class="pan-h"><div class="pan-t">[ Kündigung ausstellen ]</div></div>
-      <div class="pan-b">
-        <div style="margin-bottom:10px;">
-          <div class="fl">Mitarbeiter aus Liste wählen (optional)</div>
-          <select class="fi" id="ku-sel" onchange="fillFromMA('ku')"><option value="">— Mitarbeiter wählen —</option></select>
-        </div>
-        <div class="ir">
-          <div><div class="fl">Dienstnummer</div><input class="fi" id="ku-dn" placeholder="XX" oninput="upKu()"></div>
-          <div><div class="fl">Name</div><input class="fi" id="ku-name" placeholder="Vorname Nachname" oninput="upKu()"></div>
-        </div>
-        <div><div class="fl">Rang</div><input class="fi" id="ku-rang" placeholder="Rang des Mitarbeiters" oninput="upKu()" style="margin-bottom:10px;"></div>
-        <div><div class="fl">Grund der Kündigung</div><textarea class="fi" id="ku-grund" rows="3" placeholder="Begründung …" oninput="upKu()" style="resize:vertical;margin-bottom:12px;"></textarea></div>
-        <div class="pl">Vorschau — Discord-Nachricht</div>
-        <div class="ob" id="ku-pre">Felder ausfüllen …</div>
-        <div class="brow">
-          <button class="btn" onclick="cp('ku-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
-        </div>
-        <div class="hint">„Aktueller Tag" nutzt das heutige Datum (TT.MM.JJJJ).</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- AZ-SYSTEM -->
-  <div class="view" id="v-az">
-    <div class="mh"><h1>AZ-System</h1><div class="badge">ARBEITSZEUGNIS</div></div>
-    <div class="pan gold">
-      <div class="pan-h gold">
-        <div class="pan-t">[ Arbeitszeugnis-Generator · FIB ]</div>
-        <span style="font-size:10px;color:var(--mu);">GrandRP DE01</span>
-      </div>
-      <div class="pan-b">
-        <div style="font-size:11px;color:var(--mu);border-left:2px solid var(--gd);padding:7px 12px;margin-bottom:14px;background:rgba(201,168,76,0.04);border-radius:0 3px 3px 0;line-height:1.7;">
-          Das Federal Investigation Bureau (FIB) übermittelt hiermit das Arbeitszeugnis des folgenden Mitarbeiters.
-        </div>
-        <div style="margin-bottom:10px;">
-          <div class="fl">Mitarbeiter aus Liste wählen (optional)</div>
-          <select class="fi" id="az-sel" onchange="fillFromMA('az')"><option value="">— Mitarbeiter wählen —</option></select>
-        </div>
-        <div class="ir">
-          <div><div class="fl">Vor- u. Nachname</div><input class="fi" id="az-name" placeholder="Vorname Nachname" oninput="upAz()"></div>
-          <div><div class="fl">Reisepassnr.</div><input class="fi" id="az-pass" placeholder="z.B. 17450" oninput="upAz()"></div>
-        </div>
-        <div class="ir">
-          <div><div class="fl">Rang</div><input class="fi" id="az-rang" placeholder="z.B. 17. Commander" oninput="upAz()"></div>
-          <div>
-            <div class="fl">Datum der Kündigung</div>
-            <input class="fi" type="date" id="az-datum" oninput="upAz()">
-          </div>
-        </div>
-        <div style="margin-bottom:12px;">
-          <div class="fl">Abteilungen / Notizen (optional)</div>
-          <input class="fi" id="az-abt" placeholder="z.B. CIRG, Human Resources …" oninput="upAz()">
-        </div>
-        <div class="pl">Vorschau — Discord-Nachricht</div>
-        <div class="ob" id="az-pre" style="min-height:100px;">Felder ausfüllen …</div>
-        <div class="brow">
-          <button class="btn" onclick="cp('az-pre')" style="border-color:var(--g);font-weight:bold;"><i class="ti ti-copy"></i> Nachricht kopieren</button>
-          <button class="btn success"><i class="ti ti-send"></i> ÜBERTRAGEN</button>
-        </div>
-        <div class="hint">Kopiert Discord-Rohtext mit Markdown-Formatierung.<br>Das Arbeitszeugnis wird als Anhang beigefügt — nicht vergessen!</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SANKTION -->
-  <div class="view" id="v-san">
-    <div class="mh"><h1>Sanktion</h1><div class="badge">MODUL</div></div>
-    <div class="pan">
-      <div class="pan-h"><div class="pan-t">[ Sanktion ausstellen ]</div></div>
-      <div class="pan-b">
-        <div style="margin-bottom:10px;">
-          <div class="fl">Mitarbeiter aus Liste wählen (optional)</div>
-          <select class="fi" id="sa-sel" onchange="fillFromMA('sa')"><option value="">— Mitarbeiter wählen —</option></select>
-        </div>
-        <div class="ir">
-          <div><div class="fl">Dienstnummer</div><input class="fi" id="sa-dn" placeholder="XX" oninput="upSa()"></div>
-          <div><div class="fl">Name</div><input class="fi" id="sa-name" placeholder="Vorname Nachname" oninput="upSa()"></div>
-        </div>
-        <div><div class="fl">Sanktionsart</div>
-          <select class="fi" id="sa-art" onchange="upSa()" style="margin-bottom:10px;">
-            <option value="">— wählen —</option>
-            <option>Mündliche Verwarnung</option>
-            <option>Schriftliche Verwarnung</option>
-            <option>Gehaltskürzung</option>
-            <option>Versetzung</option>
-            <option>Suspendierung</option>
-            <option>Zwangspensionierung</option>
-          </select>
-        </div>
-        <div><div class="fl">Begründung</div><textarea class="fi" id="sa-grund" rows="3" placeholder="Begründung der Sanktion …" oninput="upSa()" style="resize:vertical;margin-bottom:12px;"></textarea></div>
-        <div class="pl">Vorschau — Discord-Nachricht</div>
-        <div class="ob" id="sa-pre">Felder ausfüllen …</div>
-        <div class="brow">
-          <button class="btn" onclick="cp('sa-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
-        </div>
-        <div class="hint">Quelle: Sanktionskatalog (Google Sheets)</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PERSONALAKTE -->
-  <div class="view" id="v-pa">
-    <div class="mh"><h1>Personalakte-Generator</h1><div class="badge">MODUL</div></div>
-    <div class="pan">
-      <div class="pan-h"><div class="pan-t">[ Akte anlegen ]</div></div>
-      <div class="pan-b">
-        <div style="margin-bottom:10px;">
-          <div class="fl">Mitarbeiter aus Liste wählen (optional)</div>
-          <select class="fi" id="pa-sel" onchange="fillFromMA('pa')"><option value="">— Mitarbeiter wählen —</option></select>
-        </div>
-        <div class="ir">
-          <div><div class="fl">Dienstnummer</div><input class="fi" id="pa-dn" placeholder="XX" oninput="upPa()"></div>
-          <div><div class="fl">Name</div><input class="fi" id="pa-name" placeholder="Vorname Nachname" oninput="upPa()"></div>
-        </div>
-        <div class="ir">
-          <div><div class="fl">Rang</div><input class="fi" id="pa-rang" placeholder="z.B. 17. Commander" oninput="upPa()"></div>
-          <div><div class="fl">Eintrittsdatum</div><input class="fi" type="date" id="pa-datum" oninput="upPa()"></div>
-        </div>
-        <div><div class="fl">Abteilung</div><input class="fi" id="pa-abt" placeholder="z.B. CIRG, Human Resources" oninput="upPa()" style="margin-bottom:12px;"></div>
-        <div class="pl">Vorschau — Personalakte</div>
-        <div class="ob" id="pa-pre" style="min-height:90px;">Felder ausfüllen …</div>
-        <div class="brow">
-          <button class="btn" onclick="cp('pa-pre')"><i class="ti ti-copy"></i> Kurzformat kopieren</button>
-        </div>
-        <div class="hint">Kurzformat: Dienstnummer | Name | ID</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- EINSTELLUNGEN -->
-  <div class="view" id="v-cfg">
-    <div class="mh"><h1>Einstellungen</h1><div class="badge">SYSTEM</div></div>
-    <div class="pan">
-      <div class="pan-h"><div class="pan-t">[ Personalisierung ]</div></div>
-      <div class="pan-b" style="display:flex;flex-direction:column;gap:18px;">
-        <div>
-          <div class="fl" style="margin-bottom:7px;">Hauptfarbe — Steuert Akzente, Icons, Rahmen & Buttons</div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <input type="color" value="#c9a84c" id="colpick" oninput="setCol(this.value)" style="width:42px;height:32px;border:1px solid var(--bd);background:transparent;border-radius:3px;cursor:pointer;padding:2px;">
-            <span id="colhex" style="font-size:12px;color:var(--mu);">#c9a84c</span>
-            <button class="btn" onclick="setCol('#c9a84c');document.getElementById('colpick').value='#c9a84c';">Zurücksetzen</button>
-          </div>
-        </div>
-        <div>
-          <div class="fl" style="margin-bottom:7px;">Über dieses Tool</div>
-          <div style="font-size:11px;color:var(--mu);line-height:1.85;background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:12px 14px;">
-            Offline-Toolsuite der FIB-Personalabteilung · GrandRP DE01.<br>
-            Läuft vollständig lokal im Browser, ohne externes Backend.<br>
-            Module greifen optional live auf Google Sheets zu und fallen automatisch auf gespeicherte Stände zurück.<br><br>
-            <strong style="color:var(--g);">Mitarbeiterdaten:</strong> FIB Mitarbeiterverzeichnis (Stand: 25.05.2026)<br>
-            <strong style="color:var(--g);">Agenten:</strong> 201 · <strong style="color:var(--g);">Abteilungsmitglieder:</strong> 139 · <strong style="color:var(--g);">Rangstufen:</strong> 30
-          </div>
-        </div>
-        <div>
-          <div class="fl" style="margin-bottom:7px;">Google Sheets Quelle</div>
-          <a href="https://docs.google.com/spreadsheets/d/1uzAA-_O2JtDBs3bpRG9Mqbva67dqh45LPDjPEf8-njQ/edit" target="_blank" class="btn" style="display:inline-flex;"><i class="ti ti-external-link"></i> FIB Mitarbeiterverzeichnis öffnen</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /main -->
-</div><!-- /layout -->
-
-<!-- BOTTOM BAR -->
-<div class="bottombar">
-  <div class="bl"><span class="dot-green"></span> Verbunden // <span id="bclk">00:00:00</span></div>
-  <div style="color:var(--g);font-weight:bold;">GrandRP DE01 · FIB Personalabteilung</div>
-  <div style="color:var(--mu);">Sicheres System · Offline-Betrieb</div>
 </div>
 
-</div><!-- /root -->
+<!-- MITARBEITERVERZEICHNIS -->
+<div class="view" id="v-ma">
+  <div class="mh"><h1>Mitarbeiterverzeichnis</h1><div class="badge" id="ma-badge">-- AGENTEN</div></div>
+  <div style="display:flex;gap:9px;flex-wrap:wrap;">
+    <div class="sw" style="flex:1;min-width:170px;"><i class="ti ti-search"></i>
+      <input class="fi si" id="ma-search" placeholder="Name, ID, Rang, Ausbildung ..." oninput="filterMA()">
+    </div>
+    <select class="fi" id="ma-filter" onchange="filterMA()" style="width:auto;min-width:145px;">
+      <option value="">Alle Divisionen</option>
+      <option>Leaderschaft</option><option>High Command Lead</option>
+      <option>High Command</option><option>Curator of Division</option>
+      <option>Division Lead</option><option>Abteilungsrang</option><option>Command</option>
+    </select>
+    <button class="btn bl" onclick="openAddModal()"><i class="ti ti-user-plus"></i> Hinzufugen</button>
+  </div>
+  <div class="pan">
+    <div class="pan-h">
+      <div class="pan-t">[ Mitarbeiterliste ]</div>
+      <span style="font-size:10px;color:var(--mu);" id="ma-count">--</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr>
+          <th>Pass-ID</th><th>Name</th><th>Rang</th><th>DN</th>
+          <th>Division</th><th>Abteilung</th><th style="color:var(--bl)">Ausbildung</th>
+          <th>Strike</th><th>Eintritt</th><th style="text-align:center">Aktionen</th>
+        </tr></thead>
+        <tbody id="ma-body"></tbody>
+      </table>
+    </div>
+    <div class="pgr" id="ma-pgr"></div>
+  </div>
+</div>
 
-<!-- TOAST -->
-<div class="toast" id="toast">✓ In Zwischenablage kopiert</div>
+<!-- RANGANPASSUNG -->
+<div class="view" id="v-rang">
+  <div class="mh"><h1>Ranganpassung</h1><div class="badge">MODUL</div></div>
+  <div class="absbox">
+    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
+    <div class="ir3">
+      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-rang-name" placeholder="@DeinName" oninput="saveAbsF();upRa()"></div>
+      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-rang-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upRa()"></div>
+      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-rang-abt" placeholder="z.B. HR" oninput="saveAbsF();upRa()"></div>
+    </div>
+  </div>
+  <div class="pan">
+    <div class="pan-h"><div class="pan-t">[ Mitarbeiter &amp; Ranganpassung ]</div></div>
+    <div class="pan-b">
+      <div style="margin-bottom:9px;">
+        <div class="fl">Mitarbeiter aus Liste wahlen (optional)</div>
+        <select class="fi" id="ra-sel" onchange="fillFromMA('ra')"><option value="">-- Mitarbeiter wahlen --</option></select>
+      </div>
+      <div class="ir">
+        <div><div class="fl">Dienstnummer</div><input class="fi" id="ra-dn" placeholder="z.B. 1" oninput="upRa()"></div>
+        <div><div class="fl">Name</div><input class="fi" id="ra-name" placeholder="Vorname Nachname" oninput="upRa()"></div>
+      </div>
+      <div class="ir">
+        <div><div class="fl">Alter Rang</div><select class="fi" id="ra-old" onchange="upRa()"><option value="">-- wahlen --</option></select></div>
+        <div><div class="fl">Neuer Rang</div><select class="fi" id="ra-new" onchange="upRa()"><option value="">-- wahlen --</option></select></div>
+      </div>
+      <div><div class="fl">Begrundung</div><input class="fi" id="ra-grund" placeholder="Begrundung ..." oninput="upRa()" style="margin-bottom:11px;"></div>
+      <div class="pl">Vorschau -- Discord-Nachricht</div>
+      <div class="ob" id="ra-pre">Felder ausfullen ...</div>
+      <div class="brow">
+        <button class="btn" onclick="cp('ra-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
+        <button class="btn ok"><i class="ti ti-send"></i> UBERTRAGEN</button>
+      </div>
+      <div class="hint">Kopiert Discord-Rohtext inkl. ** und -# Formatierung.</div>
+    </div>
+  </div>
+</div>
+
+<!-- EINSTELLUNG -->
+<div class="view" id="v-ein">
+  <div class="mh"><h1>Einstellung</h1><div class="badge">MODUL</div></div>
+  <div class="absbox">
+    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
+    <div class="ir3">
+      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-ein-name" placeholder="@DeinName" oninput="saveAbsF();upEs()"></div>
+      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-ein-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upEs()"></div>
+      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-ein-abt" placeholder="z.B. HR" oninput="saveAbsF();upEs()"></div>
+    </div>
+  </div>
+  <div class="pan"><div class="pan-h"><div class="pan-t">[ Neue Einstellung ]</div></div>
+    <div class="pan-b">
+      <div class="ir">
+        <div><div class="fl">Dienstnummer</div><input class="fi" id="es-dn" placeholder="XX" oninput="upEs()"></div>
+        <div><div class="fl">Name</div><input class="fi" id="es-name" placeholder="Vorname Nachname" oninput="upEs()"></div>
+      </div>
+      <div class="ir">
+        <div><div class="fl">Abteilung</div>
+          <select class="fi" id="es-abt" onchange="upEs()">
+            <option value="">-- wahlen --</option>
+            <option>Human Resources</option><option>Critical Incident Response Group</option>
+            <option>Criminal Investigative Division</option><option>Corruption Office</option>
+            <option>Public Relations</option><option>Training Division</option>
+            <option>LAW Department</option><option>Internal Affairs</option>
+          </select>
+        </div>
+        <div><div class="fl">Einstellungsrang</div><select class="fi" id="es-rang" onchange="upEs()"><option value="">-- wahlen --</option></select></div>
+      </div>
+      <div class="pl">Vorschau</div>
+      <div class="ob" id="es-pre">Felder ausfullen ...</div>
+      <div class="brow"><button class="btn" onclick="cp('es-pre')"><i class="ti ti-copy"></i> Kopieren</button><button class="btn ok"><i class="ti ti-send"></i> UBERTRAGEN</button></div>
+      <div class="hint">Abteilung fugt automatisch den Rollen-Ping ein.</div>
+    </div>
+  </div>
+</div>
+
+<!-- KUNDIGUNG -->
+<div class="view" id="v-kue">
+  <div class="mh"><h1>Kundigung</h1><div class="badge">MODUL</div></div>
+  <div class="absbox">
+    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
+    <div class="ir3">
+      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-kue-name" placeholder="@DeinName" oninput="saveAbsF();upKu()"></div>
+      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-kue-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upKu()"></div>
+      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-kue-abt" placeholder="z.B. HR" oninput="saveAbsF();upKu()"></div>
+    </div>
+  </div>
+  <div class="pan"><div class="pan-h"><div class="pan-t">[ Kundigung ausstellen ]</div></div>
+    <div class="pan-b">
+      <div style="margin-bottom:9px;"><div class="fl">Mitarbeiter wahlen (optional)</div>
+        <select class="fi" id="ku-sel" onchange="fillFromMA('ku')"><option value="">-- Mitarbeiter wahlen --</option></select>
+      </div>
+      <div class="ir">
+        <div><div class="fl">Dienstnummer</div><input class="fi" id="ku-dn" placeholder="XX" oninput="upKu()"></div>
+        <div><div class="fl">Name</div><input class="fi" id="ku-name" placeholder="Vorname Nachname" oninput="upKu()"></div>
+      </div>
+      <div><div class="fl">Rang</div><input class="fi" id="ku-rang" placeholder="Rang des Mitarbeiters" oninput="upKu()" style="margin-bottom:9px;"></div>
+      <div><div class="fl">Grund der Kundigung</div><textarea class="fi" id="ku-grund" rows="3" placeholder="Begrundung ..." oninput="upKu()" style="resize:vertical;margin-bottom:11px;"></textarea></div>
+      <div class="pl">Vorschau</div>
+      <div class="ob" id="ku-pre">Felder ausfullen ...</div>
+      <div class="brow"><button class="btn" onclick="cp('ku-pre')"><i class="ti ti-copy"></i> Kopieren</button></div>
+      <div class="hint">Aktueller Tag nutzt das heutige Datum (TT.MM.JJJJ).</div>
+    </div>
+  </div>
+</div>
+
+<!-- AZ-SYSTEM -->
+<div class="view" id="v-az">
+  <div class="mh"><h1>AZ-System</h1><div class="badge">ARBEITSZEUGNIS</div></div>
+  <div class="absbox">
+    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
+    <div class="ir3">
+      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-az-name" placeholder="@DeinName" oninput="saveAbsF();upAz()"></div>
+      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-az-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upAz()"></div>
+      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-az-abt" placeholder="z.B. HR" oninput="saveAbsF();upAz()"></div>
+    </div>
+  </div>
+  <div class="pan gold"><div class="pan-h gold">
+    <div class="pan-t">[ Arbeitszeugnis-Generator . FIB ]</div>
+    <span style="font-size:10px;color:var(--mu);">GrandRP DE01</span>
+  </div>
+  <div class="pan-b">
+    <div style="font-size:11px;color:var(--mu);border-left:2px solid var(--gd);padding:6px 11px;margin-bottom:12px;background:rgba(201,168,76,0.04);border-radius:0 3px 3px 0;line-height:1.7;">
+      Das Federal Investigation Bureau (FIB) ubermittelt hiermit das Arbeitszeugnis des folgenden Mitarbeiters.
+    </div>
+    <div style="margin-bottom:9px;"><div class="fl">Mitarbeiter wahlen (optional)</div>
+      <select class="fi" id="az-sel" onchange="fillFromMA('az')"><option value="">-- Mitarbeiter wahlen --</option></select>
+    </div>
+    <div class="ir">
+      <div><div class="fl">Vor- u. Nachname</div><input class="fi" id="az-name" placeholder="Vorname Nachname" oninput="upAz()"></div>
+      <div><div class="fl">Reisepassnr.</div><input class="fi" id="az-pass" placeholder="z.B. 17450" oninput="upAz()"></div>
+    </div>
+    <div class="ir">
+      <div><div class="fl">Rang</div><input class="fi" id="az-rang" placeholder="z.B. 17. Commander" oninput="upAz()"></div>
+      <div><div class="fl">Datum der Kundigung</div><input class="fi" type="date" id="az-datum" oninput="upAz()"></div>
+    </div>
+    <div style="margin-bottom:11px;"><div class="fl">Abteilungen / Notizen (optional)</div>
+      <input class="fi" id="az-abt" placeholder="z.B. CIRG, Human Resources ..." oninput="upAz()">
+    </div>
+    <div class="pl">Vorschau -- Discord-Nachricht</div>
+    <div class="ob" id="az-pre" style="min-height:90px;">Felder ausfullen ...</div>
+    <div class="brow">
+      <button class="btn" onclick="cp('az-pre')" style="border-color:var(--g);font-weight:bold;"><i class="ti ti-copy"></i> Nachricht kopieren</button>
+      <button class="btn ok"><i class="ti ti-send"></i> UBERTRAGEN</button>
+    </div>
+    <div class="hint">Arbeitszeugnis als Anhang beifugen!</div>
+  </div></div>
+</div>
+
+<!-- SANKTION -->
+<div class="view" id="v-san">
+  <div class="mh"><h1>Sanktion</h1><div class="badge">MODUL</div></div>
+  <div class="absbox">
+    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
+    <div class="ir3">
+      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-san-name" placeholder="@DeinName" oninput="saveAbsF();upSa()"></div>
+      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-san-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upSa()"></div>
+      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-san-abt" placeholder="z.B. HR" oninput="saveAbsF();upSa()"></div>
+    </div>
+  </div>
+  <div class="pan"><div class="pan-h"><div class="pan-t">[ Sanktion ausstellen ]</div></div>
+    <div class="pan-b">
+      <div style="margin-bottom:9px;"><div class="fl">Mitarbeiter wahlen (optional)</div>
+        <select class="fi" id="sa-sel" onchange="fillFromMA('sa')"><option value="">-- Mitarbeiter wahlen --</option></select>
+      </div>
+      <div class="ir">
+        <div><div class="fl">Dienstnummer</div><input class="fi" id="sa-dn" placeholder="XX" oninput="upSa()"></div>
+        <div><div class="fl">Name</div><input class="fi" id="sa-name" placeholder="Vorname Nachname" oninput="upSa()"></div>
+      </div>
+      <div><div class="fl">Sanktionsart</div>
+        <select class="fi" id="sa-art" onchange="upSa()" style="margin-bottom:9px;">
+          <option value="">-- wahlen --</option>
+          <option>Mundliche Verwarnung</option><option>Schriftliche Verwarnung</option>
+          <option>Gehaltskürzung</option><option>Versetzung</option>
+          <option>Suspendierung</option><option>Zwangspensionierung</option>
+        </select>
+      </div>
+      <div><div class="fl">Begrundung</div><textarea class="fi" id="sa-grund" rows="3" placeholder="Begrundung ..." oninput="upSa()" style="resize:vertical;margin-bottom:11px;"></textarea></div>
+      <div class="pl">Vorschau</div>
+      <div class="ob" id="sa-pre">Felder ausfullen ...</div>
+      <div class="brow"><button class="btn" onclick="cp('sa-pre')"><i class="ti ti-copy"></i> Kopieren</button></div>
+      <div class="hint">Quelle: Sanktionskatalog (Google Sheets)</div>
+    </div>
+  </div>
+</div>
+
+<!-- PERSONALAKTE -->
+<div class="view" id="v-pa">
+  <div class="mh"><h1>Personalakte-Generator</h1><div class="badge">MODUL</div></div>
+  <div class="absbox">
+    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
+    <div class="ir3">
+      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-pa-name" placeholder="@DeinName" oninput="saveAbsF();upPa()"></div>
+      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-pa-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upPa()"></div>
+      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-pa-abt" placeholder="z.B. HR" oninput="saveAbsF();upPa()"></div>
+    </div>
+  </div>
+  <div class="pan"><div class="pan-h"><div class="pan-t">[ Akte anlegen ]</div></div>
+    <div class="pan-b">
+      <div style="margin-bottom:9px;"><div class="fl">Mitarbeiter wahlen (optional)</div>
+        <select class="fi" id="pa-sel" onchange="fillFromMA('pa')"><option value="">-- Mitarbeiter wahlen --</option></select>
+      </div>
+      <div class="ir">
+        <div><div class="fl">Dienstnummer</div><input class="fi" id="pa-dn" placeholder="XX" oninput="upPa()"></div>
+        <div><div class="fl">Name</div><input class="fi" id="pa-name" placeholder="Vorname Nachname" oninput="upPa()"></div>
+      </div>
+      <div class="ir">
+        <div><div class="fl">Rang</div><input class="fi" id="pa-rang" placeholder="z.B. 17. Commander" oninput="upPa()"></div>
+        <div><div class="fl">Eintrittsdatum</div><input class="fi" type="date" id="pa-datum" oninput="upPa()"></div>
+      </div>
+      <div><div class="fl">Abteilung</div><input class="fi" id="pa-abt" placeholder="z.B. CIRG, Human Resources" oninput="upPa()" style="margin-bottom:11px;"></div>
+      <div class="pl">Vorschau</div>
+      <div class="ob" id="pa-pre" style="min-height:80px;">Felder ausfullen ...</div>
+      <div class="brow"><button class="btn" onclick="cp('pa-pre')"><i class="ti ti-copy"></i> Kurzformat kopieren</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- EINSTELLUNGEN -->
+<div class="view" id="v-cfg">
+  <div class="mh"><h1>Einstellungen</h1><div class="badge">SYSTEM</div></div>
+  <div class="pan"><div class="pan-h"><div class="pan-t">[ Personalisierung ]</div></div>
+    <div class="pan-b" style="display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <div class="fl" style="margin-bottom:6px;">Hauptfarbe -- Steuert Akzente, Icons, Rahmen &amp; Buttons</div>
+        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;">
+          <input type="color" value="#c9a84c" id="colpick" oninput="setCol(this.value)" style="width:40px;height:30px;border:1px solid var(--bd);background:transparent;border-radius:3px;cursor:pointer;padding:2px;">
+          <span id="colhex" style="font-size:11px;color:var(--mu);">#c9a84c</span>
+          <button class="btn sm" onclick="setCol('#c9a84c');document.getElementById('colpick').value='#c9a84c'">Zurucksetzen</button>
+        </div>
+      </div>
+      <div>
+        <div class="fl" style="margin-bottom:5px;">Absender-Profil (fur alle Module)</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px;">Einmal eintragen -- wird in allen Modulen vorausgefllt und in Nachrichten eingefugt.</div>
+        <div class="ir3">
+          <div><div class="fl">Dein Name / Ping</div><input class="fi" id="cfg-name" placeholder="@DeinName" oninput="syncFromCfg()"></div>
+          <div><div class="fl">Dein Rang</div><input class="fi" id="cfg-rang" placeholder="z.B. 23. SAIC" oninput="syncFromCfg()"></div>
+          <div><div class="fl">Deine Abteilung</div><input class="fi" id="cfg-abt" placeholder="z.B. HR" oninput="syncFromCfg()"></div>
+        </div>
+        <button class="btn bl sm" onclick="syncFromCfg();showToast('Profil gespeichert')"><i class="ti ti-device-floppy"></i> In alle Module ubernehmen</button>
+      </div>
+      <div>
+        <div class="fl" style="margin-bottom:5px;">Mitarbeiterdaten</div>
+        <div style="font-size:11px;color:var(--mu);line-height:1.85;background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:11px 13px;">
+          Alle Anderungen am Mitarbeiterverzeichnis werden lokal im Browser gespeichert (localStorage).<br>
+          Agenten gesamt: <span id="cfg-count" style="color:var(--g)">--</span> &nbsp;|&nbsp; Rangstufen: <span style="color:var(--g)">30</span>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn ng sm" onclick="resetData()"><i class="ti ti-refresh"></i> Auf Standarddaten zurucksetzen</button>
+          <a href="https://docs.google.com/spreadsheets/d/1uzAA-_O2JtDBs3bpRG9Mqbva67dqh45LPDjPEf8-njQ/edit" target="_blank" class="btn sm"><i class="ti ti-external-link"></i> Google Sheets offnen</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div></div>
+<div class="bottombar">
+  <div class="bl2"><span class="dg"></span> Verbunden // <span id="bclk">00:00:00</span></div>
+  <div style="color:var(--g);font-weight:bold;">GrandRP DE01 . FIB Personalabteilung</div>
+  <div style="color:var(--mu);">Sicheres System . Offline-Betrieb</div>
+</div>
+</div>
+
+<div class="toast" id="toast">Kopiert</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="ma-modal">
+  <div class="modal">
+    <h2 id="modal-title">Mitarbeiter hinzufugen</h2>
+    <input type="hidden" id="modal-eid">
+    <div class="ir">
+      <div><div class="fl">Reisepass-ID *</div><input class="fi" id="m-id" placeholder="z.B. 12345"></div>
+      <div><div class="fl">Name *</div><input class="fi" id="m-name" placeholder="Vorname Nachname"></div>
+    </div>
+    <div class="ir">
+      <div><div class="fl">Rang *</div><select class="fi" id="m-rank"><option value="">-- wahlen --</option></select></div>
+      <div><div class="fl">Dienstnummer (DN)</div><input class="fi" id="m-dn" placeholder="z.B. 42"></div>
+    </div>
+    <div class="ir">
+      <div><div class="fl">Division</div>
+        <select class="fi" id="m-div">
+          <option value="">-- wahlen --</option>
+          <option>Leaderschaft</option><option>High Command Lead</option>
+          <option>High Command</option><option>Curator of Division</option>
+          <option>Division Lead</option><option>Abteilungsrang</option><option>Command</option>
+        </select>
+      </div>
+      <div><div class="fl">Abteilung</div><input class="fi" id="m-abt" placeholder="z.B. CIRG, HR"></div>
+    </div>
+    <div class="ir">
+      <div><div class="fl" style="color:var(--bl)">Ausbildung</div><input class="fi" id="m-ausb" placeholder="z.B. FBI Academy, CIRG-Kurs"></div>
+      <div><div class="fl">Strike</div>
+        <select class="fi" id="m-strike">
+          <option value="0/3">0/3</option><option value="1/3">1/3</option>
+          <option value="2/3">2/3</option><option value="3/3">3/3</option>
+        </select>
+      </div>
+    </div>
+    <div class="ir">
+      <div><div class="fl">Eintrittsdatum</div><input class="fi" type="date" id="m-date"></div>
+      <div><div class="fl">Status</div>
+        <select class="fi" id="m-status">
+          <option value="Aktiv">Aktiv</option><option value="Suspendiert">Suspendiert</option>
+          <option value="Inaktiv">Inaktiv</option><option value="Ausgeschieden">Ausgeschieden</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:13px;">
+      <div class="fl">Notizen (intern)</div>
+      <textarea class="fi" id="m-notes" rows="2" placeholder="Interne Notizen ..." style="resize:vertical;"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+      <button class="btn ng sm" onclick="closeModal()">Abbrechen</button>
+      <button class="btn ok" onclick="saveModal()"><i class="ti ti-device-floppy"></i> Speichern</button>
+    </div>
+  </div>
+</div>
 
 <script>
-const RANKS=[
-  "30. Director of FIB","29. Deputy Director of FIB","28. Assistant Director of FIB",
-  "27. Divisional Director","26. Inspector of the FIB","25. Supervisory Head Agent",
-  "24. Supervisory Agent","23. Special Agent in Charge","22. Division Chief",
-  "21. Deputy Division Chief","20. Senior Special Agent","19. Tactical Operator",
-  "18. Department Specialist","17. Commander","16. Lieutenant Commander",
-  "15. Special Senior Agent","14. Master Special Agent","13. Senior Special Agent",
-  "12. Operational Agent","11. Field Agent","10. Senior Agent","9. Agent II",
-  "8. Agent I","7. Junior Agent","6. Probationary Agent","5. Analyst",
-  "4. Associate Analyst","3. Recruit II","2. Recruit I","1. Trainee"
+const RANKS=["30. Director of FIB","29. Deputy Director of FIB","28. Assistant Director of FIB","27. Divisional Director","26. Inspector of the FIB","25. Supervisory Head Agent","24. Supervisory Agent","23. Special Agent in Charge","22. Division Chief","21. Deputy Division Chief","20. Senior Special Agent","19. Tactical Operator","18. Department Specialist","17. Commander","16. Lieutenant Commander","15. Special Senior Agent","14. Master Special Agent","13. Senior Special Agent","12. Operational Agent","11. Field Agent","10. Senior Agent","9. Agent II","8. Agent I","7. Junior Agent","6. Probationary Agent","5. Analyst","4. Associate Analyst","3. Recruit II","2. Recruit I","1. Trainee"];
+const DEF=[
+{id:"17450",name:"Eko Plaste",rank:"30. Director of FIB",dn:"1",div:"Leaderschaft",abt:"Chief Executive Curator",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"264694",name:"Tim Chessee",rank:"29. Deputy Director of FIB",dn:"2",div:"Leaderschaft",abt:"Deputy Executive Curator",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"240601",name:"Nils Brandenburger",rank:"28. Assistant Director of FIB",dn:"777",div:"Leaderschaft",abt:"Assistant Executive Curator",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"156935",name:"Assan Diop",rank:"28. Assistant Director of FIB",dn:"999",div:"Leaderschaft",abt:"Assistant Executive Curator",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"76002",name:"Dan Reacher",rank:"28. Assistant Director of FIB",dn:"5",div:"Leaderschaft",abt:"Assistant Executive Curator",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"85558",name:"Dimii Nevergone",rank:"28. Assistant Director of FIB",dn:"3",div:"Leaderschaft",abt:"Assistant Executive Curator",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"26412",name:"Luca Santos",rank:"28. Assistant Director of FIB",dn:"361",div:"Leaderschaft",abt:"Assistant Executive Curator",ausb:"",strike:"0/3",date:"29.05.2026",status:"Aktiv",notes:""},
+{id:"6180",name:"Paul Nao",rank:"28. Assistant Director of FIB",dn:"17",div:"Leaderschaft",abt:"Assistant Executive Curator",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"102262",name:"Hakuri Schrom",rank:"28. Assistant Director of FIB",dn:"262",div:"Leaderschaft",abt:"Assistant Executive Curator",ausb:"",strike:"0/3",date:"02.06.2026",status:"Aktiv",notes:""},
+{id:"135691",name:"Joachim vonWanze",rank:"27. Divisional Director",dn:"10",div:"Curator of Division",abt:"Curator | HR / FIBCO",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"157291",name:"Hugo Federov",rank:"27. Divisional Director",dn:"7",div:"Curator of Division",abt:"Curator | FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"128034",name:"Bali Nevergone",rank:"27. Divisional Director",dn:"27",div:"Curator of Division",abt:"Curator | CIRG",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"156327",name:"Falkdoc Federov",rank:"27. Divisional Director",dn:"8",div:"Curator of Division",abt:"Curator | PR / FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"295473",name:"Felix Mccalley",rank:"26. Inspector of the FIB",dn:"6",div:"High Command Lead",abt:"Head of High Command / FIBCO",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"217060",name:"Raffi Yane",rank:"25. Supervisory Head Agent",dn:"4",div:"High Command",abt:"HR Leitung / FIBCO",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"26899",name:"Amando Carillo",rank:"25. Supervisory Head Agent",dn:"31",div:"High Command",abt:"CID Stellv. Leitung",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"219213",name:"Jannick Yurr",rank:"25. Supervisory Head Agent",dn:"187",div:"High Command",abt:"CID Stellv. Leitung / FIBCO",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"34258",name:"Fynn Andreas",rank:"25. Supervisory Head Agent",dn:"11",div:"High Command",abt:"FIBCO Leitung",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"106544",name:"Marcel Gruuber",rank:"25. Supervisory Head Agent",dn:"15",div:"High Command",abt:"--",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"256009",name:"Kayne Smoker",rank:"24. Supervisory Agent",dn:"25",div:"High Command",abt:"TD Stellv. Leitung / CIRG",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"142220",name:"Simon Kellermann",rank:"24. Supervisory Agent",dn:"143",div:"High Command",abt:"FIBCO",ausb:"",strike:"0/3",date:"29.05.2026",status:"Aktiv",notes:""},
+{id:"176902",name:"Filip vonWanze",rank:"23. Special Agent in Charge",dn:"32",div:"High Command",abt:"TD",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"218257",name:"Ranjid Bay",rank:"23. Special Agent in Charge",dn:"33",div:"High Command",abt:"CIRG / CID",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"135217",name:"Sebastian Kuroyama",rank:"23. Special Agent in Charge",dn:"52",div:"High Command",abt:"CID",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"264668",name:"Kai Herzog",rank:"23. Special Agent in Charge",dn:"21",div:"High Command",abt:"FIBCO / HR",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"258321",name:"Mickey Maybach",rank:"23. Special Agent in Charge",dn:"53",div:"High Command",abt:"FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"50091",name:"Syn Veno",rank:"23. Special Agent in Charge",dn:"59",div:"High Command",abt:"CID",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"244186",name:"Anton Moluda",rank:"23. Special Agent in Charge",dn:"9",div:"High Command",abt:"FIBCO Stellv. Leitung",ausb:"",strike:"0/3",date:"05.06.2026",status:"Aktiv",notes:""},
+{id:"109467",name:"Felix Cunningham",rank:"23. Special Agent in Charge",dn:"12",div:"High Command",abt:"CID Leitung / HR",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"192812",name:"Nico Saito",rank:"23. Special Agent in Charge",dn:"23",div:"High Command",abt:"TD Stellv. Leitung",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"105534",name:"Akin Kaplan",rank:"23. Special Agent in Charge",dn:"71",div:"High Command",abt:"FIBCO / CID",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"257441",name:"Hugo Pinsel",rank:"23. Special Agent in Charge",dn:"16",div:"High Command",abt:"FIBCO Stellv. Leitung / HR",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"290275",name:"Tomek Dick",rank:"23. Special Agent in Charge",dn:"58",div:"High Command",abt:"PR",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"288863",name:"Bernhard Wolf",rank:"23. Special Agent in Charge",dn:"132",div:"High Command",abt:"FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"239288",name:"Noah Raiin",rank:"23. Special Agent in Charge",dn:"444",div:"High Command",abt:"FIBCO / HR",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"12263",name:"Fabi Astro",rank:"23. Special Agent in Charge",dn:"107",div:"High Command",abt:"HR Senior / FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"136176",name:"Quentin Wesh",rank:"23. Special Agent in Charge",dn:"111",div:"High Command",abt:"CIRG Stellv. Leitung / TD",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"79712",name:"Angus Newton",rank:"23. Special Agent in Charge",dn:"62",div:"High Command",abt:"FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"214462",name:"Marcel Fero",rank:"23. Special Agent in Charge",dn:"34",div:"High Command",abt:"--",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"18612",name:"Nico Schlumpf",rank:"22. Division Chief",dn:"28",div:"Division Lead",abt:"IA Leitung / FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"140883",name:"Johannes Brecher",rank:"22. Division Chief",dn:"14",div:"Division Lead",abt:"CIRG Leitung / CID",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"126465",name:"Nia vonWanze",rank:"22. Division Chief",dn:"22",div:"Division Lead",abt:"TD Leitung",ausb:"",strike:"0/3",date:"27.05.2026",status:"Aktiv",notes:""},
+{id:"190803",name:"Berkoli Midnight",rank:"22. Division Chief",dn:"19",div:"Division Lead",abt:"PR Leitung",ausb:"",strike:"0/3",date:"27.05.2026",status:"Aktiv",notes:""},
+{id:"200311",name:"Jonas Rak",rank:"21. Deputy Division Chief",dn:"13",div:"Division Lead",abt:"HR Stellv. Leitung",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"5545",name:"Fredo Frost",rank:"21. Deputy Division Chief",dn:"69",div:"Division Lead",abt:"CID Stellv. Leitung",ausb:"",strike:"0/3",date:"25.05.2026",status:"Aktiv",notes:""},
+{id:"220186",name:"Bellobatz Dacruze",rank:"21. Deputy Division Chief",dn:"77",div:"Division Lead",abt:"CIRG Stellv. Leitung",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"155716",name:"Paul Trappler",rank:"19. Tactical Operator",dn:"122",div:"Abteilungsrang",abt:"CIRG",ausb:"",strike:"0/3",date:"06.06.2026",status:"Aktiv",notes:""},
+{id:"218503",name:"Frosty Dick",rank:"19. Tactical Operator",dn:"85",div:"Abteilungsrang",abt:"CIRG",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"244882",name:"Tobi Lakiri",rank:"18. Department Specialist",dn:"48",div:"Abteilungsrang",abt:"PR",ausb:"",strike:"0/3",date:"01.06.2026",status:"Aktiv",notes:""},
+{id:"9895",name:"Kalle Osbornee",rank:"18. Department Specialist",dn:"57",div:"Abteilungsrang",abt:"TD",ausb:"",strike:"0/3",date:"27.05.2026",status:"Aktiv",notes:""},
+{id:"189768",name:"Kenan Kasalla",rank:"17. Commander",dn:"37",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"07.06.2026",status:"Aktiv",notes:""},
+{id:"137965",name:"Nate Nays",rank:"17. Commander",dn:"121",div:"Command",abt:"HR / CID",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"14338",name:"Carlos Sandman",rank:"17. Commander",dn:"163",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"07.06.2026",status:"Aktiv",notes:""},
+{id:"404",name:"Kev Error",rank:"17. Commander",dn:"404",div:"Command",abt:"CIRG",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"225755",name:"Thommy Perez",rank:"17. Commander",dn:"50",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"04.06.2026",status:"Aktiv",notes:""},
+{id:"4149",name:"Atze Altin",rank:"17. Commander",dn:"49",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"192303",name:"Jonass Breitling",rank:"17. Commander",dn:"51",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"02.06.2026",status:"Aktiv",notes:""},
+{id:"225011",name:"Odin Wolf",rank:"17. Commander",dn:"112",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"232642",name:"Peter Holz",rank:"17. Commander",dn:"61",div:"Command",abt:"FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"252692",name:"Jason Janee",rank:"17. Commander",dn:"155",div:"Command",abt:"CIRG",ausb:"",strike:"0/3",date:"27.05.2026",status:"Aktiv",notes:""},
+{id:"52617",name:"Michi Mahoni",rank:"17. Commander",dn:"95",div:"Command",abt:"CIRG",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"203202",name:"Fernando Dick",rank:"17. Commander",dn:"66",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"286372",name:"Cengo Neverloved",rank:"17. Commander",dn:"70",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"115582",name:"Lia Kaplan",rank:"17. Commander",dn:"35",div:"Command",abt:"CID",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"251159",name:"Tim Balls",rank:"17. Commander",dn:"125",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"212921",name:"Alicee Asic",rank:"17. Commander",dn:"73",div:"Command",abt:"CIRG",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"62",name:"Kevin Done",rank:"17. Commander",dn:"63",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"27.05.2026",status:"Aktiv",notes:""},
+{id:"292078",name:"Ibo Aquila",rank:"17. Commander",dn:"74",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"66603",name:"Harald Sachse",rank:"17. Commander",dn:"603",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"29.05.2026",status:"Aktiv",notes:""},
+{id:"208195",name:"Vaun Deberg",rank:"17. Commander",dn:"82",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"30.05.2026",status:"Aktiv",notes:""},
+{id:"301271",name:"Aure Knusper",rank:"17. Commander",dn:"80",div:"Command",abt:"CIRG",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"159846",name:"Titus Maximus",rank:"17. Commander",dn:"152",div:"Command",abt:"FIBCO",ausb:"",strike:"0/3",date:"27.05.2026",status:"Aktiv",notes:""},
+{id:"174040",name:"Luca Hochreiter",rank:"17. Commander",dn:"175",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"30.05.2026",status:"Aktiv",notes:""},
+{id:"257297",name:"Yuri Loveless",rank:"17. Commander",dn:"79",div:"Command",abt:"CID",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"26568",name:"Harleen Bama",rank:"17. Commander",dn:"65",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"229248",name:"Eren Almaz",rank:"17. Commander",dn:"20",div:"Command",abt:"FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"289353",name:"Raul Nuis",rank:"17. Commander",dn:"75",div:"Command",abt:"--",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
+{id:"253176",name:"Gimo Jimmbo",rank:"17. Commander",dn:"707",div:"Command",abt:"FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
 ];
 
-const MA=[
-  {id:"17450",name:"Eko Plaste",rank:"30. Director of FIB",dn:"1",div:"Leaderschaft",abt:"Chief Executive Curator",strike:"0/3",date:"25.05.2026"},
-  {id:"264694",name:"Tim Chessee",rank:"29. Deputy Director of FIB",dn:"2",div:"Leaderschaft",abt:"Deputy Executive Curator",strike:"0/3",date:"25.05.2026"},
-  {id:"240601",name:"Nils Brandenburger",rank:"28. Assistant Director of FIB",dn:"777",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"25.05.2026"},
-  {id:"156935",name:"Assan Diop",rank:"28. Assistant Director of FIB",dn:"999",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"25.05.2026"},
-  {id:"76002",name:"Dan Reacher",rank:"28. Assistant Director of FIB",dn:"5",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"25.05.2026"},
-  {id:"85558",name:"Dimii Nevergone",rank:"28. Assistant Director of FIB",dn:"3",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"26.05.2026"},
-  {id:"26412",name:"Luca Santos",rank:"28. Assistant Director of FIB",dn:"361",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"29.05.2026"},
-  {id:"6180",name:"Paul Nao",rank:"28. Assistant Director of FIB",dn:"17",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"26.05.2026"},
-  {id:"102262",name:"Hakuri Schrom",rank:"28. Assistant Director of FIB",dn:"262",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"02.06.2026"},
-  {id:"135691",name:"Joachim vonWanze",rank:"27. Divisional Director",dn:"10",div:"Curator of Division",abt:"Curator | HR / FIBCO",strike:"0/3",date:"25.05.2026"},
-  {id:"157291",name:"Hugo Federov",rank:"27. Divisional Director",dn:"7",div:"Curator of Division",abt:"Curator | FIBCO",strike:"0/3",date:"26.05.2026"},
-  {id:"128034",name:"Bali Nevergone",rank:"27. Divisional Director",dn:"27",div:"Curator of Division",abt:"Curator | CIRG",strike:"0/3",date:"26.05.2026"},
-  {id:"156327",name:"Falkdoc Federov",rank:"27. Divisional Director",dn:"8",div:"Curator of Division",abt:"Curator | PR / FIBCO",strike:"0/3",date:"26.05.2026"},
-  {id:"295473",name:"Felix Mccalley",rank:"26. Inspector of the FIB",dn:"6",div:"High Command Lead",abt:"Head of High Command / FIBCO",strike:"0/3",date:"25.05.2026"},
-  {id:"217060",name:"Raffi Yane",rank:"25. Supervisory Head Agent",dn:"4",div:"High Command",abt:"HR Leitung / FIBCO",strike:"0/3",date:"25.05.2026"},
-  {id:"26899",name:"Amando Carillo",rank:"25. Supervisory Head Agent",dn:"31",div:"High Command",abt:"CID Stellv. Leitung",strike:"0/3",date:"25.05.2026"},
-  {id:"219213",name:"Jannick Yurr",rank:"25. Supervisory Head Agent",dn:"187",div:"High Command",abt:"CID Stellv. Leitung / FIBCO",strike:"0/3",date:"25.05.2026"},
-  {id:"34258",name:"Fynn Andreas",rank:"25. Supervisory Head Agent",dn:"11",div:"High Command",abt:"FIBCO Leitung",strike:"0/3",date:"26.05.2026"},
-  {id:"106544",name:"Marcel Gruuber",rank:"25. Supervisory Head Agent",dn:"15",div:"High Command",abt:"—",strike:"0/3",date:"25.05.2026"},
-  {id:"256009",name:"Kayne Smoker",rank:"24. Supervisory Agent",dn:"25",div:"High Command",abt:"TD Stellv. Leitung / CIRG",strike:"0/3",date:"26.05.2026"},
-  {id:"142220",name:"Simon Kellermann",rank:"24. Supervisory Agent",dn:"143",div:"High Command",abt:"FIBCO",strike:"0/3",date:"29.05.2026"},
-  {id:"176902",name:"Filip vonWanze",rank:"23. Special Agent in Charge",dn:"32",div:"High Command",abt:"TD",strike:"0/3",date:"26.05.2026"},
-  {id:"218257",name:"Ranjid Bay",rank:"23. Special Agent in Charge",dn:"33",div:"High Command",abt:"CIRG / CID",strike:"0/3",date:"26.05.2026"},
-  {id:"135217",name:"Sebastian Kuroyama",rank:"23. Special Agent in Charge",dn:"52",div:"High Command",abt:"CID",strike:"0/3",date:"26.05.2026"},
-  {id:"264668",name:"Kai Herzog",rank:"23. Special Agent in Charge",dn:"21",div:"High Command",abt:"FIBCO / HR",strike:"0/3",date:"26.05.2026"},
-  {id:"258321",name:"Mickey Maybach",rank:"23. Special Agent in Charge",dn:"53",div:"High Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
-  {id:"50091",name:"Syn Veno",rank:"23. Special Agent in Charge",dn:"59",div:"High Command",abt:"CID",strike:"0/3",date:"26.05.2026"},
-  {id:"244186",name:"Anton Moluda",rank:"23. Special Agent in Charge",dn:"9",div:"High Command",abt:"FIBCO Stellv. Leitung",strike:"0/3",date:"05.06.2026"},
-  {id:"109467",name:"Felix Cunningham",rank:"23. Special Agent in Charge",dn:"12",div:"High Command",abt:"CID Leitung / HR",strike:"0/3",date:"26.05.2026"},
-  {id:"192812",name:"Nico Saito",rank:"23. Special Agent in Charge",dn:"23",div:"High Command",abt:"TD Stellv. Leitung",strike:"0/3",date:"26.05.2026"},
-  {id:"105534",name:"Akin Kaplan",rank:"23. Special Agent in Charge",dn:"71",div:"High Command",abt:"FIBCO / CID",strike:"0/3",date:"26.05.2026"},
-  {id:"257441",name:"Hugo Pinsel",rank:"23. Special Agent in Charge",dn:"16",div:"High Command",abt:"FIBCO Stellv. Leitung / HR",strike:"0/3",date:"26.05.2026"},
-  {id:"290275",name:"Tomek Dick",rank:"23. Special Agent in Charge",dn:"58",div:"High Command",abt:"PR",strike:"0/3",date:"26.05.2026"},
-  {id:"288863",name:"Bernhard Wolf",rank:"23. Special Agent in Charge",dn:"132",div:"High Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
-  {id:"239288",name:"Noah Raiin",rank:"23. Special Agent in Charge",dn:"444",div:"High Command",abt:"FIBCO / HR",strike:"0/3",date:"26.05.2026"},
-  {id:"12263",name:"Fabi Astro",rank:"23. Special Agent in Charge",dn:"107",div:"High Command",abt:"HR Senior / FIBCO",strike:"0/3",date:"26.05.2026"},
-  {id:"136176",name:"Quentin Wesh",rank:"23. Special Agent in Charge",dn:"111",div:"High Command",abt:"CIRG Stellv. Leitung / TD",strike:"0/3",date:"26.05.2026"},
-  {id:"79712",name:"Angus Newton",rank:"23. Special Agent in Charge",dn:"62",div:"High Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
-  {id:"214462",name:"Marcel Fero",rank:"23. Special Agent in Charge",dn:"34",div:"High Command",abt:"—",strike:"0/3",date:"26.05.2026"},
-  {id:"18612",name:"Nico Schlumpf",rank:"22. Division Chief",dn:"28",div:"Division Lead",abt:"IA Leitung / FIBCO",strike:"0/3",date:"26.05.2026"},
-  {id:"140883",name:"Johannes Brecher",rank:"22. Division Chief",dn:"14",div:"Division Lead",abt:"CIRG Leitung / CID",strike:"0/3",date:"26.05.2026"},
-  {id:"126465",name:"Nia vonWanze",rank:"22. Division Chief",dn:"22",div:"Division Lead",abt:"TD Leitung",strike:"0/3",date:"27.05.2026"},
-  {id:"190803",name:"Berkoli Midnight",rank:"22. Division Chief",dn:"19",div:"Division Lead",abt:"PR Leitung",strike:"0/3",date:"27.05.2026"},
-  {id:"200311",name:"Jonas Rak",rank:"21. Deputy Division Chief",dn:"13",div:"Division Lead",abt:"HR Stellv. Leitung",strike:"0/3",date:"26.05.2026"},
-  {id:"5545",name:"Fredo Frost",rank:"21. Deputy Division Chief",dn:"69",div:"Division Lead",abt:"CID Stellv. Leitung",strike:"0/3",date:"25.05.2026"},
-  {id:"220186",name:"Bellobatz Dacruze",rank:"21. Deputy Division Chief",dn:"77",div:"Division Lead",abt:"CIRG Stellv. Leitung",strike:"0/3",date:"26.05.2026"},
-  {id:"155716",name:"Paul Trappler",rank:"19. Tactical Operator",dn:"122",div:"Abteilungsrang",abt:"CIRG",strike:"0/3",date:"06.06.2026"},
-  {id:"218503",name:"Frosty Dick",rank:"19. Tactical Operator",dn:"85",div:"Abteilungsrang",abt:"CIRG",strike:"0/3",date:"26.05.2026"},
-  {id:"244882",name:"Tobi Lakiri",rank:"18. Department Specialist",dn:"48",div:"Abteilungsrang",abt:"PR",strike:"0/3",date:"01.06.2026"},
-  {id:"9895",name:"Kalle Osbornee",rank:"18. Department Specialist",dn:"57",div:"Abteilungsrang",abt:"TD",strike:"0/3",date:"27.05.2026"},
-  {id:"189768",name:"Kenan Kasalla",rank:"17. Commander",dn:"37",div:"Command",abt:"—",strike:"0/3",date:"07.06.2026"},
-  {id:"137965",name:"Nate Nays",rank:"17. Commander",dn:"121",div:"Command",abt:"HR / CID",strike:"0/3",date:"26.05.2026"},
-  {id:"14338",name:"Carlos Sandman",rank:"17. Commander",dn:"163",div:"Command",abt:"—",strike:"0/3",date:"07.06.2026"},
-  {id:"404",name:"Kev Error",rank:"17. Commander",dn:"404",div:"Command",abt:"CIRG",strike:"0/3",date:"26.05.2026"},
-  {id:"225755",name:"Thommy Perez",rank:"17. Commander",dn:"50",div:"Command",abt:"—",strike:"0/3",date:"04.06.2026"},
-  {id:"4149",name:"Atze Altin",rank:"17. Commander",dn:"49",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
-  {id:"192303",name:"Jonass Breitling",rank:"17. Commander",dn:"51",div:"Command",abt:"—",strike:"0/3",date:"02.06.2026"},
-  {id:"225011",name:"Odin Wolf",rank:"17. Commander",dn:"112",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
-  {id:"232642",name:"Peter Holz",rank:"17. Commander",dn:"61",div:"Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
-  {id:"252692",name:"Jason Janee",rank:"17. Commander",dn:"155",div:"Command",abt:"CIRG",strike:"0/3",date:"27.05.2026"},
-  {id:"52617",name:"Michi Mahoni",rank:"17. Commander",dn:"95",div:"Command",abt:"CIRG",strike:"0/3",date:"26.05.2026"},
-  {id:"203202",name:"Fernando Dick",rank:"17. Commander",dn:"66",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
-  {id:"286372",name:"Cengo Neverloved",rank:"17. Commander",dn:"70",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
-  {id:"115582",name:"Lia Kaplan",rank:"17. Commander",dn:"35",div:"Command",abt:"CID",strike:"0/3",date:"26.05.2026"},
-  {id:"251159",name:"Tim Balls",rank:"17. Commander",dn:"125",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
-  {id:"212921",name:"Alicee Asic",rank:"17. Commander",dn:"73",div:"Command",abt:"CIRG",strike:"0/3",date:"26.05.2026"},
-  {id:"62",name:"Kevin Done",rank:"17. Commander",dn:"63",div:"Command",abt:"—",strike:"0/3",date:"27.05.2026"},
-  {id:"292078",name:"Ibo Aquila",rank:"17. Commander",dn:"74",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
-  {id:"66603",name:"Harald Sachse",rank:"17. Commander",dn:"603",div:"Command",abt:"—",strike:"0/3",date:"29.05.2026"},
-  {id:"208195",name:"Vaun Deberg",rank:"17. Commander",dn:"82",div:"Command",abt:"—",strike:"0/3",date:"30.05.2026"},
-  {id:"301271",name:"Aure Knusper",rank:"17. Commander",dn:"80",div:"Command",abt:"CIRG",strike:"0/3",date:"26.05.2026"},
-  {id:"159846",name:"Titus Maximus",rank:"17. Commander",dn:"152",div:"Command",abt:"FIBCO",strike:"0/3",date:"27.05.2026"},
-  {id:"174040",name:"Luca Hochreiter",rank:"17. Commander",dn:"175",div:"Command",abt:"—",strike:"0/3",date:"30.05.2026"},
-  {id:"257297",name:"Yuri Loveless",rank:"17. Commander",dn:"79",div:"Command",abt:"CID",strike:"0/3",date:"26.05.2026"},
-  {id:"26568",name:"Harleen Bama",rank:"17. Commander",dn:"65",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
-  {id:"229248",name:"Eren Almaz",rank:"17. Commander",dn:"20",div:"Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
-  {id:"289353",name:"Raul Nuis",rank:"17. Commander",dn:"75",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
-  {id:"253176",name:"Gimo Jimmbo",rank:"17. Commander",dn:"707",div:"Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
-];
+function loadMA(){try{const d=localStorage.getItem('fib_ma');if(d)return JSON.parse(d);}catch(e){}return DEF.map(m=>({...m}));}
+function saveMA(){try{localStorage.setItem('fib_ma',JSON.stringify(MA));}catch(e){}}
+function resetData(){if(!confirm('Alle Anderungen zurucksetzen? Dies kann nicht ruckgangig gemacht werden.'))return;localStorage.removeItem('fib_ma');MA=DEF.map(m=>({...m}));filtered=[...MA];filterMA();refreshSelects();showToast('Zuruckgesetzt');}
 
-let maPage=1;const PER=15;let filtered=[...MA];
+let MA=loadMA(),filtered=[...MA],maPage=1;const PER=15;
 
-function rankClass(r){const n=parseInt(r);if(n>=26)return'rh';if(n>=20)return'rm';return'rl';}
+function gv(id){const e=document.getElementById(id);return e?e.value:'';}
+function sv2(id,v){const e=document.getElementById(id);if(e)e.value=v;}
+function setOb(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function fmtD(raw){if(!raw)return'--';if(raw.includes('.'))return raw;const d=new Date(raw);return[String(d.getDate()).padStart(2,'0'),String(d.getMonth()+1).padStart(2,'0'),d.getFullYear()].join('.');}
+function gd(){return fmtD(new Date().toISOString().slice(0,10));}
+function rankCls(r){const n=parseInt(r);if(n>=26)return'rh';if(n>=20)return'rm';return'rl';}
 
+// --- ABSENDER ---
+function loadAbs(){try{const d=localStorage.getItem('fib_abs');if(d)return JSON.parse(d);}catch(e){}return{name:'',rang:'',abt:''};}
+function saveAbsF(){
+  const name=gv('abs-rang-name')||gv('abs-ein-name')||gv('abs-kue-name')||gv('abs-az-name')||gv('abs-san-name')||gv('abs-pa-name');
+  const rang=gv('abs-rang-rang')||gv('abs-ein-rang')||gv('abs-kue-rang')||gv('abs-az-rang')||gv('abs-san-rang')||gv('abs-pa-rang');
+  const abt=gv('abs-rang-abt')||gv('abs-ein-abt')||gv('abs-kue-abt')||gv('abs-az-abt')||gv('abs-san-abt')||gv('abs-pa-abt');
+  try{localStorage.setItem('fib_abs',JSON.stringify({name,rang,abt}));}catch(e){}
+  sv2('cfg-name',name);sv2('cfg-rang',rang);sv2('cfg-abt',abt);
+}
+function syncFromCfg(){
+  const name=gv('cfg-name'),rang=gv('cfg-rang'),abt=gv('cfg-abt');
+  ['rang','ein','kue','az','san','pa'].forEach(p=>{sv2('abs-'+p+'-name',name);sv2('abs-'+p+'-rang',rang);sv2('abs-'+p+'-abt',abt);});
+  try{localStorage.setItem('fib_abs',JSON.stringify({name,rang,abt}));}catch(e){}
+  [upRa,upEs,upKu,upAz,upSa,upPa].forEach(f=>f());
+}
+function loadAbsIntoFields(){
+  const a=loadAbs();
+  ['rang','ein','kue','az','san','pa'].forEach(p=>{sv2('abs-'+p+'-name',a.name||'');sv2('abs-'+p+'-rang',a.rang||'');sv2('abs-'+p+'-abt',a.abt||'');});
+  sv2('cfg-name',a.name||'');sv2('cfg-rang',a.rang||'');sv2('cfg-abt',a.abt||'');
+}
+function absLine(p){
+  const name=gv('abs-'+p+'-name'),rang=gv('abs-'+p+'-rang'),abt=gv('abs-'+p+'-abt');
+  const parts=[];if(rang)parts.push(rang);if(name)parts.push(name);if(abt)parts.push('| '+abt);
+  return parts.length?'\n\n-# Ausgestellt von: '+parts.join(' '):'';
+}
+
+// --- TABLE ---
 function buildMA(){
-  const tbody=document.getElementById('ma-body');
-  const start=(maPage-1)*PER,slice=filtered.slice(start,start+PER);
-  tbody.innerHTML=slice.map(m=>`<tr>
+  const s=(maPage-1)*PER,sl=filtered.slice(s,s+PER);
+  document.getElementById('ma-body').innerHTML=sl.map(m=>`<tr>
     <td style="color:var(--mu);font-size:11px">${m.id}</td>
     <td style="font-weight:bold">${m.name}</td>
-    <td><span class="rb ${rankClass(m.rank)}">${m.rank}</span></td>
-    <td style="color:var(--g)">${m.dn}</td>
-    <td style="color:var(--mu);font-size:11px">${m.div}</td>
-    <td style="color:var(--mu);font-size:10px">${m.abt}</td>
-    <td style="color:${m.strike==='0/3'?'var(--gr)':'var(--re)'}">${m.strike}</td>
-    <td style="color:var(--mu);font-size:11px">${m.date}</td>
-  </tr>`).join('');
+    <td><span class="rb ${rankCls(m.rank)}">${m.rank}</span></td>
+    <td style="color:var(--g)">${m.dn||'--'}</td>
+    <td style="color:var(--mu);font-size:11px">${m.div||'--'}</td>
+    <td style="color:var(--mu);font-size:10px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${m.abt||''}">${m.abt||'--'}</td>
+    <td style="color:#3a8fd4;font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${m.ausb||''}">${m.ausb||'--'}</td>
+    <td style="color:${m.strike==='0/3'?'var(--gr)':'var(--re)'}">${m.strike||'0/3'}</td>
+    <td style="color:var(--mu);font-size:11px;white-space:nowrap">${m.date||'--'}</td>
+    <td style="text-align:center;white-space:nowrap">
+      <button class="btn sm bl" onclick="openEdit('${m.id}')" title="Bearbeiten"><i class="ti ti-edit"></i></button>
+      <button class="btn sm ng" onclick="delMA('${m.id}')" title="Loschen"><i class="ti ti-trash"></i></button>
+    </td></tr>`).join('');
   const cnt=document.getElementById('ma-count');
-  if(cnt)cnt.textContent=`Zeige ${Math.min(start+1,filtered.length)}–${Math.min(start+PER,filtered.length)} von ${filtered.length}`;
+  if(cnt)cnt.textContent=`${Math.min(s+1,filtered.length)}-${Math.min(s+PER,filtered.length)} von ${filtered.length}`;
+  const b=document.getElementById('ma-badge');if(b)b.textContent=MA.length+' AGENTEN';
+  const dc=document.getElementById('dash-count');if(dc)dc.textContent=MA.length;
+  const cc=document.getElementById('cfg-count');if(cc)cc.textContent=MA.length;
   buildPgr();
 }
-
 function buildPgr(){
-  const total=Math.ceil(filtered.length/PER);
-  const pgr=document.getElementById('ma-pgr');
-  if(!pgr)return;
+  const total=Math.ceil(filtered.length/PER),pgr=document.getElementById('ma-pgr');if(!pgr)return;
   if(total<=1){pgr.innerHTML='';return;}
-  let h=`<button onclick="maGo(maPage-1)">‹</button>`;
+  let h='<button onclick="maGo(maPage-1)">&#x2039;</button>';
   for(let i=1;i<=total;i++)h+=`<button class="${i===maPage?'cur':''}" onclick="maGo(${i})">${i}</button>`;
-  h+=`<button onclick="maGo(maPage+1)">›</button>`;
-  pgr.innerHTML=h;
+  pgr.innerHTML=h+'<button onclick="maGo(maPage+1)">&#x203a;</button>';
 }
-
 function maGo(p){const t=Math.ceil(filtered.length/PER);maPage=Math.max(1,Math.min(p,t));buildMA();}
-
 function filterMA(){
-  const q=(document.getElementById('ma-search').value||'').toLowerCase();
-  const f=document.getElementById('ma-filter').value;
+  const q=gv('ma-search').toLowerCase(),f=gv('ma-filter');
   filtered=MA.filter(m=>{
-    const match=!q||(m.name.toLowerCase().includes(q)||m.id.includes(q)||m.rank.toLowerCase().includes(q)||m.abt.toLowerCase().includes(q)||m.dn.includes(q));
-    const div=!f||m.div===f;
-    return match&&div;
+    const ok=!q||(m.name.toLowerCase().includes(q)||m.id.includes(q)||m.rank.toLowerCase().includes(q)||(m.abt||'').toLowerCase().includes(q)||(m.dn||'').includes(q)||(m.ausb||'').toLowerCase().includes(q)||(m.notes||'').toLowerCase().includes(q));
+    return ok&&(!f||m.div===f);
   });
   maPage=1;buildMA();
 }
+function delMA(id){if(!confirm('Mitarbeiter wirklich loschen?'))return;MA=MA.filter(m=>m.id!==id);saveMA();filtered=filtered.filter(m=>m.id!==id);buildMA();refreshSelects();}
 
-function fillSelects(){
+// --- MODAL ---
+function fillRankSel(){const s=document.getElementById('m-rank');if(!s||s.options.length>1)return;RANKS.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;s.appendChild(o);});}
+function openAddModal(){
+  fillRankSel();
+  document.getElementById('modal-title').textContent='Mitarbeiter hinzufugen';
+  document.getElementById('modal-eid').value='';
+  ['m-id','m-name','m-dn','m-abt','m-ausb','m-notes'].forEach(id=>sv2(id,''));
+  sv2('m-rank','');sv2('m-div','');sv2('m-strike','0/3');sv2('m-status','Aktiv');
+  document.getElementById('m-date').value='';
+  document.getElementById('ma-modal').classList.add('show');
+}
+function openEdit(id){
+  fillRankSel();
+  const m=MA.find(x=>x.id===id);if(!m)return;
+  document.getElementById('modal-title').textContent='Mitarbeiter bearbeiten';
+  document.getElementById('modal-eid').value=id;
+  sv2('m-id',m.id);sv2('m-name',m.name);sv2('m-rank',m.rank);sv2('m-dn',m.dn||'');
+  sv2('m-div',m.div||'');sv2('m-abt',m.abt||'');sv2('m-ausb',m.ausb||'');
+  sv2('m-strike',m.strike||'0/3');sv2('m-status',m.status||'Aktiv');sv2('m-notes',m.notes||'');
+  const dv=m.date&&m.date.includes('.')?m.date.split('.').reverse().join('-'):(m.date||'');
+  document.getElementById('m-date').value=dv;
+  document.getElementById('ma-modal').classList.add('show');
+}
+function closeModal(){document.getElementById('ma-modal').classList.remove('show');}
+function saveModal(){
+  const eid=gv('modal-eid'),nid=gv('m-id').trim();
+  if(!nid||!gv('m-name').trim()||!gv('m-rank')){alert('Bitte Pass-ID, Name und Rang ausfullen.');return;}
+  if(!eid&&MA.find(m=>m.id===nid)){alert('Pass-ID bereits vorhanden!');return;}
+  const dv=document.getElementById('m-date').value;
+  const entry={id:nid,name:gv('m-name').trim(),rank:gv('m-rank'),dn:gv('m-dn').trim(),div:gv('m-div'),abt:gv('m-abt').trim(),ausb:gv('m-ausb').trim(),strike:gv('m-strike'),status:gv('m-status'),notes:gv('m-notes').trim(),date:dv?fmtD(dv):''};
+  if(eid){const i=MA.findIndex(m=>m.id===eid);if(i>=0)MA[i]=entry;}else MA.push(entry);
+  saveMA();filtered=[...MA];filterMA();refreshSelects();closeModal();showToast('Gespeichert');
+}
+document.getElementById('ma-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// --- SELECTS ---
+function refreshSelects(){
   ['ra-sel','ku-sel','az-sel','sa-sel','pa-sel'].forEach(id=>{
     const s=document.getElementById(id);if(!s)return;
-    MA.forEach(m=>{
-      const o=document.createElement('option');
-      o.value=m.id;
-      o.textContent=`${m.dn} | ${m.name}`;
-      s.appendChild(o);
-    });
-  });
-  ['ra-old','ra-new','es-rang'].forEach(id=>{
-    const s=document.getElementById(id);if(!s)return;
-    RANKS.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;s.appendChild(o);});
+    const cur=s.value;while(s.options.length>1)s.remove(1);
+    MA.forEach(m=>{const o=document.createElement('option');o.value=m.id;o.textContent=(m.dn||m.id)+' | '+m.name;s.appendChild(o);});
+    s.value=cur;
   });
 }
-
-function fillFromMA(prefix){
-  const sel=document.getElementById(prefix+'-sel');if(!sel)return;
+function fillSelects(){
+  refreshSelects();
+  ['ra-old','ra-new','es-rang'].forEach(id=>{const s=document.getElementById(id);if(!s)return;RANKS.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;s.appendChild(o);});});
+}
+function fillFromMA(pfx){
+  const sel=document.getElementById(pfx+'-sel');if(!sel)return;
   const m=MA.find(x=>x.id===sel.value);if(!m)return;
-  const set=(id,val)=>{const el=document.getElementById(prefix+'-'+id);if(el)el.value=val;};
-  if(prefix==='ra'){set('name',m.name);set('dn',m.dn);set('old',m.rank);}
-  if(prefix==='ku'){set('name',m.name);set('dn',m.dn);set('rang',m.rank);}
-  if(prefix==='az'){set('name',m.name);set('pass',m.id);set('rang',m.rank);set('abt',m.abt==='—'?'':m.abt);}
-  if(prefix==='sa'){set('name',m.name);set('dn',m.dn);}
-  if(prefix==='pa'){set('name',m.name);set('dn',m.dn);set('rang',m.rank);set('abt',m.abt==='—'?'':m.abt);}
-  const fns={ra:upRa,ku:upKu,az:upAz,sa:upSa,pa:upPa,es:upEs};
-  if(fns[prefix])fns[prefix]();
+  if(pfx==='ra'){sv2('ra-name',m.name);sv2('ra-dn',m.dn||'');sv2('ra-old',m.rank);}
+  if(pfx==='ku'){sv2('ku-name',m.name);sv2('ku-dn',m.dn||'');sv2('ku-rang',m.rank);}
+  if(pfx==='az'){sv2('az-name',m.name);sv2('az-pass',m.id);sv2('az-rang',m.rank);sv2('az-abt',m.abt==='--'?'':m.abt||'');}
+  if(pfx==='sa'){sv2('sa-name',m.name);sv2('sa-dn',m.dn||'');}
+  if(pfx==='pa'){sv2('pa-name',m.name);sv2('pa-dn',m.dn||'');sv2('pa-rang',m.rank);sv2('pa-abt',m.abt==='--'?'':m.abt||'');}
+  const fns={ra:upRa,ku:upKu,az:upAz,sa:upSa,pa:upPa};if(fns[pfx])fns[pfx]();
 }
 
-function gd(){const d=new Date();return[String(d.getDate()).padStart(2,'0'),String(d.getMonth()+1).padStart(2,'0'),d.getFullYear()].join('.');}
-function fmtDate(raw){if(!raw)return'—';const d=new Date(raw);return[String(d.getDate()).padStart(2,'0'),String(d.getMonth()+1).padStart(2,'0'),d.getFullYear()].join('.');}
-function v(id){const e=document.getElementById(id);return e?e.value:'';}
-function setOb(id,val){const e=document.getElementById(id);if(e)e.textContent=val;}
-
+// --- PREVIEWS ---
 function upRa(){
-  const dn=v('ra-dn')||'XX',name=v('ra-name')||'Name',old=v('ra-old')||'Alter Rang',nw=v('ra-new')||'Neuer Rang',grund=v('ra-grund')||'—';
-  setOb('ra-pre',`-# Ranganpassung · FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${name}\n**Von:** ${old}\n**Nach:** ${nw}\n**Datum:** ${gd()}\n**Begründung:** ${grund}\n\n-# GrandRP DE01 · FIB`);
+  const dn=gv('ra-dn')||'XX',n=gv('ra-name')||'Name',o=gv('ra-old')||'Alter Rang',nw=gv('ra-new')||'Neuer Rang',g=gv('ra-grund')||'--';
+  setOb('ra-pre',`-# Ranganpassung . FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${n}\n**Von:** ${o}\n**Nach:** ${nw}\n**Datum:** ${gd()}\n**Begruendung:** ${g}${absLine('rang')}\n\n-# GrandRP DE01 . FIB`);
 }
 function upEs(){
-  const dn=v('es-dn')||'XX',name=v('es-name')||'Name',abt=v('es-abt')||'Abteilung',rang=v('es-rang')||'Rang';
-  setOb('es-pre',`-# Einstellung · FIB Personalabteilung\n\n**Dienstnummer:** ${dn}\n**Name:** ${name}\n**Rang:** ${rang}\n**Abteilung:** @${abt}\n**Einstellungsdatum:** ${gd()}\n\nWillkommen im Federal Investigation Bureau!\n\n-# GrandRP DE01 · FIB`);
+  const dn=gv('es-dn')||'XX',n=gv('es-name')||'Name',a=gv('es-abt')||'Abteilung',r=gv('es-rang')||'Rang';
+  setOb('es-pre',`-# Einstellung . FIB Personalabteilung\n\n**Dienstnummer:** ${dn}\n**Name:** ${n}\n**Rang:** ${r}\n**Abteilung:** @${a}\n**Einstellungsdatum:** ${gd()}\n\nWillkommen im Federal Investigation Bureau!${absLine('ein')}\n\n-# GrandRP DE01 . FIB`);
 }
 function upKu(){
-  const dn=v('ku-dn')||'XX',name=v('ku-name')||'Name',rang=v('ku-rang')||'—',grund=v('ku-grund')||'—';
-  setOb('ku-pre',`-# Kündigung · FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${name}\n**Rang:** ${rang}\n**Datum:** ${gd()}\n**Grund:** ${grund}\n\nDer Mitarbeiter wird mit sofortiger Wirkung aus dem Dienst entlassen.\n\n-# GrandRP DE01 · FIB`);
+  const dn=gv('ku-dn')||'XX',n=gv('ku-name')||'Name',r=gv('ku-rang')||'--',g=gv('ku-grund')||'--';
+  setOb('ku-pre',`-# Kuendigung . FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${n}\n**Rang:** ${r}\n**Datum:** ${gd()}\n**Grund:** ${g}\n\nDer Mitarbeiter wird mit sofortiger Wirkung aus dem Dienst entlassen.${absLine('kue')}\n\n-# GrandRP DE01 . FIB`);
 }
 function upAz(){
-  const name=v('az-name')||'Vor- u. Nachname',pass=v('az-pass')||'—',rang=v('az-rang')||'—',abt=v('az-abt'),dat=fmtDate(v('az-datum'));
-  let msg=`Das Federal Investigation Bureau (FIB),\nübermittelt hiermit das Arbeitszeugnis von:\n\n**Vor- u. Nachname:** ${name}\n**Reisepassnr.:** ${pass}\n**Rang:** ${rang}\n**Datum der Kündigung:** ${dat}`;
-  if(abt&&abt.trim())msg+=`\n**Abteilungen:** ${abt}`;
-  msg+=`\n\n(Arbeitszeugnis wird als Anhang beigefügt)\n\n-# GrandRP DE01 · FIB Personalabteilung`;
+  const n=gv('az-name')||'Vor- u. Nachname',p=gv('az-pass')||'--',r=gv('az-rang')||'--',a=gv('az-abt'),d=fmtD(gv('az-datum'))||'--';
+  let msg=`Das Federal Investigation Bureau (FIB),\nuebermittelt hiermit das Arbeitszeugnis von:\n\n**Vor- u. Nachname:** ${n}\n**Reisepassnr.:** ${p}\n**Rang:** ${r}\n**Datum der Kuendigung:** ${d}`;
+  if(a&&a.trim())msg+=`\n**Abteilungen:** ${a}`;
+  msg+=`\n\n(Arbeitszeugnis wird als Anhang beigefuegt)${absLine('az')}\n\n-# GrandRP DE01 . FIB Personalabteilung`;
   setOb('az-pre',msg);
 }
 function upSa(){
-  const dn=v('sa-dn')||'XX',name=v('sa-name')||'Name',art=v('sa-art')||'—',grund=v('sa-grund')||'—';
-  setOb('sa-pre',`-# Sanktion · FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${name}\n**Sanktionsart:** ${art}\n**Datum:** ${gd()}\n**Begründung:** ${grund}\n\n-# GrandRP DE01 · FIB`);
+  const dn=gv('sa-dn')||'XX',n=gv('sa-name')||'Name',a=gv('sa-art')||'--',g=gv('sa-grund')||'--';
+  setOb('sa-pre',`-# Sanktion . FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${n}\n**Sanktionsart:** ${a}\n**Datum:** ${gd()}\n**Begruendung:** ${g}${absLine('san')}\n\n-# GrandRP DE01 . FIB`);
 }
 function upPa(){
-  const dn=v('pa-dn')||'XX',name=v('pa-name')||'Name',rang=v('pa-rang')||'—',abt=v('pa-abt')||'—',dat=fmtDate(v('pa-datum'))||gd();
-  setOb('pa-pre',`-# Personalakte · FIB\n\n**Dienstnummer:** ${dn}\n**Name:** ${name}\n**Rang:** ${rang}\n**Abteilung:** ${abt}\n**Eintrittsdatum:** ${dat}\n**Strike:** 0/3\n**Status:** Aktiv\n\n-# GrandRP DE01 · Federal Investigation Bureau`);
+  const dn=gv('pa-dn')||'XX',n=gv('pa-name')||'Name',r=gv('pa-rang')||'--',a=gv('pa-abt')||'--',d=fmtD(gv('pa-datum'))||gd();
+  setOb('pa-pre',`-# Personalakte . FIB\n\n**Dienstnummer:** ${dn}\n**Name:** ${n}\n**Rang:** ${r}\n**Abteilung:** ${a}\n**Eintrittsdatum:** ${d}\n**Strike:** 0/3\n**Status:** Aktiv${absLine('pa')}\n\n-# GrandRP DE01 . Federal Investigation Bureau`);
 }
 
-function cp(id){
-  const e=document.getElementById(id);
-  if(!e)return;
-  navigator.clipboard.writeText(e.textContent).then(()=>{
-    const t=document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2000);
-  }).catch(()=>{});
-}
-
+// --- UTILS ---
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function cp(id){const e=document.getElementById(id);if(!e)return;navigator.clipboard.writeText(e.textContent).then(()=>showToast('In Zwischenablage kopiert')).catch(()=>{});}
 function sv(name,el){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('act'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));
   const vEl=document.getElementById('v-'+name);if(vEl)vEl.classList.add('act');
-  if(el&&el.classList&&el.classList.contains('ni')){el.classList.add('act');}
-  else{document.querySelectorAll('.ni').forEach(n=>{const oc=n.getAttribute('onclick')||'';if(oc.includes("'"+name+"'"))n.classList.add('act');});}
-  if(name==='ma'){filterMA();}
+  if(el&&el.classList&&el.classList.contains('ni'))el.classList.add('act');
+  else document.querySelectorAll('.ni').forEach(n=>{if((n.getAttribute('onclick')||'').includes("'"+name+"'"))n.classList.add('act');});
+  if(name==='ma')filterMA();
 }
-
 function setCol(h){
   document.documentElement.style.setProperty('--g',h);
   const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
   document.documentElement.style.setProperty('--gd',`rgba(${r},${g},${b},0.45)`);
   document.documentElement.style.setProperty('--gg',`rgba(${r},${g},${b},0.10)`);
   const el=document.getElementById('colhex');if(el)el.textContent=h;
+  try{localStorage.setItem('fib_color',h);}catch(e){}
 }
-
 function tick(){
-  const t=new Date();
-  const s=[t.getHours(),t.getMinutes(),t.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+  const t=new Date(),s=[t.getHours(),t.getMinutes(),t.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
   ['clk','bclk'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=s;});
 }
 
-tick();
-setInterval(tick,1000);
-fillSelects();
-buildMA();
-upAz();
+// INIT
+try{const c=localStorage.getItem('fib_color');if(c){setCol(c);document.getElementById('colpick').value=c;}}catch(e){}
+tick();setInterval(tick,1000);
+fillSelects();buildMA();loadAbsIntoFields();
+[upAz,upRa,upEs,upKu,upSa,upPa].forEach(f=>f());
 </script>
 </body>
 </html>
