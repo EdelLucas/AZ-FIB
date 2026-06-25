@@ -90,6 +90,10 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 .abtitle{font-size:10px;color:var(--bl);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--gd);}
 @media(max-width:768px){.sb{width:46px;}.ni span,.nl,.sb-title,.sb-sub{display:none;}.sb-emblem{width:30px;height:30px;font-size:10px;}.sb-logo{padding:7px 4px;}.srow{grid-template-columns:1fr 1fr;}.mg{grid-template-columns:1fr;}.ir{grid-template-columns:1fr;}.ir3{grid-template-columns:1fr 1fr;}.topbar-brand{font-size:9px;letter-spacing:.05em;}}
+.edit-card{background:var(--p2);border:1px solid var(--bd);border-radius:5px;padding:10px 13px;display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.ec-row{display:flex;flex-direction:column;gap:3px;}
+.ec-lbl{font-size:10px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;}
+.ec-inp{font-size:12px;padding:5px 8px;}
 .tpl-tab{opacity:.6;transition:.15s;}
 .tpl-tab:hover{opacity:1;}
 .act-tab{opacity:1;background:var(--gg)!important;border-color:var(--g)!important;}
@@ -218,13 +222,18 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div style="margin-bottom:11px;">
         <div class="fl">Reisepassnummer eingeben</div>
         <div style="display:flex;gap:8px;">
-          <input class="fi" id="ra-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('ra')">
+          <input class="fi" id="ra-pass-in" placeholder="Pass-ID oder Name ..." style="max-width:260px;" oninput="lookupPass('ra')">
           <div id="ra-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
         </div>
       </div>
       <div id="ra-fields" style="display:none;">
-        <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="ra-info"></div>
-        <div class="ir">
+        <div class="edit-card" id="ra-info">
+          <div class="ec-row"><span class="ec-lbl">Name</span><input class="fi ec-inp" id="ra-name-ed" oninput="sv2('ra-name',this.value);upRa()"></div>
+          <div class="ec-row"><span class="ec-lbl">Dienstnr.</span><input class="fi ec-inp" id="ra-dn-ed" oninput="sv2('ra-dn',this.value);upRa()"></div>
+          <div class="ec-row"><span class="ec-lbl">Abteilung</span><input class="fi ec-inp" id="ra-abt-ed" readonly style="color:var(--mu)"></div>
+          <div class="ec-row"><span class="ec-lbl">Strike</span><input class="fi ec-inp" id="ra-strike-ed" readonly style="color:var(--mu)"></div>
+        </div>
+        <div class="ir" style="margin-top:11px;">
           <div><div class="fl">Alter Rang</div><select class="fi" id="ra-old" onchange="upRa()"><option value="">-- wahlen --</option></select></div>
           <div><div class="fl">Neuer Rang</div><select class="fi" id="ra-new" onchange="upRa()"><option value="">-- wahlen --</option></select></div>
         </div>
@@ -236,7 +245,6 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
           <button class="btn ok"><i class="ti ti-send"></i> UBERTRAGEN</button>
         </div>
       </div>
-      <!-- hidden fields for template engine -->
       <input type="hidden" id="ra-dn"><input type="hidden" id="ra-name">
     </div>
   </div>
@@ -250,13 +258,16 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div style="margin-bottom:11px;">
         <div class="fl">Reisepassnummer eingeben</div>
         <div style="display:flex;gap:8px;">
-          <input class="fi" id="es-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('es')">
+          <input class="fi" id="es-pass-in" placeholder="Pass-ID oder Name ..." style="max-width:260px;" oninput="lookupPass('es')">
           <div id="es-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
         </div>
       </div>
       <div id="es-fields" style="display:none;">
-        <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="es-info"></div>
-        <div class="ir">
+        <div class="edit-card" id="es-info">
+          <div class="ec-row"><span class="ec-lbl">Name</span><input class="fi ec-inp" id="es-name-ed" oninput="sv2('es-name',this.value);upEs()"></div>
+          <div class="ec-row"><span class="ec-lbl">Dienstnr.</span><input class="fi ec-inp" id="es-dn-ed" oninput="sv2('es-dn',this.value);upEs()"></div>
+        </div>
+        <div class="ir" style="margin-top:11px;">
           <div><div class="fl">Abteilung</div>
             <select class="fi" id="es-abt" onchange="upEs()">
               <option value="">-- wahlen --</option>
@@ -285,17 +296,21 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div style="margin-bottom:11px;">
         <div class="fl">Reisepassnummer eingeben</div>
         <div style="display:flex;gap:8px;">
-          <input class="fi" id="ku-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('ku')">
+          <input class="fi" id="ku-pass-in" placeholder="Pass-ID oder Name ..." style="max-width:260px;" oninput="lookupPass('ku')">
           <div id="ku-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
         </div>
       </div>
       <div id="ku-fields" style="display:none;">
-        <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="ku-info"></div>
-        <div><div class="fl">Grund der Kundigung</div><textarea class="fi" id="ku-grund" rows="3" placeholder="Begrundung ..." oninput="upKu()" style="resize:vertical;margin-bottom:11px;"></textarea></div>
+        <div class="edit-card" id="ku-info">
+          <div class="ec-row"><span class="ec-lbl">Name</span><input class="fi ec-inp" id="ku-name-ed" oninput="sv2('ku-name',this.value);upKu()"></div>
+          <div class="ec-row"><span class="ec-lbl">Dienstnr.</span><input class="fi ec-inp" id="ku-dn-ed" oninput="sv2('ku-dn',this.value);upKu()"></div>
+          <div class="ec-row"><span class="ec-lbl">Rang</span><input class="fi ec-inp" id="ku-rang-ed" oninput="sv2('ku-rang',this.value);upKu()"></div>
+          <div class="ec-row"><span class="ec-lbl">Abteilung</span><input class="fi ec-inp" id="ku-abt-ed" readonly style="color:var(--mu)"></div>
+        </div>
+        <div><div class="fl" style="margin-top:11px;">Grund der Kundigung</div><textarea class="fi" id="ku-grund" rows="3" placeholder="Begrundung ..." oninput="upKu()" style="resize:vertical;margin-bottom:11px;"></textarea></div>
         <div class="pl">Vorschau</div>
         <div class="ob" id="ku-pre"></div>
         <div class="brow"><button class="btn" onclick="cp('ku-pre')"><i class="ti ti-copy"></i> Kopieren</button></div>
-        <div class="hint">Aktueller Tag nutzt das heutige Datum.</div>
       </div>
       <input type="hidden" id="ku-dn"><input type="hidden" id="ku-name"><input type="hidden" id="ku-rang">
     </div>
@@ -315,13 +330,18 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <div style="margin-bottom:11px;">
       <div class="fl">Reisepassnummer eingeben</div>
       <div style="display:flex;gap:8px;">
-        <input class="fi" id="az-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('az')">
+        <input class="fi" id="az-pass-in" placeholder="Pass-ID oder Name ..." style="max-width:260px;" oninput="lookupPass('az')">
         <div id="az-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
       </div>
     </div>
     <div id="az-fields" style="display:none;">
-      <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="az-info"></div>
-      <div><div class="fl">Datum der Kundigung</div><input class="fi" type="date" id="az-datum" oninput="upAz()" style="max-width:220px;margin-bottom:11px;"></div>
+      <div class="edit-card" id="az-info">
+        <div class="ec-row"><span class="ec-lbl">Name</span><input class="fi ec-inp" id="az-name-ed" oninput="sv2('az-name',this.value);upAz()"></div>
+        <div class="ec-row"><span class="ec-lbl">Pass-ID</span><input class="fi ec-inp" id="az-pass-ed" oninput="sv2('az-pass',this.value);upAz()"></div>
+        <div class="ec-row"><span class="ec-lbl">Rang</span><input class="fi ec-inp" id="az-rang-ed" oninput="sv2('az-rang',this.value);upAz()"></div>
+        <div class="ec-row"><span class="ec-lbl">Abteilung</span><input class="fi ec-inp" id="az-abt-ed" readonly style="color:var(--mu)"></div>
+      </div>
+      <div><div class="fl" style="margin-top:11px;">Datum der Kundigung</div><input class="fi" type="date" id="az-datum" oninput="upAz()" style="max-width:220px;margin-bottom:11px;"></div>
       <div class="pl">Vorschau</div>
       <div class="ob" id="az-pre" style="min-height:90px;"></div>
       <div class="brow">
@@ -342,13 +362,18 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div style="margin-bottom:11px;">
         <div class="fl">Reisepassnummer eingeben</div>
         <div style="display:flex;gap:8px;">
-          <input class="fi" id="sa-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('sa')">
+          <input class="fi" id="sa-pass-in" placeholder="Pass-ID oder Name ..." style="max-width:260px;" oninput="lookupPass('sa')">
           <div id="sa-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
         </div>
       </div>
       <div id="sa-fields" style="display:none;">
-        <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="sa-info"></div>
-        <div><div class="fl">Sanktionsart</div>
+        <div class="edit-card" id="sa-info">
+          <div class="ec-row"><span class="ec-lbl">Name</span><input class="fi ec-inp" id="sa-name-ed" oninput="sv2('sa-name',this.value);upSa()"></div>
+          <div class="ec-row"><span class="ec-lbl">Dienstnr.</span><input class="fi ec-inp" id="sa-dn-ed" oninput="sv2('sa-dn',this.value);upSa()"></div>
+          <div class="ec-row"><span class="ec-lbl">Rang</span><input class="fi ec-inp" id="sa-rang-ed" readonly style="color:var(--mu)"></div>
+          <div class="ec-row"><span class="ec-lbl">Strike</span><input class="fi ec-inp" id="sa-strike-ed" readonly style="color:var(--mu)"></div>
+        </div>
+        <div><div class="fl" style="margin-top:11px;">Sanktionsart</div>
           <select class="fi" id="sa-art" onchange="upSa()" style="margin-bottom:9px;">
             <option value="">-- wahlen --</option>
             <option>Mundliche Verwarnung</option><option>Schriftliche Verwarnung</option>
@@ -374,13 +399,19 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div style="margin-bottom:11px;">
         <div class="fl">Reisepassnummer eingeben</div>
         <div style="display:flex;gap:8px;">
-          <input class="fi" id="pa-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('pa')">
+          <input class="fi" id="pa-pass-in" placeholder="Pass-ID oder Name ..." style="max-width:260px;" oninput="lookupPass('pa')">
           <div id="pa-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
         </div>
       </div>
       <div id="pa-fields" style="display:none;">
-        <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="pa-info"></div>
-        <div><div class="fl">Eintrittsdatum</div><input class="fi" type="date" id="pa-datum" oninput="upPa()" style="max-width:220px;margin-bottom:11px;"></div>
+        <div class="edit-card" id="pa-info">
+          <div class="ec-row"><span class="ec-lbl">Name</span><input class="fi ec-inp" id="pa-name-ed" oninput="sv2('pa-name',this.value);upPa()"></div>
+          <div class="ec-row"><span class="ec-lbl">Dienstnr.</span><input class="fi ec-inp" id="pa-dn-ed" oninput="sv2('pa-dn',this.value);upPa()"></div>
+          <div class="ec-row"><span class="ec-lbl">Rang</span><input class="fi ec-inp" id="pa-rang-ed" oninput="sv2('pa-rang',this.value);upPa()"></div>
+          <div class="ec-row"><span class="ec-lbl">Abteilung</span><input class="fi ec-inp" id="pa-abt-ed" oninput="sv2('pa-abt',this.value);upPa()"></div>
+          <div class="ec-row"><span class="ec-lbl">Strike</span><input class="fi ec-inp" id="pa-strike-ed" readonly style="color:var(--mu)"></div>
+        </div>
+        <div><div class="fl" style="margin-top:11px;">Eintrittsdatum</div><input class="fi" type="date" id="pa-datum" oninput="upPa()" style="max-width:220px;margin-bottom:11px;"></div>
         <div class="pl">Vorschau</div>
         <div class="ob" id="pa-pre" style="min-height:80px;"></div>
         <div class="brow"><button class="btn" onclick="cp('pa-pre')"><i class="ti ti-copy"></i> Kopieren</button></div>
@@ -756,28 +787,75 @@ function absLine(){
 }
 
 // --- PASS LOOKUP ---
+// also accepts name search (partial, case-insensitive)
 function lookupPass(pfx){
   const inp=document.getElementById(pfx+'-pass-in');if(!inp)return;
   const val=inp.value.trim();
   const foundEl=document.getElementById(pfx+'-found');
   const fieldsEl=document.getElementById(pfx+'-fields');
-  const infoEl=document.getElementById(pfx+'-info');
-  if(!val){if(foundEl)foundEl.innerHTML='';if(fieldsEl)fieldsEl.style.display='none';return;}
-  const m=MA.find(x=>x.id===val);
-  if(!m){
-    if(foundEl)foundEl.innerHTML='<span style="color:var(--re)"><i class="ti ti-x" style="font-size:12px"></i> Nicht gefunden</span>';
+  if(!val){
+    if(foundEl)foundEl.innerHTML='<span style="color:var(--mu);font-size:11px">Pass-ID oder Name eingeben</span>';
     if(fieldsEl)fieldsEl.style.display='none';
     return;
   }
-  if(foundEl)foundEl.innerHTML=`<span style="color:var(--gr)"><i class="ti ti-check" style="font-size:12px"></i> <b>${m.name}</b></span>`;
-  if(infoEl) infoEl.innerHTML=`<span style="color:var(--g)">Name:</span> <b>${m.name}</b> &nbsp;·&nbsp; <span style="color:var(--g)">DN:</span> ${m.dn||'--'} &nbsp;·&nbsp; <span style="color:var(--g)">Rang:</span> ${m.rank} &nbsp;·&nbsp; <span style="color:var(--g)">Abteilung:</span> ${m.abt||'--'} &nbsp;·&nbsp; <span style="color:var(--g)">Strike:</span> ${m.strike||'0/3'}`;
+  // exact ID match first, then name substring
+  let m=MA.find(x=>x.id===val);
+  if(!m){
+    const q=val.toLowerCase();
+    const hits=MA.filter(x=>x.name.toLowerCase().includes(q));
+    if(hits.length===1){m=hits[0];}
+    else if(hits.length>1){
+      if(foundEl)foundEl.innerHTML=`<span style="color:var(--g);font-size:11px"><i class="ti ti-search" style="font-size:11px"></i> ${hits.length} Treffer — Pass-ID prazisieren</span>`;
+      if(fieldsEl)fieldsEl.style.display='none';
+      return;
+    }
+  }
+  if(!m){
+    if(foundEl)foundEl.innerHTML='<span style="color:var(--re);font-size:11px"><i class="ti ti-x" style="font-size:11px"></i> Kein Treffer</span>';
+    if(fieldsEl)fieldsEl.style.display='none';
+    return;
+  }
+  if(foundEl)foundEl.innerHTML=`<span style="color:var(--gr);font-size:11px"><i class="ti ti-check" style="font-size:11px"></i> <b>${m.name}</b> · ${m.rank}</span>`;
   if(fieldsEl)fieldsEl.style.display='block';
-  if(pfx==='ra'){sv2('ra-dn',m.dn||'');sv2('ra-name',m.name);sv2('ra-old',m.rank);upRa();}
-  if(pfx==='es'){sv2('es-dn',m.dn||'');sv2('es-name',m.name);upEs();}
-  if(pfx==='ku'){sv2('ku-dn',m.dn||'');sv2('ku-name',m.name);sv2('ku-rang',m.rank);upKu();}
-  if(pfx==='az'){sv2('az-name',m.name);sv2('az-pass',m.id);sv2('az-rang',m.rank);upAz();}
-  if(pfx==='sa'){sv2('sa-dn',m.dn||'');sv2('sa-name',m.name);upSa();}
-  if(pfx==='pa'){sv2('pa-dn',m.dn||'');sv2('pa-name',m.name);sv2('pa-rang',m.rank);sv2('pa-abt',m.abt==='--'?'':m.abt||'');
+  // fill editable cards
+  if(pfx==='ra'){
+    sv2('ra-name',m.name);sv2('ra-dn',m.dn||'');
+    sv2('ra-name-ed',m.name);sv2('ra-dn-ed',m.dn||'');
+    sv2('ra-abt-ed',m.abt||'');sv2('ra-strike-ed',m.strike||'0/3');
+    // pre-select current rank as "alter rang", next rank as "neuer rang" suggestion
+    sv2('ra-old',m.rank);
+    const ri=RANKS.indexOf(m.rank);
+    sv2('ra-new',ri>0?RANKS[ri-1]:'');
+    upRa();
+  }
+  if(pfx==='es'){
+    sv2('es-dn',m.dn||'');sv2('es-name',m.name);
+    sv2('es-name-ed',m.name);sv2('es-dn-ed',m.dn||'');
+    upEs();
+  }
+  if(pfx==='ku'){
+    sv2('ku-dn',m.dn||'');sv2('ku-name',m.name);sv2('ku-rang',m.rank);
+    sv2('ku-name-ed',m.name);sv2('ku-dn-ed',m.dn||'');
+    sv2('ku-rang-ed',m.rank);sv2('ku-abt-ed',m.abt||'');
+    upKu();
+  }
+  if(pfx==='az'){
+    sv2('az-name',m.name);sv2('az-pass',m.id);sv2('az-rang',m.rank);
+    sv2('az-name-ed',m.name);sv2('az-pass-ed',m.id);
+    sv2('az-rang-ed',m.rank);sv2('az-abt-ed',m.abt||'');
+    upAz();
+  }
+  if(pfx==='sa'){
+    sv2('sa-dn',m.dn||'');sv2('sa-name',m.name);
+    sv2('sa-name-ed',m.name);sv2('sa-dn-ed',m.dn||'');
+    sv2('sa-rang-ed',m.rank);sv2('sa-strike-ed',m.strike||'0/3');
+    upSa();
+  }
+  if(pfx==='pa'){
+    sv2('pa-dn',m.dn||'');sv2('pa-name',m.name);sv2('pa-rang',m.rank);sv2('pa-abt',m.abt==='--'?'':m.abt||'');
+    sv2('pa-name-ed',m.name);sv2('pa-dn-ed',m.dn||'');
+    sv2('pa-rang-ed',m.rank);sv2('pa-abt-ed',m.abt==='--'?'':m.abt||'');
+    sv2('pa-strike-ed',m.strike||'0/3');
     const dv=m.date&&m.date.includes('.')?m.date.split('.').reverse().join('-'):(m.date||'');
     const dtEl=document.getElementById('pa-datum');if(dtEl)dtEl.value=dv;
     upPa();
@@ -854,8 +932,21 @@ function updateTplPreview(){
   const ed = document.getElementById('tpl-editor');
   const pre = document.getElementById('tpl-preview');
   if(!ed||!pre) return;
-  const sample = {...TPL_SAMPLE};
-  sample.absender = absLine();
+  // use real current values from whichever module fields are filled
+  const sample = {
+    name: gv('ra-name')||gv('ku-name')||gv('az-name')||gv('sa-name')||gv('pa-name')||TPL_SAMPLE.name,
+    dn:   gv('ra-dn')||gv('ku-dn')||gv('sa-dn')||gv('pa-dn')||TPL_SAMPLE.dn,
+    rang: gv('ra-old')||gv('ku-rang')||gv('az-rang')||gv('pa-rang')||TPL_SAMPLE.rang,
+    alter_rang: gv('ra-old')||TPL_SAMPLE.alter_rang,
+    neuer_rang: gv('ra-new')||TPL_SAMPLE.neuer_rang,
+    datum: gd(),
+    grund: gv('ra-grund')||gv('ku-grund')||gv('sa-grund')||TPL_SAMPLE.grund,
+    abteilung: gv('es-abt')||gv('pa-abt')||TPL_SAMPLE.abteilung,
+    pass: gv('az-pass')||TPL_SAMPLE.pass,
+    sanktion: gv('sa-art')||TPL_SAMPLE.sanktion,
+    eintritt: fmtD(gv('pa-datum'))||gd(),
+    absender: absLine(),
+  };
   pre.textContent = applyTplVars(ed.value, sample);
 }
 
