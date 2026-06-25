@@ -1,583 +1,735 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FIB HQ CyberPanel · GrandRP</title>
-  <style>
-    :root {
-      --bg-main: #060913;
-      --bg-gradient: linear-gradient(135deg, #060814 0%, #0b112c 100%);
-      --sidebar-bg: rgba(10, 15, 30, 0.85);
-      --card-bg: rgba(30, 41, 59, 0.4);
-      --card-border: rgba(255, 255, 255, 0.06);
-      --input-bg: rgba(5, 8, 22, 0.6);
-      --text-primary: #f8fafc;
-      --text-muted: #64748b;
-      --accent-color: #3b82f6;
-      --accent-hover: #2563eb;
-      --accent-glow: rgba(59, 130, 246, 0.3);
-      --success-color: #10b981;
-      --blur-effect: blur(16px);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg-main);
-      background: var(--bg-gradient);
-      color: var(--text-primary);
-      min-height: 100vh;
-      display: flex;
-      overflow: hidden;
-    }
-
-    /* --- SIDEBAR --- */
-    aside {
-      width: 260px;
-      background: var(--sidebar-bg);
-      backdrop-filter: var(--blur-effect);
-      -webkit-backdrop-filter: var(--blur-effect);
-      border-right: 1px solid var(--card-border);
-      display: flex;
-      flex-direction: column;
-      padding: 24px;
-      flex-shrink: 0;
-    }
-
-    .brand-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 35px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid var(--card-border);
-    }
-
-    .brand-badge {
-      width: 35px;
-      height: 35px;
-      background: var(--accent-color);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 1.1rem;
-      box-shadow: 0 0 15px var(--accent-glow);
-    }
-
-    .brand-title h1 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    .brand-title p {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .nav-category {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-      margin: 24px 0 10px 4px;
-      font-weight: 700;
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      color: #94a3b8;
-      transition: all 0.2s ease;
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-      border: 1px solid transparent;
-    }
-
-    .nav-link:hover {
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--text-primary);
-    }
-
-    .nav-link.active {
-      background: rgba(59, 130, 246, 0.1);
-      color: #60a5fa;
-      border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-
-    /* --- MAIN BERG --- */
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .top-statusbar {
-      padding: 16px 40px;
-      border-bottom: 1px solid var(--card-border);
-      font-size: 0.8rem;
-      display: flex;
-      gap: 20px;
-      color: var(--text-muted);
-      background: rgba(6, 9, 19, 0.4);
-      flex-shrink: 0;
-    }
-
-    .status-online {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--success-color);
-      font-weight: 600;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--success-color);
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--success-color);
-    }
-
-    .content-container {
-      flex: 1;
-      padding: 40px;
-      overflow-y: auto;
-    }
-
-    .module-header {
-      margin-bottom: 35px;
-    }
-
-    .module-header p {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      color: var(--accent-color);
-      letter-spacing: 1.5px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .module-header h2 {
-      font-size: 1.85rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .panel-card {
-      background: var(--card-bg);
-      backdrop-filter: var(--blur-effect);
-      -webkit-backdrop-filter: var(--blur-effect);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 28px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      margin-bottom: 25px;
-    }
-
-    /* --- GRID FÜR GENERATOR --- */
-    .workspace-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      align-items: start;
-    }
-
-    .card-header-area {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #cbd5e1;
-      margin-bottom: 25px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .input-wrapper {
-      margin-bottom: 20px;
-    }
-
-    .input-wrapper label {
-      display: block;
-      font-size: 0.8rem;
-      color: #94a3b8;
-      margin-bottom: 8px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .input-wrapper input {
-      width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      padding: 14px;
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.25s ease;
-    }
-
-    .input-wrapper input:focus {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
-    }
-
-    .copy-btn {
-      background: var(--accent-color);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .copy-btn:hover {
-      background: var(--accent-hover);
-    }
-
-    .code-output-box {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--card-border);
-      padding: 24px;
-      border-radius: 8px;
-      min-height: 300px;
-      font-family: "Courier New", Courier, monospace;
-      white-space: pre-wrap;
-      line-height: 1.6;
-    }
-
-    /* --- TABLE STYLING --- */
-    .search-bar {
-      width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      padding: 14px;
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-size: 1rem;
-      margin-bottom: 20px;
-      outline: none;
-    }
-
-    .table-responsive {
-      overflow-x: auto;
-      max-height: 550px;
-      border-radius: 8px;
-      border: 1px solid var(--card-border);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 0.9rem;
-    }
-
-    th {
-      background: #0f172a;
-      padding: 16px 14px;
-      font-weight: 600;
-      color: #60a5fa;
-      border-bottom: 2px solid var(--card-border);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      white-space: nowrap;
-    }
-
-    td {
-      padding: 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      color: #cbd5e1;
-      white-space: nowrap;
-    }
-
-    .clickable-row {
-      cursor: pointer;
-      transition: background 0.15s ease;
-    }
-
-    .clickable-row:hover {
-      background: rgba(59, 130, 246, 0.15) !!important;
-    }
-
-    .clickable-row:hover td {
-      color: #fff;
-    }
-
-    .loading-status {
-      text-align: center;
-      padding: 40px;
-      color: var(--text-muted);
-      font-style: italic;
-    }
-    
-    .action-badge {
-      background: rgba(16, 185, 129, 0.15);
-      color: #10b981;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIB · Personalabteilung · GrandRP DE01</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#c9a84c;--gd:rgba(201,168,76,0.45);--gg:rgba(201,168,76,0.10);
+  --bg:#0a0c10;--p1:#10141c;--p2:#161b26;--bd:#1e2a3a;
+  --tx:#e8e4d8;--mu:#7a8490;--gr:#2ecc71;--re:#e74c3c;
+}
+html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;font-size:13px;color:var(--tx);}
+/* LAYOUT */
+.root{display:flex;flex-direction:column;height:100vh;}
+.topbar{background:var(--p1);border-bottom:1px solid var(--gd);padding:8px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-brand{color:var(--g);font-size:11px;letter-spacing:.14em;font-weight:bold;}
+.topbar-right{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--mu);}
+.dot-green{display:inline-block;width:7px;height:7px;background:var(--gr);border-radius:50%;margin-right:4px;}
+.layout{display:flex;flex:1;overflow:hidden;}
+/* SIDEBAR */
+.sb{width:190px;background:var(--p1);border-right:1px solid var(--bd);flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto;}
+.sb-logo{text-align:center;padding:16px 10px 14px;border-bottom:1px solid var(--bd);}
+.sb-emblem{width:46px;height:46px;border:2px solid var(--g);border-radius:50%;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;color:var(--g);}
+.sb-title{font-size:13px;color:var(--g);font-weight:bold;letter-spacing:.1em;}
+.sb-sub{font-size:10px;color:var(--mu);margin-top:2px;}
+.nav-g{padding:6px 0;}
+.nav-lbl{font-size:10px;color:var(--mu);letter-spacing:.12em;padding:5px 14px;text-transform:uppercase;}
+.ni{padding:7px 14px;cursor:pointer;font-size:12px;color:var(--mu);display:flex;align-items:center;gap:9px;border-left:2px solid transparent;transition:.15s;user-select:none;}
+.ni:hover,.ni.act{color:var(--g);background:var(--gg);border-left-color:var(--g);}
+.ni i{font-size:15px;opacity:.75;}
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px;}
+.mh{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);padding-bottom:10px;}
+.mh h1{font-size:17px;color:var(--g);letter-spacing:.05em;}
+.badge{background:var(--gg);border:1px solid var(--gd);color:var(--g);font-size:10px;padding:3px 9px;border-radius:3px;letter-spacing:.08em;}
+.view{display:none;flex-direction:column;gap:14px;}
+.view.act{display:flex;}
+/* STATS */
+.srow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.sc{background:var(--p1);border:1px solid var(--bd);border-radius:5px;padding:12px 14px;position:relative;overflow:hidden;}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gd);}
+.sc .lbl{font-size:10px;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.sc .val{font-size:20px;color:var(--g);font-weight:bold;}
+.sc .sub{font-size:10px;color:var(--mu);margin-top:3px;}
+/* PANEL */
+.pan{background:var(--p1);border:1px solid var(--bd);border-radius:6px;overflow:hidden;}
+.pan.gold{border-color:var(--gd);}
+.pan-h{background:var(--p2);border-bottom:1px solid var(--bd);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;}
+.pan-h.gold{background:rgba(201,168,76,0.07);border-bottom-color:var(--gd);}
+.pan-t{color:var(--g);font-size:11px;letter-spacing:.1em;text-transform:uppercase;}
+.pan-b{padding:14px;}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.tbl th{font-size:10px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--bd);padding:6px 8px;text-align:left;}
+.tbl td{padding:7px 8px;border-bottom:1px solid rgba(30,42,58,.4);color:var(--tx);vertical-align:middle;}
+.tbl tr:hover td{background:var(--gg);}
+.rb{display:inline-block;font-size:10px;padding:1px 7px;border-radius:2px;white-space:nowrap;}
+.rh{background:rgba(201,168,76,.12);color:var(--g);border:1px solid var(--gd);}
+.rm{background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.3);}
+.rl{background:rgba(122,132,144,.15);color:var(--mu);border:1px solid var(--bd);}
+/* INPUTS */
+.fi{background:var(--p2);border:1px solid var(--bd);color:var(--tx);font-family:'Courier New',monospace;font-size:12px;padding:7px 10px;border-radius:3px;width:100%;transition:.15s;outline:none;}
+.fi:focus{border-color:var(--gd);}
+.fi::placeholder{color:var(--mu);}
+.ir{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.fl{font-size:10px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;}
+/* OUTPUT */
+.ob{background:#050709;border:1px solid var(--bd);border-radius:3px;padding:10px 13px;font-size:11px;color:#8fb3d4;line-height:1.8;white-space:pre-wrap;min-height:60px;position:relative;}
+.pl{font-size:10px;color:var(--gd);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
+.pl::before{content:'› ';color:var(--g);}
+/* BUTTONS */
+.btn{font-size:11px;padding:5px 10px;border:1px solid var(--gd);background:transparent;color:var(--g);border-radius:3px;cursor:pointer;font-family:'Courier New',monospace;letter-spacing:.04em;transition:.15s;display:inline-flex;align-items:center;gap:5px;}
+.btn:hover{background:var(--gg);}
+.btn.success{color:var(--gr);border-color:rgba(46,204,113,.35);}
+.btn.success:hover{background:rgba(46,204,113,.08);}
+.btn.danger{color:var(--re);border-color:rgba(231,76,60,.3);}
+.btn.sm{font-size:10px;padding:3px 8px;}
+.brow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.hint{font-size:10px;color:var(--mu);margin-top:6px;line-height:1.6;}
+/* SEARCH */
+.search-wrap{position:relative;}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--mu);pointer-events:none;}
+.search-inp{padding-left:32px!important;}
+/* MODULES GRID */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mc{background:var(--p2);border:1px solid var(--bd);border-radius:5px;padding:13px;cursor:pointer;transition:.15s;}
+.mc:hover{border-color:var(--gd);background:var(--gg);}
+.mc .mt{font-size:12px;color:var(--g);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.mc .mt i{font-size:15px;}
+.mc .md{font-size:11px;color:var(--mu);}
+.mc .ma{margin-top:9px;display:flex;gap:6px;}
+/* PAGINATION */
+.pgr{display:flex;align-items:center;gap:5px;justify-content:center;padding:10px 0 4px;}
+.pgr button{font-size:10px;padding:3px 8px;border:1px solid var(--bd);background:transparent;color:var(--mu);border-radius:3px;cursor:pointer;font-family:monospace;transition:.12s;}
+.pgr button.cur{border-color:var(--g);color:var(--g);}
+.pgr button:hover{border-color:var(--gd);color:var(--g);}
+/* BOTTOM */
+.bottombar{background:var(--p1);border-top:1px solid var(--gd);padding:5px 18px;display:flex;align-items:center;justify-content:space-between;font-size:10px;flex-shrink:0;}
+.bottombar .bl{color:var(--mu);display:flex;align-items:center;gap:5px;}
+/* COPY TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--p2);border:1px solid var(--gd);color:var(--g);font-size:12px;padding:8px 16px;border-radius:4px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--gd);}
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sb{width:48px;}
+  .ni span,.nav-lbl,.sb-title,.sb-sub{display:none;}
+  .sb-emblem{width:32px;height:32px;font-size:11px;}
+  .sb-logo{padding:8px 4px;}
+  .srow{grid-template-columns:1fr 1fr;}
+  .mg{grid-template-columns:1fr;}
+  .ir{grid-template-columns:1fr;}
+  .topbar-brand{font-size:9px;}
+}
+</style>
 </head>
 <body>
+<div class="root">
 
-  <!-- SIDEBAR NAVIGATION -->
-  <aside>
-    <div class="brand-header">
-      <div class="brand-badge">F</div>
-      <div class="brand-title">
-        <h1>HQ CyberPanel</h1>
-        <p>FIB Personalabteilung</p>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">FEDERAL INVESTIGATION BUREAU ✦ GRANDRP DE01 ✦ PERSONALABTEILUNG</div>
+  <div class="topbar-right">
+    <span class="dot-green"></span>
+    <span id="clk">00:00:00</span>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sb">
+  <div class="sb-logo">
+    <div class="sb-emblem">FIB</div>
+    <div class="sb-title">Personalabt.</div>
+    <div class="sb-sub">GrandRP DE01</div>
+  </div>
+  <div class="nav-g">
+    <div class="nav-lbl">Übersicht</div>
+    <div class="ni act" onclick="sv('dash',this)"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></div>
+    <div class="ni" onclick="sv('ma',this)"><i class="ti ti-users"></i><span>Mitarbeiterverz.</span></div>
+  </div>
+  <div class="nav-g">
+    <div class="nav-lbl">Module</div>
+    <div class="ni" onclick="sv('rang',this)"><i class="ti ti-award"></i><span>Ranganpassung</span></div>
+    <div class="ni" onclick="sv('ein',this)"><i class="ti ti-user-plus"></i><span>Einstellung</span></div>
+    <div class="ni" onclick="sv('kue',this)"><i class="ti ti-user-minus"></i><span>Kündigung</span></div>
+    <div class="ni" onclick="sv('az',this)"><i class="ti ti-file-certificate"></i><span>AZ-System</span></div>
+    <div class="ni" onclick="sv('san',this)"><i class="ti ti-gavel"></i><span>Sanktion</span></div>
+    <div class="ni" onclick="sv('pa',this)"><i class="ti ti-id-badge"></i><span>Personalakte</span></div>
+  </div>
+  <div class="nav-g">
+    <div class="nav-lbl">System</div>
+    <div class="ni" onclick="sv('cfg',this)"><i class="ti ti-settings"></i><span>Einstellungen</span></div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div class="view act" id="v-dash">
+    <div class="mh"><h1>Personalabteilung</h1><div class="badge">ÜBERSICHT & MODULE</div></div>
+    <div style="font-size:11px;color:var(--mu);display:flex;gap:10px;flex-wrap:wrap;">
+      <span style="color:var(--gr)">›</span> Verbindung herstellen
+      <span style="color:var(--gr)">›</span> Anmeldedaten prüfen
+      <span style="color:var(--gr)">›</span> Zugriff autorisiert
+    </div>
+    <div class="srow">
+      <div class="sc"><div class="lbl">Gesamtstärke</div><div class="val">201</div><div class="sub">Agenten</div></div>
+      <div class="sc"><div class="lbl">Abteilungen</div><div class="val">8</div><div class="sub">Aktiv</div></div>
+      <div class="sc"><div class="lbl">Führungsränge</div><div class="val">8</div><div class="sub">Ränge 28–30</div></div>
+      <div class="sc"><div class="lbl">Status</div><div class="val" style="font-size:14px;color:var(--gr);">ONLINE</div><div class="sub">Verbunden</div></div>
+    </div>
+    <div class="mg">
+      <div class="mc" onclick="sv('rang',null)"><div class="mt"><i class="ti ti-award"></i>Ranganpassung</div><div class="md">Beförderungen & Degradierungen mit Discord-Formatierung</div><div class="ma"><button class="btn sm">› Öffnen</button></div></div>
+      <div class="mc" onclick="sv('ein',null)"><div class="mt"><i class="ti ti-user-plus"></i>Einstellung</div><div class="md">Neue Mitarbeiter aufnehmen mit Rollen-Ping & Vorlage</div><div class="ma"><button class="btn sm">› Öffnen</button></div></div>
+      <div class="mc" onclick="sv('kue',null)"><div class="mt"><i class="ti ti-user-minus"></i>Kündigung</div><div class="md">Entlassungen mit Begründung und aktuellem Datum</div><div class="ma"><button class="btn sm">› Öffnen</button></div></div>
+      <div class="mc" onclick="sv('az',null)" style="border-color:var(--gd);"><div class="mt" style="color:var(--g);"><i class="ti ti-file-certificate"></i>AZ-System</div><div class="md">Arbeitszeugnisse für ausscheidende Mitarbeiter</div><div class="ma"><button class="btn sm" style="border-color:var(--g);">› Öffnen</button></div></div>
+      <div class="mc" onclick="sv('san',null)"><div class="mt"><i class="ti ti-gavel"></i>Sanktion</div><div class="md">Verwarnungen & Sanktionen aus dem Katalog</div><div class="ma"><button class="btn sm">› Öffnen</button></div></div>
+      <div class="mc" onclick="sv('pa',null)"><div class="mt"><i class="ti ti-id-badge"></i>Personalakte-Generator</div><div class="md">Vollständige Personalakten erstellen</div><div class="ma"><button class="btn sm">› Öffnen</button></div></div>
+    </div>
+    <div class="pan">
+      <div class="pan-h"><div class="pan-t">[ Abteilungsübersicht ]</div><button class="btn sm" onclick="sv('ma',null)"><i class="ti ti-external-link"></i> Vollansicht</button></div>
+      <div class="pan-b" style="padding:0;">
+        <table class="tbl">
+          <thead><tr><th>Abteilung</th><th>Mitglieder</th><th>Anteil</th></tr></thead>
+          <tbody>
+            <tr><td>Critical Incident Response Group (CIRG)</td><td>43</td><td style="color:var(--g)">21 %</td></tr>
+            <tr><td>Criminal Investigative Division (CID)</td><td>34</td><td style="color:var(--g)">17 %</td></tr>
+            <tr><td>Corruption Office (CO)</td><td>27</td><td style="color:var(--g)">13 %</td></tr>
+            <tr><td>Human Resources (HR)</td><td>16</td><td style="color:var(--g)">8 %</td></tr>
+            <tr><td>Public Relations (PR)</td><td>10</td><td style="color:var(--g)">5 %</td></tr>
+            <tr><td>Training Division (TD)</td><td>6</td><td style="color:var(--g)">3 %</td></tr>
+            <tr><td>Internal Affairs (IA)</td><td>2</td><td style="color:var(--g)">1 %</td></tr>
+            <tr><td>LAW Department</td><td>1</td><td style="color:var(--g)">&lt; 1 %</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
+  </div>
 
-    <div class="nav-category">Daten & Übersicht</div>
-    <div id="link-verzeichnis" class="nav-link active" onclick="switchModule('verzeichnis')">📂 Mitarbeiterverzeichnis</div>
-    <div class="nav-link">📈 Statistiken</div>
-
-    <div class="nav-category">Dokumente</div>
-    <div id="link-az" class="nav-link" onclick="switchModule('az-generator')">📄 Arbeitszeugnis</div>
-    <div class="nav-link">📝 Einstellung</div>
-    <div class="nav-link">❌ Kündigung</div>
-  </aside>
-
-  <!-- MAIN AREA -->
-  <main>
-    <div class="top-statusbar">
-      <div class="status-online">
-        <div class="status-dot"></div>
-        <span id="sheet-status">Synchronisiere mit Dienstblatt...</span>
+  <!-- MITARBEITERVERZEICHNIS -->
+  <div class="view" id="v-ma">
+    <div class="mh"><h1>Mitarbeiterverzeichnis</h1><div class="badge">201 AGENTEN · 139 ABT.-MITGLIEDER</div></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="search-wrap" style="flex:1;min-width:200px;">
+        <i class="ti ti-search"></i>
+        <input class="fi search-inp" id="ma-search" placeholder="Name, ID, Rang oder Abteilung suchen …" oninput="filterMA()">
       </div>
-      <span>//</span>
-      <span>GrandRP DE01 · Federal Investigation Bureau</span>
+      <select class="fi" id="ma-filter" onchange="filterMA()" style="width:auto;min-width:160px;">
+        <option value="">Alle Divisionen</option>
+        <option>Leaderschaft</option>
+        <option>High Command Lead</option>
+        <option>High Command</option>
+        <option>Curator of Division</option>
+        <option>Division Lead</option>
+        <option>Abteilungsrang</option>
+        <option>Command</option>
+      </select>
     </div>
-
-    <div class="content-container">
-      
-      <!-- MODULE 1: MITARBEITERVERZEICHNIS -->
-      <div id="module-verzeichnis">
-        <div class="module-header">
-          <p>Human Resources · Datenbank</p>
-          <h2>Mitarbeiterverzeichnis (Live)</h2>
-        </div>
-
-        <div class="panel-card">
-          <input type="text" id="search-input" class="search-bar" placeholder="Nach Name, ID, Abteilung oder Dienstgrad filtern..." oninput="filterTable()">
-          
-          <div class="table-responsive">
-            <table id="employee-table">
-              <thead>
-                <tr id="table-headers">
-                  <th>Lade Tabellen-Struktur...</th>
-                </tr>
-              </thead>
-              <tbody id="table-body">
-                <tr>
-                  <td class="loading-status">Verbindung zu Google Sheets wird aufgebaut...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <div class="pan">
+      <div class="pan-h">
+        <div class="pan-t">[ Mitarbeiterliste ]</div>
+        <span style="font-size:10px;color:var(--mu);" id="ma-count">Zeige alle 75 Einträge</span>
       </div>
-
-      <!-- MODULE 2: ARBEITSZEUGNIS GENERATOR -->
-      <div id="module-az-generator" style="display: none;">
-        <div class="module-header">
-          <p>Human Resources · Vorlagen-Generator</p>
-          <h2>Arbeitszeugnis (AZ) erstellen</h2>
-        </div>
-
-        <div class="workspace-grid">
-          <div class="panel-card">
-            <div class="card-header-area">Personalien eintragen</div>
-            
-            <div class="input-wrapper"><label>Vor- u. Nachname</label><input type="text" id="f-name" placeholder="z. B. Tim Chessee"></div>
-            <div class="input-wrapper"><label>Reisepassnummer</label><input type="text" id="f-pass" placeholder="z. B. 264694"></div>
-            <div class="input-wrapper"><label>Letzter Rang</label><input type="text" id="f-rang" placeholder="z. B. Assistant Director"></div>
-            <div class="input-wrapper"><label>Datum der Kündigung</label><input type="date" id="f-date"></div>
-            <div class="input-wrapper"><label>Arbeitszeugnis Link</label><input type="text" id="f-link" placeholder="Link (z. B. Imgur/Discord)"></div>
-          </div>
-
-          <div class="panel-card">
-            <div class="card-header-area">
-              <span>Discord Rohtext-Vorschau</span>
-              <button class="copy-btn" onclick="copyTextToClipboard()">Kopieren</button>
-            </div>
-            <div class="code-output-box" id="live-az-preview"></div>
-          </div>
-        </div>
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Reisepass-ID</th><th>Name</th><th>Rang</th><th>DN</th><th>Division</th><th>Abteilung</th><th>Strike</th><th>Eintritt</th></tr></thead>
+          <tbody id="ma-body"></tbody>
+        </table>
       </div>
-
+      <div class="pgr" id="ma-pgr"></div>
     </div>
-  </main>
+  </div>
 
-  <script>
-    // Deine exakte Tabellenkonfiguration via Google-API Proxy (verhindert GID-Sperren)
-    const SHEET_ID = '1uzAA-_O2JtDBs3bpRG9Mqbva67dqh45LPDjPEf8-njQ';
-    const GID = '1591796957'; 
-    // Nutzen den tqx=out:csv um den exakten Tabellen-Reiter zu erzwingen
-    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
+  <!-- RANGANPASSUNG -->
+  <div class="view" id="v-rang">
+    <div class="mh"><h1>Ranganpassung</h1><div class="badge">MODUL</div></div>
+    <div class="pan">
+      <div class="pan-h"><div class="pan-t">[ Daten eingeben ]</div></div>
+      <div class="pan-b">
+        <div style="margin-bottom:10px;">
+          <div class="fl">Mitarbeiter aus Liste wählen (optional)</div>
+          <select class="fi" id="ra-sel" onchange="fillFromMA('ra')"><option value="">— Mitarbeiter wählen —</option></select>
+        </div>
+        <div class="ir">
+          <div><div class="fl">Dienstnummer</div><input class="fi" id="ra-dn" placeholder="z.B. 1" oninput="upRa()"></div>
+          <div><div class="fl">Name</div><input class="fi" id="ra-name" placeholder="Vorname Nachname" oninput="upRa()"></div>
+        </div>
+        <div class="ir">
+          <div><div class="fl">Alter Rang</div><select class="fi" id="ra-old" onchange="upRa()"><option value="">— wählen —</option></select></div>
+          <div><div class="fl">Neuer Rang</div><select class="fi" id="ra-new" onchange="upRa()"><option value="">— wählen —</option></select></div>
+        </div>
+        <div><div class="fl">Begründung</div><input class="fi" id="ra-grund" placeholder="Begründung der Ranganpassung …" oninput="upRa()" style="margin-bottom:12px;"></div>
+        <div class="pl">Vorschau — Discord-Nachricht</div>
+        <div class="ob" id="ra-pre">Felder ausfüllen …</div>
+        <div class="brow">
+          <button class="btn" onclick="cp('ra-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
+          <button class="btn success"><i class="ti ti-send"></i> ÜBERTRAGEN</button>
+        </div>
+        <div class="hint">Kopiert wird der Discord-Rohtext inkl. ** und -# Formatierung.</div>
+      </div>
+    </div>
+  </div>
 
-    let employeeData = [];
-    let headers = [];
+  <!-- EINSTELLUNG -->
+  <div class="view" id="v-ein">
+    <div class="mh"><h1>Einstellung</h1><div class="badge">MODUL</div></div>
+    <div class="pan">
+      <div class="pan-h"><div class="pan-t">[ Neue Einstellung ]</div></div>
+      <div class="pan-b">
+        <div class="ir">
+          <div><div class="fl">Dienstnummer</div><input class="fi" id="es-dn" placeholder="XX" oninput="upEs()"></div>
+          <div><div class="fl">Name</div><input class="fi" id="es-name" placeholder="Vorname Nachname" oninput="upEs()"></div>
+        </div>
+        <div class="ir">
+          <div><div class="fl">Abteilung</div>
+            <select class="fi" id="es-abt" onchange="upEs()">
+              <option value="">— wählen —</option>
+              <option>Human Resources</option>
+              <option>Critical Incident Response Group</option>
+              <option>Criminal Investigative Division</option>
+              <option>Corruption Office</option>
+              <option>Public Relations</option>
+              <option>Training Division</option>
+              <option>LAW Department</option>
+              <option>Internal Affairs</option>
+            </select>
+          </div>
+          <div><div class="fl">Einstellungsrang</div>
+            <select class="fi" id="es-rang" onchange="upEs()"><option value="">— wählen —</option></select>
+          </div>
+        </div>
+        <div class="pl">Vorschau — Discord-Nachricht</div>
+        <div class="ob" id="es-pre">Felder ausfüllen …</div>
+        <div class="brow">
+          <button class="btn" onclick="cp('es-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
+          <button class="btn success"><i class="ti ti-send"></i> ÜBERTRAGEN</button>
+        </div>
+        <div class="hint">Abteilung fügt automatisch den Rollen-Ping ein. Die Ping-Zeile ist fest.</div>
+      </div>
+    </div>
+  </div>
 
-    // Navigation umschalten
-    function switchModule(moduleId) {
-      document.getElementById('module-verzeichnis').style.display = moduleId === 'verzeichnis' ? 'block' : 'none';
-      document.getElementById('module-az-generator').style.display = moduleId === 'az-generator' ? 'block' : 'none';
-      
-      document.getElementById('link-verzeichnis').classList.toggle('active', moduleId === 'verzeichnis');
-      document.getElementById('link-az').classList.toggle('active', moduleId === 'az-generator');
-    }
+  <!-- KÜNDIGUNG -->
+  <div class="view" id="v-kue">
+    <div class="mh"><h1>Kündigung</h1><div class="badge">MODUL</div></div>
+    <div class="pan">
+      <div class="pan-h"><div class="pan-t">[ Kündigung ausstellen ]</div></div>
+      <div class="pan-b">
+        <div style="margin-bottom:10px;">
+          <div class="fl">Mitarbeiter aus Liste wählen (optional)</div>
+          <select class="fi" id="ku-sel" onchange="fillFromMA('ku')"><option value="">— Mitarbeiter wählen —</option></select>
+        </div>
+        <div class="ir">
+          <div><div class="fl">Dienstnummer</div><input class="fi" id="ku-dn" placeholder="XX" oninput="upKu()"></div>
+          <div><div class="fl">Name</div><input class="fi" id="ku-name" placeholder="Vorname Nachname" oninput="upKu()"></div>
+        </div>
+        <div><div class="fl">Rang</div><input class="fi" id="ku-rang" placeholder="Rang des Mitarbeiters" oninput="upKu()" style="margin-bottom:10px;"></div>
+        <div><div class="fl">Grund der Kündigung</div><textarea class="fi" id="ku-grund" rows="3" placeholder="Begründung …" oninput="upKu()" style="resize:vertical;margin-bottom:12px;"></textarea></div>
+        <div class="pl">Vorschau — Discord-Nachricht</div>
+        <div class="ob" id="ku-pre">Felder ausfüllen …</div>
+        <div class="brow">
+          <button class="btn" onclick="cp('ku-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
+        </div>
+        <div class="hint">„Aktueller Tag" nutzt das heutige Datum (TT.MM.JJJJ).</div>
+      </div>
+    </div>
+  </div>
 
-    // Google Sheets sauber laden & parsen
-    async function loadGoogleSheet() {
-      try {
-        const response = await fetch(CSV_URL);
-        if (!response.ok) throw new Error('Proxy-Fehler beim Abruf');
-        const text = await response.text();
-        
-        // Zeilen parsen
-        const rows = text.split('\n').map(row => parseCSVRow(row));
-        if (rows.length === 0) return;
+  <!-- AZ-SYSTEM -->
+  <div class="view" id="v-az">
+    <div class="mh"><h1>AZ-System</h1><div class="badge">ARBEITSZEUGNIS</div></div>
+    <div class="pan gold">
+      <div class="pan-h gold">
+        <div class="pan-t">[ Arbeitszeugnis-Generator · FIB ]</div>
+        <span style="font-size:10px;color:var(--mu);">GrandRP DE01</span>
+      </div>
+      <div class="pan-b">
+        <div style="font-size:11px;color:var(--mu);border-left:2px solid var(--gd);padding:7px 12px;margin-bottom:14px;background:rgba(201,168,76,0.04);border-radius:0 3px 3px 0;line-height:1.7;">
+          Das Federal Investigation Bureau (FIB) übermittelt hiermit das Arbeitszeugnis des folgenden Mitarbeiters.
+        </div>
+        <div style="margin-bottom:10px;">
+          <div class="fl">Mitarbeiter aus Liste wählen (optional)</div>
+          <select class="fi" id="az-sel" onchange="fillFromMA('az')"><option value="">— Mitarbeiter wählen —</option></select>
+        </div>
+        <div class="ir">
+          <div><div class="fl">Vor- u. Nachname</div><input class="fi" id="az-name" placeholder="Vorname Nachname" oninput="upAz()"></div>
+          <div><div class="fl">Reisepassnr.</div><input class="fi" id="az-pass" placeholder="z.B. 17450" oninput="upAz()"></div>
+        </div>
+        <div class="ir">
+          <div><div class="fl">Rang</div><input class="fi" id="az-rang" placeholder="z.B. 17. Commander" oninput="upAz()"></div>
+          <div>
+            <div class="fl">Datum der Kündigung</div>
+            <input class="fi" type="date" id="az-datum" oninput="upAz()">
+          </div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <div class="fl">Abteilungen / Notizen (optional)</div>
+          <input class="fi" id="az-abt" placeholder="z.B. CIRG, Human Resources …" oninput="upAz()">
+        </div>
+        <div class="pl">Vorschau — Discord-Nachricht</div>
+        <div class="ob" id="az-pre" style="min-height:100px;">Felder ausfüllen …</div>
+        <div class="brow">
+          <button class="btn" onclick="cp('az-pre')" style="border-color:var(--g);font-weight:bold;"><i class="ti ti-copy"></i> Nachricht kopieren</button>
+          <button class="btn success"><i class="ti ti-send"></i> ÜBERTRAGEN</button>
+        </div>
+        <div class="hint">Kopiert Discord-Rohtext mit Markdown-Formatierung.<br>Das Arbeitszeugnis wird als Anhang beigefügt — nicht vergessen!</div>
+      </div>
+    </div>
+  </div>
 
-        // Header zuweisen (Entfernt Anführungszeichen)
-        headers = rows[0].map(h => h.replace(/^"|"$/g, '').trim());
-        
-        // Datenzeilen filtern (Keine leeren Zeilen)
-        employeeData = rows.slice(1)
-          .map(row => row.map(cell => cell.replace(/^"|"$/g, '').trim()))
-          .filter(row => row.length > 1 && row[0] !== "");
+  <!-- SANKTION -->
+  <div class="view" id="v-san">
+    <div class="mh"><h1>Sanktion</h1><div class="badge">MODUL</div></div>
+    <div class="pan">
+      <div class="pan-h"><div class="pan-t">[ Sanktion ausstellen ]</div></div>
+      <div class="pan-b">
+        <div style="margin-bottom:10px;">
+          <div class="fl">Mitarbeiter aus Liste wählen (optional)</div>
+          <select class="fi" id="sa-sel" onchange="fillFromMA('sa')"><option value="">— Mitarbeiter wählen —</option></select>
+        </div>
+        <div class="ir">
+          <div><div class="fl">Dienstnummer</div><input class="fi" id="sa-dn" placeholder="XX" oninput="upSa()"></div>
+          <div><div class="fl">Name</div><input class="fi" id="sa-name" placeholder="Vorname Nachname" oninput="upSa()"></div>
+        </div>
+        <div><div class="fl">Sanktionsart</div>
+          <select class="fi" id="sa-art" onchange="upSa()" style="margin-bottom:10px;">
+            <option value="">— wählen —</option>
+            <option>Mündliche Verwarnung</option>
+            <option>Schriftliche Verwarnung</option>
+            <option>Gehaltskürzung</option>
+            <option>Versetzung</option>
+            <option>Suspendierung</option>
+            <option>Zwangspensionierung</option>
+          </select>
+        </div>
+        <div><div class="fl">Begründung</div><textarea class="fi" id="sa-grund" rows="3" placeholder="Begründung der Sanktion …" oninput="upSa()" style="resize:vertical;margin-bottom:12px;"></textarea></div>
+        <div class="pl">Vorschau — Discord-Nachricht</div>
+        <div class="ob" id="sa-pre">Felder ausfüllen …</div>
+        <div class="brow">
+          <button class="btn" onclick="cp('sa-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
+        </div>
+        <div class="hint">Quelle: Sanktionskatalog (Google Sheets)</div>
+      </div>
+    </div>
+  </div>
 
-        // Setze Headers in die HTML Tabelle + Extra Spalte für Aktionen
-        const headerRow = document.getElementById('table-headers');
-        headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('') + `<th>Aktion</th>`;
+  <!-- PERSONALAKTE -->
+  <div class="view" id="v-pa">
+    <div class="mh"><h1>Personalakte-Generator</h1><div class="badge">MODUL</div></div>
+    <div class="pan">
+      <div class="pan-h"><div class="pan-t">[ Akte anlegen ]</div></div>
+      <div class="pan-b">
+        <div style="margin-bottom:10px;">
+          <div class="fl">Mitarbeiter aus Liste wählen (optional)</div>
+          <select class="fi" id="pa-sel" onchange="fillFromMA('pa')"><option value="">— Mitarbeiter wählen —</option></select>
+        </div>
+        <div class="ir">
+          <div><div class="fl">Dienstnummer</div><input class="fi" id="pa-dn" placeholder="XX" oninput="upPa()"></div>
+          <div><div class="fl">Name</div><input class="fi" id="pa-name" placeholder="Vorname Nachname" oninput="upPa()"></div>
+        </div>
+        <div class="ir">
+          <div><div class="fl">Rang</div><input class="fi" id="pa-rang" placeholder="z.B. 17. Commander" oninput="upPa()"></div>
+          <div><div class="fl">Eintrittsdatum</div><input class="fi" type="date" id="pa-datum" oninput="upPa()"></div>
+        </div>
+        <div><div class="fl">Abteilung</div><input class="fi" id="pa-abt" placeholder="z.B. CIRG, Human Resources" oninput="upPa()" style="margin-bottom:12px;"></div>
+        <div class="pl">Vorschau — Personalakte</div>
+        <div class="ob" id="pa-pre" style="min-height:90px;">Felder ausfüllen …</div>
+        <div class="brow">
+          <button class="btn" onclick="cp('pa-pre')"><i class="ti ti-copy"></i> Kurzformat kopieren</button>
+        </div>
+        <div class="hint">Kurzformat: Dienstnummer | Name | ID</div>
+      </div>
+    </div>
+  </div>
 
-        renderTable(employeeData);
-        document.getElementById('sheet-status').innerText = "Personalblatt erfolgreich synchronisiert";
-      } catch (error) {
-        console.error(error);
-        document.getElementById('table-body').innerHTML = `<tr><td class="loading-status" style="color: #ef4444;">Fehler beim Laden! Bitte prüfe, ob die Google Tabelle auf 'Jeder der den Link hat: Betrachter' steht.</td></tr>`;
-      }
-    }
+  <!-- EINSTELLUNGEN -->
+  <div class="view" id="v-cfg">
+    <div class="mh"><h1>Einstellungen</h1><div class="badge">SYSTEM</div></div>
+    <div class="pan">
+      <div class="pan-h"><div class="pan-t">[ Personalisierung ]</div></div>
+      <div class="pan-b" style="display:flex;flex-direction:column;gap:18px;">
+        <div>
+          <div class="fl" style="margin-bottom:7px;">Hauptfarbe — Steuert Akzente, Icons, Rahmen & Buttons</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <input type="color" value="#c9a84c" id="colpick" oninput="setCol(this.value)" style="width:42px;height:32px;border:1px solid var(--bd);background:transparent;border-radius:3px;cursor:pointer;padding:2px;">
+            <span id="colhex" style="font-size:12px;color:var(--mu);">#c9a84c</span>
+            <button class="btn" onclick="setCol('#c9a84c');document.getElementById('colpick').value='#c9a84c';">Zurücksetzen</button>
+          </div>
+        </div>
+        <div>
+          <div class="fl" style="margin-bottom:7px;">Über dieses Tool</div>
+          <div style="font-size:11px;color:var(--mu);line-height:1.85;background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:12px 14px;">
+            Offline-Toolsuite der FIB-Personalabteilung · GrandRP DE01.<br>
+            Läuft vollständig lokal im Browser, ohne externes Backend.<br>
+            Module greifen optional live auf Google Sheets zu und fallen automatisch auf gespeicherte Stände zurück.<br><br>
+            <strong style="color:var(--g);">Mitarbeiterdaten:</strong> FIB Mitarbeiterverzeichnis (Stand: 25.05.2026)<br>
+            <strong style="color:var(--g);">Agenten:</strong> 201 · <strong style="color:var(--g);">Abteilungsmitglieder:</strong> 139 · <strong style="color:var(--g);">Rangstufen:</strong> 30
+          </div>
+        </div>
+        <div>
+          <div class="fl" style="margin-bottom:7px;">Google Sheets Quelle</div>
+          <a href="https://docs.google.com/spreadsheets/d/1uzAA-_O2JtDBs3bpRG9Mqbva67dqh45LPDjPEf8-njQ/edit" target="_blank" class="btn" style="display:inline-flex;"><i class="ti ti-external-link"></i> FIB Mitarbeiterverzeichnis öffnen</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    // Erweitertes CSV-Parsing für Google Sheets (Berücksichtigt Kommas innerhalb von Anführungszeichen)
-    function parseCSVRow(text) {
-      let p = '', r = [];
-      let q = false;
-      for (let i = 0; i < text.length; i++) {
-        let c = text[i];
-        if (c === '"') { q = !q; }
-        else if (c === ',' && !q) { r.push(p); p = ''; }
-        else { p += c; }
-      }
-      r.push(p);
-      return r;
-    }
+</div><!-- /main -->
+</div><!-- /layout -->
 
-    // Tabelle rendern
-    function renderTable(data) {
-      const tbody = document.getElementById('table-body');
-      if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="${headers.length + 1}" class="loading-status">Keine passenden Agenten gefunden.</td></tr>`;
-        return;
-      }
+<!-- BOTTOM BAR -->
+<div class="bottombar">
+  <div class="bl"><span class="dot-green"></span> Verbunden // <span id="bclk">00:00:00</span></div>
+  <div style="color:var(--g);font-weight:bold;">GrandRP DE01 · FIB Personalabteilung</div>
+  <div style="color:var(--mu);">Sicheres System · Offline-Betrieb</div>
+</div>
 
-      tbody.innerHTML = data.map((row, index) => {
-        const rowCells = row.map(cell => `<td>${cell}</td>`).join('');
-        return `<tr class="clickable-row" onclick="selectEmployee(${index})">${rowCells}<td><span class="action-badge">Auswählen</span></td></tr>`;
-      }).join('');
-    }
+</div><!-- /root -->
 
-    // Such-Filter (Durchsucht alle Spalten)
-    function filterTable() {
-      const searchVal = document.getElementById('search-input').value.toLowerCase();
-      const filtered = employeeData.filter(row => {
-        return row.some(cell => cell.toLowerCase().includes(searchVal));
-      });
-      renderTable(filtered);
-    }
+<!-- TOAST -->
+<div class="toast" id="toast">✓ In Zwischenablage kopiert</div>
 
-    // Automatische Übernahme in den AZ-Generator bei Klick auf eine Zeile
-    function selectEmployee(index) {
-      const row = employeeData[index];
-      
-      // Suche dynamisch nach den richtigen Spaltennamen in deinem Google Sheet
-      const nameIndex = headers.findIndex(h => h.toLowerCase().includes('name'));
-      const idIndex = headers.findIndex(h => h.toLowerCase().includes('id') || h.toLowerCase().includes('pass') || h.toLowerCase().includes('nummer'));
-      const rangIndex = headers.findIndex(h => h.toLowerCase().includes('rang') || h.toLowerCase().includes('dienstgrad'));
+<script>
+const RANKS=[
+  "30. Director of FIB","29. Deputy Director of FIB","28. Assistant Director of FIB",
+  "27. Divisional Director","26. Inspector of the FIB","25. Supervisory Head Agent",
+  "24. Supervisory Agent","23. Special Agent in Charge","22. Division Chief",
+  "21. Deputy Division Chief","20. Senior Special Agent","19. Tactical Operator",
+  "18. Department Specialist","17. Commander","16. Lieutenant Commander",
+  "15. Special Senior Agent","14. Master Special Agent","13. Senior Special Agent",
+  "12. Operational Agent","11. Field Agent","10. Senior Agent","9. Agent II",
+  "8. Agent I","7. Junior Agent","6. Probationary Agent","5. Analyst",
+  "4. Associate Analyst","3. Recruit II","2. Recruit I","1. Trainee"
+];
 
-      // Werte eintragen falls Spalte gefunden, sonst Standard-Fallback
-      if (nameIndex !== -1) document.getElementById('f-name').value = row[nameIndex];
-      if (idIndex !== -1) document.getElementById('f-pass').value = row[idIndex];
-      if (rangIndex !== -1) document.getElementById('f-rang').value = row[rangIndex];
+const MA=[
+  {id:"17450",name:"Eko Plaste",rank:"30. Director of FIB",dn:"1",div:"Leaderschaft",abt:"Chief Executive Curator",strike:"0/3",date:"25.05.2026"},
+  {id:"264694",name:"Tim Chessee",rank:"29. Deputy Director of FIB",dn:"2",div:"Leaderschaft",abt:"Deputy Executive Curator",strike:"0/3",date:"25.05.2026"},
+  {id:"240601",name:"Nils Brandenburger",rank:"28. Assistant Director of FIB",dn:"777",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"25.05.2026"},
+  {id:"156935",name:"Assan Diop",rank:"28. Assistant Director of FIB",dn:"999",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"25.05.2026"},
+  {id:"76002",name:"Dan Reacher",rank:"28. Assistant Director of FIB",dn:"5",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"25.05.2026"},
+  {id:"85558",name:"Dimii Nevergone",rank:"28. Assistant Director of FIB",dn:"3",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"26.05.2026"},
+  {id:"26412",name:"Luca Santos",rank:"28. Assistant Director of FIB",dn:"361",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"29.05.2026"},
+  {id:"6180",name:"Paul Nao",rank:"28. Assistant Director of FIB",dn:"17",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"26.05.2026"},
+  {id:"102262",name:"Hakuri Schrom",rank:"28. Assistant Director of FIB",dn:"262",div:"Leaderschaft",abt:"Assistant Executive Curator",strike:"0/3",date:"02.06.2026"},
+  {id:"135691",name:"Joachim vonWanze",rank:"27. Divisional Director",dn:"10",div:"Curator of Division",abt:"Curator | HR / FIBCO",strike:"0/3",date:"25.05.2026"},
+  {id:"157291",name:"Hugo Federov",rank:"27. Divisional Director",dn:"7",div:"Curator of Division",abt:"Curator | FIBCO",strike:"0/3",date:"26.05.2026"},
+  {id:"128034",name:"Bali Nevergone",rank:"27. Divisional Director",dn:"27",div:"Curator of Division",abt:"Curator | CIRG",strike:"0/3",date:"26.05.2026"},
+  {id:"156327",name:"Falkdoc Federov",rank:"27. Divisional Director",dn:"8",div:"Curator of Division",abt:"Curator | PR / FIBCO",strike:"0/3",date:"26.05.2026"},
+  {id:"295473",name:"Felix Mccalley",rank:"26. Inspector of the FIB",dn:"6",div:"High Command Lead",abt:"Head of High Command / FIBCO",strike:"0/3",date:"25.05.2026"},
+  {id:"217060",name:"Raffi Yane",rank:"25. Supervisory Head Agent",dn:"4",div:"High Command",abt:"HR Leitung / FIBCO",strike:"0/3",date:"25.05.2026"},
+  {id:"26899",name:"Amando Carillo",rank:"25. Supervisory Head Agent",dn:"31",div:"High Command",abt:"CID Stellv. Leitung",strike:"0/3",date:"25.05.2026"},
+  {id:"219213",name:"Jannick Yurr",rank:"25. Supervisory Head Agent",dn:"187",div:"High Command",abt:"CID Stellv. Leitung / FIBCO",strike:"0/3",date:"25.05.2026"},
+  {id:"34258",name:"Fynn Andreas",rank:"25. Supervisory Head Agent",dn:"11",div:"High Command",abt:"FIBCO Leitung",strike:"0/3",date:"26.05.2026"},
+  {id:"106544",name:"Marcel Gruuber",rank:"25. Supervisory Head Agent",dn:"15",div:"High Command",abt:"—",strike:"0/3",date:"25.05.2026"},
+  {id:"256009",name:"Kayne Smoker",rank:"24. Supervisory Agent",dn:"25",div:"High Command",abt:"TD Stellv. Leitung / CIRG",strike:"0/3",date:"26.05.2026"},
+  {id:"142220",name:"Simon Kellermann",rank:"24. Supervisory Agent",dn:"143",div:"High Command",abt:"FIBCO",strike:"0/3",date:"29.05.2026"},
+  {id:"176902",name:"Filip vonWanze",rank:"23. Special Agent in Charge",dn:"32",div:"High Command",abt:"TD",strike:"0/3",date:"26.05.2026"},
+  {id:"218257",name:"Ranjid Bay",rank:"23. Special Agent in Charge",dn:"33",div:"High Command",abt:"CIRG / CID",strike:"0/3",date:"26.05.2026"},
+  {id:"135217",name:"Sebastian Kuroyama",rank:"23. Special Agent in Charge",dn:"52",div:"High Command",abt:"CID",strike:"0/3",date:"26.05.2026"},
+  {id:"264668",name:"Kai Herzog",rank:"23. Special Agent in Charge",dn:"21",div:"High Command",abt:"FIBCO / HR",strike:"0/3",date:"26.05.2026"},
+  {id:"258321",name:"Mickey Maybach",rank:"23. Special Agent in Charge",dn:"53",div:"High Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
+  {id:"50091",name:"Syn Veno",rank:"23. Special Agent in Charge",dn:"59",div:"High Command",abt:"CID",strike:"0/3",date:"26.05.2026"},
+  {id:"244186",name:"Anton Moluda",rank:"23. Special Agent in Charge",dn:"9",div:"High Command",abt:"FIBCO Stellv. Leitung",strike:"0/3",date:"05.06.2026"},
+  {id:"109467",name:"Felix Cunningham",rank:"23. Special Agent in Charge",dn:"12",div:"High Command",abt:"CID Leitung / HR",strike:"0/3",date:"26.05.2026"},
+  {id:"192812",name:"Nico Saito",rank:"23. Special Agent in Charge",dn:"23",div:"High Command",abt:"TD Stellv. Leitung",strike:"0/3",date:"26.05.2026"},
+  {id:"105534",name:"Akin Kaplan",rank:"23. Special Agent in Charge",dn:"71",div:"High Command",abt:"FIBCO / CID",strike:"0/3",date:"26.05.2026"},
+  {id:"257441",name:"Hugo Pinsel",rank:"23. Special Agent in Charge",dn:"16",div:"High Command",abt:"FIBCO Stellv. Leitung / HR",strike:"0/3",date:"26.05.2026"},
+  {id:"290275",name:"Tomek Dick",rank:"23. Special Agent in Charge",dn:"58",div:"High Command",abt:"PR",strike:"0/3",date:"26.05.2026"},
+  {id:"288863",name:"Bernhard Wolf",rank:"23. Special Agent in Charge",dn:"132",div:"High Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
+  {id:"239288",name:"Noah Raiin",rank:"23. Special Agent in Charge",dn:"444",div:"High Command",abt:"FIBCO / HR",strike:"0/3",date:"26.05.2026"},
+  {id:"12263",name:"Fabi Astro",rank:"23. Special Agent in Charge",dn:"107",div:"High Command",abt:"HR Senior / FIBCO",strike:"0/3",date:"26.05.2026"},
+  {id:"136176",name:"Quentin Wesh",rank:"23. Special Agent in Charge",dn:"111",div:"High Command",abt:"CIRG Stellv. Leitung / TD",strike:"0/3",date:"26.05.2026"},
+  {id:"79712",name:"Angus Newton",rank:"23. Special Agent in Charge",dn:"62",div:"High Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
+  {id:"214462",name:"Marcel Fero",rank:"23. Special Agent in Charge",dn:"34",div:"High Command",abt:"—",strike:"0/3",date:"26.05.2026"},
+  {id:"18612",name:"Nico Schlumpf",rank:"22. Division Chief",dn:"28",div:"Division Lead",abt:"IA Leitung / FIBCO",strike:"0/3",date:"26.05.2026"},
+  {id:"140883",name:"Johannes Brecher",rank:"22. Division Chief",dn:"14",div:"Division Lead",abt:"CIRG Leitung / CID",strike:"0/3",date:"26.05.2026"},
+  {id:"126465",name:"Nia vonWanze",rank:"22. Division Chief",dn:"22",div:"Division Lead",abt:"TD Leitung",strike:"0/3",date:"27.05.2026"},
+  {id:"190803",name:"Berkoli Midnight",rank:"22. Division Chief",dn:"19",div:"Division Lead",abt:"PR Leitung",strike:"0/3",date:"27.05.2026"},
+  {id:"200311",name:"Jonas Rak",rank:"21. Deputy Division Chief",dn:"13",div:"Division Lead",abt:"HR Stellv. Leitung",strike:"0/3",date:"26.05.2026"},
+  {id:"5545",name:"Fredo Frost",rank:"21. Deputy Division Chief",dn:"69",div:"Division Lead",abt:"CID Stellv. Leitung",strike:"0/3",date:"25.05.2026"},
+  {id:"220186",name:"Bellobatz Dacruze",rank:"21. Deputy Division Chief",dn:"77",div:"Division Lead",abt:"CIRG Stellv. Leitung",strike:"0/3",date:"26.05.2026"},
+  {id:"155716",name:"Paul Trappler",rank:"19. Tactical Operator",dn:"122",div:"Abteilungsrang",abt:"CIRG",strike:"0/3",date:"06.06.2026"},
+  {id:"218503",name:"Frosty Dick",rank:"19. Tactical Operator",dn:"85",div:"Abteilungsrang",abt:"CIRG",strike:"0/3",date:"26.05.2026"},
+  {id:"244882",name:"Tobi Lakiri",rank:"18. Department Specialist",dn:"48",div:"Abteilungsrang",abt:"PR",strike:"0/3",date:"01.06.2026"},
+  {id:"9895",name:"Kalle Osbornee",rank:"18. Department Specialist",dn:"57",div:"Abteilungsrang",abt:"TD",strike:"0/3",date:"27.05.2026"},
+  {id:"189768",name:"Kenan Kasalla",rank:"17. Commander",dn:"37",div:"Command",abt:"—",strike:"0/3",date:"07.06.2026"},
+  {id:"137965",name:"Nate Nays",rank:"17. Commander",dn:"121",div:"Command",abt:"HR / CID",strike:"0/3",date:"26.05.2026"},
+  {id:"14338",name:"Carlos Sandman",rank:"17. Commander",dn:"163",div:"Command",abt:"—",strike:"0/3",date:"07.06.2026"},
+  {id:"404",name:"Kev Error",rank:"17. Commander",dn:"404",div:"Command",abt:"CIRG",strike:"0/3",date:"26.05.2026"},
+  {id:"225755",name:"Thommy Perez",rank:"17. Commander",dn:"50",div:"Command",abt:"—",strike:"0/3",date:"04.06.2026"},
+  {id:"4149",name:"Atze Altin",rank:"17. Commander",dn:"49",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
+  {id:"192303",name:"Jonass Breitling",rank:"17. Commander",dn:"51",div:"Command",abt:"—",strike:"0/3",date:"02.06.2026"},
+  {id:"225011",name:"Odin Wolf",rank:"17. Commander",dn:"112",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
+  {id:"232642",name:"Peter Holz",rank:"17. Commander",dn:"61",div:"Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
+  {id:"252692",name:"Jason Janee",rank:"17. Commander",dn:"155",div:"Command",abt:"CIRG",strike:"0/3",date:"27.05.2026"},
+  {id:"52617",name:"Michi Mahoni",rank:"17. Commander",dn:"95",div:"Command",abt:"CIRG",strike:"0/3",date:"26.05.2026"},
+  {id:"203202",name:"Fernando Dick",rank:"17. Commander",dn:"66",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
+  {id:"286372",name:"Cengo Neverloved",rank:"17. Commander",dn:"70",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
+  {id:"115582",name:"Lia Kaplan",rank:"17. Commander",dn:"35",div:"Command",abt:"CID",strike:"0/3",date:"26.05.2026"},
+  {id:"251159",name:"Tim Balls",rank:"17. Commander",dn:"125",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
+  {id:"212921",name:"Alicee Asic",rank:"17. Commander",dn:"73",div:"Command",abt:"CIRG",strike:"0/3",date:"26.05.2026"},
+  {id:"62",name:"Kevin Done",rank:"17. Commander",dn:"63",div:"Command",abt:"—",strike:"0/3",date:"27.05.2026"},
+  {id:"292078",name:"Ibo Aquila",rank:"17. Commander",dn:"74",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
+  {id:"66603",name:"Harald Sachse",rank:"17. Commander",dn:"603",div:"Command",abt:"—",strike:"0/3",date:"29.05.2026"},
+  {id:"208195",name:"Vaun Deberg",rank:"17. Commander",dn:"82",div:"Command",abt:"—",strike:"0/3",date:"30.05.2026"},
+  {id:"301271",name:"Aure Knusper",rank:"17. Commander",dn:"80",div:"Command",abt:"CIRG",strike:"0/3",date:"26.05.2026"},
+  {id:"159846",name:"Titus Maximus",rank:"17. Commander",dn:"152",div:"Command",abt:"FIBCO",strike:"0/3",date:"27.05.2026"},
+  {id:"174040",name:"Luca Hochreiter",rank:"17. Commander",dn:"175",div:"Command",abt:"—",strike:"0/3",date:"30.05.2026"},
+  {id:"257297",name:"Yuri Loveless",rank:"17. Commander",dn:"79",div:"Command",abt:"CID",strike:"0/3",date:"26.05.2026"},
+  {id:"26568",name:"Harleen Bama",rank:"17. Commander",dn:"65",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
+  {id:"229248",name:"Eren Almaz",rank:"17. Commander",dn:"20",div:"Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
+  {id:"289353",name:"Raul Nuis",rank:"17. Commander",dn:"75",div:"Command",abt:"—",strike:"0/3",date:"26.05.2026"},
+  {id:"253176",name:"Gimo Jimmbo",rank:"17. Commander",dn:"707",div:"Command",abt:"FIBCO",strike:"0/3",date:"26.05.2026"},
+];
 
-      // Formular-Vorschau aktualisieren und zum Generator springen
-      updateAZPreview();
-      switchModule('az-generator');
-    }
+let maPage=1;const PER=15;let filtered=[...MA];
 
-    /* --- ARBEITSZEUGNIS LOGIK --- */
-    function updateAZPreview() {
-      const name = document.getElementById('f-name').value || '__________';
-      const pass = document.getElementById('f-pass').value || '__________';
-      const rang = document.getElementById('f-rang').value || '__________';
-      const link = document.getElementById('f-link').value || '__________';
-      const rawDate = document.getElementById('f-date').value;
-      let cleanDate = '__________';
-      
-      if (rawDate) {
-        cleanDate = new Date(rawDate).toLocaleDateString('de-DE');
-      }
+function rankClass(r){const n=parseInt(r);if(n>=26)return'rh';if(n>=20)return'rm';return'rl';}
 
-      document.getElementById('live-az-preview').innerText = `Das Federal Investigation Bureau (FIB),
-übermittelt hiermit das Arbeitszeugnis von:
+function buildMA(){
+  const tbody=document.getElementById('ma-body');
+  const start=(maPage-1)*PER,slice=filtered.slice(start,start+PER);
+  tbody.innerHTML=slice.map(m=>`<tr>
+    <td style="color:var(--mu);font-size:11px">${m.id}</td>
+    <td style="font-weight:bold">${m.name}</td>
+    <td><span class="rb ${rankClass(m.rank)}">${m.rank}</span></td>
+    <td style="color:var(--g)">${m.dn}</td>
+    <td style="color:var(--mu);font-size:11px">${m.div}</td>
+    <td style="color:var(--mu);font-size:10px">${m.abt}</td>
+    <td style="color:${m.strike==='0/3'?'var(--gr)':'var(--re)'}">${m.strike}</td>
+    <td style="color:var(--mu);font-size:11px">${m.date}</td>
+  </tr>`).join('');
+  const cnt=document.getElementById('ma-count');
+  if(cnt)cnt.textContent=`Zeige ${Math.min(start+1,filtered.length)}–${Math.min(start+PER,filtered.length)} von ${filtered.length}`;
+  buildPgr();
+}
 
-**Vor- u. Nachname:** ${name}
-**Reisepassnr.:** ${pass}
-**Rang:** ${rang}
-**Datum der Kündigung:** ${cleanDate}
+function buildPgr(){
+  const total=Math.ceil(filtered.length/PER);
+  const pgr=document.getElementById('ma-pgr');
+  if(!pgr)return;
+  if(total<=1){pgr.innerHTML='';return;}
+  let h=`<button onclick="maGo(maPage-1)">‹</button>`;
+  for(let i=1;i<=total;i++)h+=`<button class="${i===maPage?'cur':''}" onclick="maGo(${i})">${i}</button>`;
+  h+=`<button onclick="maGo(maPage+1)">›</button>`;
+  pgr.innerHTML=h;
+}
 
-(Arbeitszeugnis wird als Anhang beigefügt: ${link})`;
-    }
+function maGo(p){const t=Math.ceil(filtered.length/PER);maPage=Math.max(1,Math.min(p,t));buildMA();}
 
-    function copyTextToClipboard() {
-      navigator.clipboard.writeText(document.getElementById('live-az-preview').innerText).then(() => {
-        alert('Arbeitszeugnis erfolgreich in die Zwischenablage kopiert!');
-      });
-    }
+function filterMA(){
+  const q=(document.getElementById('ma-search').value||'').toLowerCase();
+  const f=document.getElementById('ma-filter').value;
+  filtered=MA.filter(m=>{
+    const match=!q||(m.name.toLowerCase().includes(q)||m.id.includes(q)||m.rank.toLowerCase().includes(q)||m.abt.toLowerCase().includes(q)||m.dn.includes(q));
+    const div=!f||m.div===f;
+    return match&&div;
+  });
+  maPage=1;buildMA();
+}
 
-    // Inputs überwachen
-    ['f-name', 'f-pass', 'f-rang', 'f-date', 'f-link'].forEach(id => {
-      document.getElementById(id).addEventListener('input', updateAZPreview);
+function fillSelects(){
+  ['ra-sel','ku-sel','az-sel','sa-sel','pa-sel'].forEach(id=>{
+    const s=document.getElementById(id);if(!s)return;
+    MA.forEach(m=>{
+      const o=document.createElement('option');
+      o.value=m.id;
+      o.textContent=`${m.dn} | ${m.name}`;
+      s.appendChild(o);
     });
+  });
+  ['ra-old','ra-new','es-rang'].forEach(id=>{
+    const s=document.getElementById(id);if(!s)return;
+    RANKS.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;s.appendChild(o);});
+  });
+}
 
-    // Initialisierung beim Start
-    updateAZPreview();
-    loadGoogleSheet();
-  </script>
+function fillFromMA(prefix){
+  const sel=document.getElementById(prefix+'-sel');if(!sel)return;
+  const m=MA.find(x=>x.id===sel.value);if(!m)return;
+  const set=(id,val)=>{const el=document.getElementById(prefix+'-'+id);if(el)el.value=val;};
+  if(prefix==='ra'){set('name',m.name);set('dn',m.dn);set('old',m.rank);}
+  if(prefix==='ku'){set('name',m.name);set('dn',m.dn);set('rang',m.rank);}
+  if(prefix==='az'){set('name',m.name);set('pass',m.id);set('rang',m.rank);set('abt',m.abt==='—'?'':m.abt);}
+  if(prefix==='sa'){set('name',m.name);set('dn',m.dn);}
+  if(prefix==='pa'){set('name',m.name);set('dn',m.dn);set('rang',m.rank);set('abt',m.abt==='—'?'':m.abt);}
+  const fns={ra:upRa,ku:upKu,az:upAz,sa:upSa,pa:upPa,es:upEs};
+  if(fns[prefix])fns[prefix]();
+}
+
+function gd(){const d=new Date();return[String(d.getDate()).padStart(2,'0'),String(d.getMonth()+1).padStart(2,'0'),d.getFullYear()].join('.');}
+function fmtDate(raw){if(!raw)return'—';const d=new Date(raw);return[String(d.getDate()).padStart(2,'0'),String(d.getMonth()+1).padStart(2,'0'),d.getFullYear()].join('.');}
+function v(id){const e=document.getElementById(id);return e?e.value:'';}
+function setOb(id,val){const e=document.getElementById(id);if(e)e.textContent=val;}
+
+function upRa(){
+  const dn=v('ra-dn')||'XX',name=v('ra-name')||'Name',old=v('ra-old')||'Alter Rang',nw=v('ra-new')||'Neuer Rang',grund=v('ra-grund')||'—';
+  setOb('ra-pre',`-# Ranganpassung · FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${name}\n**Von:** ${old}\n**Nach:** ${nw}\n**Datum:** ${gd()}\n**Begründung:** ${grund}\n\n-# GrandRP DE01 · FIB`);
+}
+function upEs(){
+  const dn=v('es-dn')||'XX',name=v('es-name')||'Name',abt=v('es-abt')||'Abteilung',rang=v('es-rang')||'Rang';
+  setOb('es-pre',`-# Einstellung · FIB Personalabteilung\n\n**Dienstnummer:** ${dn}\n**Name:** ${name}\n**Rang:** ${rang}\n**Abteilung:** @${abt}\n**Einstellungsdatum:** ${gd()}\n\nWillkommen im Federal Investigation Bureau!\n\n-# GrandRP DE01 · FIB`);
+}
+function upKu(){
+  const dn=v('ku-dn')||'XX',name=v('ku-name')||'Name',rang=v('ku-rang')||'—',grund=v('ku-grund')||'—';
+  setOb('ku-pre',`-# Kündigung · FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${name}\n**Rang:** ${rang}\n**Datum:** ${gd()}\n**Grund:** ${grund}\n\nDer Mitarbeiter wird mit sofortiger Wirkung aus dem Dienst entlassen.\n\n-# GrandRP DE01 · FIB`);
+}
+function upAz(){
+  const name=v('az-name')||'Vor- u. Nachname',pass=v('az-pass')||'—',rang=v('az-rang')||'—',abt=v('az-abt'),dat=fmtDate(v('az-datum'));
+  let msg=`Das Federal Investigation Bureau (FIB),\nübermittelt hiermit das Arbeitszeugnis von:\n\n**Vor- u. Nachname:** ${name}\n**Reisepassnr.:** ${pass}\n**Rang:** ${rang}\n**Datum der Kündigung:** ${dat}`;
+  if(abt&&abt.trim())msg+=`\n**Abteilungen:** ${abt}`;
+  msg+=`\n\n(Arbeitszeugnis wird als Anhang beigefügt)\n\n-# GrandRP DE01 · FIB Personalabteilung`;
+  setOb('az-pre',msg);
+}
+function upSa(){
+  const dn=v('sa-dn')||'XX',name=v('sa-name')||'Name',art=v('sa-art')||'—',grund=v('sa-grund')||'—';
+  setOb('sa-pre',`-# Sanktion · FIB Personalabteilung\n\n**Mitarbeiter:** ${dn} | ${name}\n**Sanktionsart:** ${art}\n**Datum:** ${gd()}\n**Begründung:** ${grund}\n\n-# GrandRP DE01 · FIB`);
+}
+function upPa(){
+  const dn=v('pa-dn')||'XX',name=v('pa-name')||'Name',rang=v('pa-rang')||'—',abt=v('pa-abt')||'—',dat=fmtDate(v('pa-datum'))||gd();
+  setOb('pa-pre',`-# Personalakte · FIB\n\n**Dienstnummer:** ${dn}\n**Name:** ${name}\n**Rang:** ${rang}\n**Abteilung:** ${abt}\n**Eintrittsdatum:** ${dat}\n**Strike:** 0/3\n**Status:** Aktiv\n\n-# GrandRP DE01 · Federal Investigation Bureau`);
+}
+
+function cp(id){
+  const e=document.getElementById(id);
+  if(!e)return;
+  navigator.clipboard.writeText(e.textContent).then(()=>{
+    const t=document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2000);
+  }).catch(()=>{});
+}
+
+function sv(name,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('act'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));
+  const vEl=document.getElementById('v-'+name);if(vEl)vEl.classList.add('act');
+  if(el&&el.classList&&el.classList.contains('ni')){el.classList.add('act');}
+  else{document.querySelectorAll('.ni').forEach(n=>{const oc=n.getAttribute('onclick')||'';if(oc.includes("'"+name+"'"))n.classList.add('act');});}
+  if(name==='ma'){filterMA();}
+}
+
+function setCol(h){
+  document.documentElement.style.setProperty('--g',h);
+  const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  document.documentElement.style.setProperty('--gd',`rgba(${r},${g},${b},0.45)`);
+  document.documentElement.style.setProperty('--gg',`rgba(${r},${g},${b},0.10)`);
+  const el=document.getElementById('colhex');if(el)el.textContent=h;
+}
+
+function tick(){
+  const t=new Date();
+  const s=[t.getHours(),t.getMinutes(),t.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+  ['clk','bclk'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=s;});
+}
+
+tick();
+setInterval(tick,1000);
+fillSelects();
+buildMA();
+upAz();
+</script>
 </body>
 </html>
