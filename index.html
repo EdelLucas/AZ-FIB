@@ -201,40 +201,43 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
   </div>
 </div>
 
+<!-- ABSENDER BOX (shared, hidden inputs) -->
+<input type="hidden" id="abs-rang-name"><input type="hidden" id="abs-rang-rang"><input type="hidden" id="abs-rang-abt">
+<input type="hidden" id="abs-ein-name"><input type="hidden" id="abs-ein-rang"><input type="hidden" id="abs-ein-abt">
+<input type="hidden" id="abs-kue-name"><input type="hidden" id="abs-kue-rang"><input type="hidden" id="abs-kue-abt">
+<input type="hidden" id="abs-az-name"><input type="hidden" id="abs-az-rang"><input type="hidden" id="abs-az-abt">
+<input type="hidden" id="abs-san-name"><input type="hidden" id="abs-san-rang"><input type="hidden" id="abs-san-abt">
+<input type="hidden" id="abs-pa-name"><input type="hidden" id="abs-pa-rang"><input type="hidden" id="abs-pa-abt">
+
 <!-- RANGANPASSUNG -->
 <div class="view" id="v-rang">
   <div class="mh"><h1>Ranganpassung</h1><div class="badge">MODUL</div></div>
-  <div class="absbox">
-    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
-    <div class="ir3">
-      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-rang-name" placeholder="@DeinName" oninput="saveAbsF();upRa()"></div>
-      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-rang-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upRa()"></div>
-      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-rang-abt" placeholder="z.B. HR" oninput="saveAbsF();upRa()"></div>
-    </div>
-  </div>
   <div class="pan">
-    <div class="pan-h"><div class="pan-t">[ Mitarbeiter &amp; Ranganpassung ]</div></div>
+    <div class="pan-h"><div class="pan-t">[ Mitarbeiter-Lookup ]</div></div>
     <div class="pan-b">
-      <div style="margin-bottom:9px;">
-        <div class="fl">Mitarbeiter aus Liste wahlen (optional)</div>
-        <select class="fi" id="ra-sel" onchange="fillFromMA('ra')"><option value="">-- Mitarbeiter wahlen --</option></select>
+      <div style="margin-bottom:11px;">
+        <div class="fl">Reisepassnummer eingeben</div>
+        <div style="display:flex;gap:8px;">
+          <input class="fi" id="ra-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('ra')">
+          <div id="ra-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
+        </div>
       </div>
-      <div class="ir">
-        <div><div class="fl">Dienstnummer</div><input class="fi" id="ra-dn" placeholder="z.B. 1" oninput="upRa()"></div>
-        <div><div class="fl">Name</div><input class="fi" id="ra-name" placeholder="Vorname Nachname" oninput="upRa()"></div>
+      <div id="ra-fields" style="display:none;">
+        <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="ra-info"></div>
+        <div class="ir">
+          <div><div class="fl">Alter Rang</div><select class="fi" id="ra-old" onchange="upRa()"><option value="">-- wahlen --</option></select></div>
+          <div><div class="fl">Neuer Rang</div><select class="fi" id="ra-new" onchange="upRa()"><option value="">-- wahlen --</option></select></div>
+        </div>
+        <div><div class="fl">Begrundung</div><input class="fi" id="ra-grund" placeholder="Begrundung ..." oninput="upRa()" style="margin-bottom:11px;"></div>
+        <div class="pl">Vorschau</div>
+        <div class="ob" id="ra-pre"></div>
+        <div class="brow">
+          <button class="btn" onclick="cp('ra-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
+          <button class="btn ok"><i class="ti ti-send"></i> UBERTRAGEN</button>
+        </div>
       </div>
-      <div class="ir">
-        <div><div class="fl">Alter Rang</div><select class="fi" id="ra-old" onchange="upRa()"><option value="">-- wahlen --</option></select></div>
-        <div><div class="fl">Neuer Rang</div><select class="fi" id="ra-new" onchange="upRa()"><option value="">-- wahlen --</option></select></div>
-      </div>
-      <div><div class="fl">Begrundung</div><input class="fi" id="ra-grund" placeholder="Begrundung ..." oninput="upRa()" style="margin-bottom:11px;"></div>
-      <div class="pl">Vorschau -- Discord-Nachricht</div>
-      <div class="ob" id="ra-pre">Felder ausfullen ...</div>
-      <div class="brow">
-        <button class="btn" onclick="cp('ra-pre')"><i class="ti ti-copy"></i> Nachricht kopieren</button>
-        <button class="btn ok"><i class="ti ti-send"></i> UBERTRAGEN</button>
-      </div>
-      <div class="hint">Kopiert Discord-Rohtext inkl. ** und -# Formatierung.</div>
+      <!-- hidden fields for template engine -->
+      <input type="hidden" id="ra-dn"><input type="hidden" id="ra-name">
     </div>
   </div>
 </div>
@@ -242,36 +245,34 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 <!-- EINSTELLUNG -->
 <div class="view" id="v-ein">
   <div class="mh"><h1>Einstellung</h1><div class="badge">MODUL</div></div>
-  <div class="absbox">
-    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
-    <div class="ir3">
-      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-ein-name" placeholder="@DeinName" oninput="saveAbsF();upEs()"></div>
-      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-ein-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upEs()"></div>
-      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-ein-abt" placeholder="z.B. HR" oninput="saveAbsF();upEs()"></div>
-    </div>
-  </div>
   <div class="pan"><div class="pan-h"><div class="pan-t">[ Neue Einstellung ]</div></div>
     <div class="pan-b">
-      <div class="ir">
-        <div><div class="fl">Dienstnummer</div><input class="fi" id="es-dn" placeholder="XX" oninput="upEs()"></div>
-        <div><div class="fl">Name</div><input class="fi" id="es-name" placeholder="Vorname Nachname" oninput="upEs()"></div>
-      </div>
-      <div class="ir">
-        <div><div class="fl">Abteilung</div>
-          <select class="fi" id="es-abt" onchange="upEs()">
-            <option value="">-- wahlen --</option>
-            <option>Human Resources</option><option>Critical Incident Response Group</option>
-            <option>Criminal Investigative Division</option><option>Corruption Office</option>
-            <option>Public Relations</option><option>Training Division</option>
-            <option>LAW Department</option><option>Internal Affairs</option>
-          </select>
+      <div style="margin-bottom:11px;">
+        <div class="fl">Reisepassnummer eingeben</div>
+        <div style="display:flex;gap:8px;">
+          <input class="fi" id="es-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('es')">
+          <div id="es-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
         </div>
-        <div><div class="fl">Einstellungsrang</div><select class="fi" id="es-rang" onchange="upEs()"><option value="">-- wahlen --</option></select></div>
       </div>
-      <div class="pl">Vorschau</div>
-      <div class="ob" id="es-pre">Felder ausfullen ...</div>
-      <div class="brow"><button class="btn" onclick="cp('es-pre')"><i class="ti ti-copy"></i> Kopieren</button><button class="btn ok"><i class="ti ti-send"></i> UBERTRAGEN</button></div>
-      <div class="hint">Abteilung fugt automatisch den Rollen-Ping ein.</div>
+      <div id="es-fields" style="display:none;">
+        <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="es-info"></div>
+        <div class="ir">
+          <div><div class="fl">Abteilung</div>
+            <select class="fi" id="es-abt" onchange="upEs()">
+              <option value="">-- wahlen --</option>
+              <option>Human Resources</option><option>Critical Incident Response Group</option>
+              <option>Criminal Investigative Division</option><option>Corruption Office</option>
+              <option>Public Relations</option><option>Training Division</option>
+              <option>LAW Department</option><option>Internal Affairs</option>
+            </select>
+          </div>
+          <div><div class="fl">Einstellungsrang</div><select class="fi" id="es-rang" onchange="upEs()"><option value="">-- wahlen --</option></select></div>
+        </div>
+        <div class="pl">Vorschau</div>
+        <div class="ob" id="es-pre"></div>
+        <div class="brow"><button class="btn" onclick="cp('es-pre')"><i class="ti ti-copy"></i> Kopieren</button><button class="btn ok"><i class="ti ti-send"></i> UBERTRAGEN</button></div>
+      </div>
+      <input type="hidden" id="es-dn"><input type="hidden" id="es-name">
     </div>
   </div>
 </div>
@@ -279,29 +280,24 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 <!-- KUNDIGUNG -->
 <div class="view" id="v-kue">
   <div class="mh"><h1>Kundigung</h1><div class="badge">MODUL</div></div>
-  <div class="absbox">
-    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
-    <div class="ir3">
-      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-kue-name" placeholder="@DeinName" oninput="saveAbsF();upKu()"></div>
-      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-kue-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upKu()"></div>
-      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-kue-abt" placeholder="z.B. HR" oninput="saveAbsF();upKu()"></div>
-    </div>
-  </div>
   <div class="pan"><div class="pan-h"><div class="pan-t">[ Kundigung ausstellen ]</div></div>
     <div class="pan-b">
-      <div style="margin-bottom:9px;"><div class="fl">Mitarbeiter wahlen (optional)</div>
-        <select class="fi" id="ku-sel" onchange="fillFromMA('ku')"><option value="">-- Mitarbeiter wahlen --</option></select>
+      <div style="margin-bottom:11px;">
+        <div class="fl">Reisepassnummer eingeben</div>
+        <div style="display:flex;gap:8px;">
+          <input class="fi" id="ku-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('ku')">
+          <div id="ku-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
+        </div>
       </div>
-      <div class="ir">
-        <div><div class="fl">Dienstnummer</div><input class="fi" id="ku-dn" placeholder="XX" oninput="upKu()"></div>
-        <div><div class="fl">Name</div><input class="fi" id="ku-name" placeholder="Vorname Nachname" oninput="upKu()"></div>
+      <div id="ku-fields" style="display:none;">
+        <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="ku-info"></div>
+        <div><div class="fl">Grund der Kundigung</div><textarea class="fi" id="ku-grund" rows="3" placeholder="Begrundung ..." oninput="upKu()" style="resize:vertical;margin-bottom:11px;"></textarea></div>
+        <div class="pl">Vorschau</div>
+        <div class="ob" id="ku-pre"></div>
+        <div class="brow"><button class="btn" onclick="cp('ku-pre')"><i class="ti ti-copy"></i> Kopieren</button></div>
+        <div class="hint">Aktueller Tag nutzt das heutige Datum.</div>
       </div>
-      <div><div class="fl">Rang</div><input class="fi" id="ku-rang" placeholder="Rang des Mitarbeiters" oninput="upKu()" style="margin-bottom:9px;"></div>
-      <div><div class="fl">Grund der Kundigung</div><textarea class="fi" id="ku-grund" rows="3" placeholder="Begrundung ..." oninput="upKu()" style="resize:vertical;margin-bottom:11px;"></textarea></div>
-      <div class="pl">Vorschau</div>
-      <div class="ob" id="ku-pre">Felder ausfullen ...</div>
-      <div class="brow"><button class="btn" onclick="cp('ku-pre')"><i class="ti ti-copy"></i> Kopieren</button></div>
-      <div class="hint">Aktueller Tag nutzt das heutige Datum (TT.MM.JJJJ).</div>
+      <input type="hidden" id="ku-dn"><input type="hidden" id="ku-name"><input type="hidden" id="ku-rang">
     </div>
   </div>
 </div>
@@ -309,76 +305,63 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 <!-- AZ-SYSTEM -->
 <div class="view" id="v-az">
   <div class="mh"><h1>AZ-System</h1><div class="badge">ARBEITSZEUGNIS</div></div>
-  <div class="absbox">
-    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
-    <div class="ir3">
-      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-az-name" placeholder="@DeinName" oninput="saveAbsF();upAz()"></div>
-      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-az-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upAz()"></div>
-      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-az-abt" placeholder="z.B. HR" oninput="saveAbsF();upAz()"></div>
-    </div>
-  </div>
   <div class="pan gold"><div class="pan-h gold">
     <div class="pan-t">[ Arbeitszeugnis-Generator . FIB ]</div>
-    <span style="font-size:10px;color:var(--mu);">GrandRP DE01</span>
   </div>
   <div class="pan-b">
     <div style="font-size:11px;color:var(--mu);border-left:2px solid var(--gd);padding:6px 11px;margin-bottom:12px;background:rgba(201,168,76,0.04);border-radius:0 3px 3px 0;line-height:1.7;">
       Das Federal Investigation Bureau (FIB) ubermittelt hiermit das Arbeitszeugnis des folgenden Mitarbeiters.
     </div>
-    <div style="margin-bottom:9px;"><div class="fl">Mitarbeiter wahlen (optional)</div>
-      <select class="fi" id="az-sel" onchange="fillFromMA('az')"><option value="">-- Mitarbeiter wahlen --</option></select>
+    <div style="margin-bottom:11px;">
+      <div class="fl">Reisepassnummer eingeben</div>
+      <div style="display:flex;gap:8px;">
+        <input class="fi" id="az-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('az')">
+        <div id="az-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
+      </div>
     </div>
-    <div class="ir">
-      <div><div class="fl">Vor- u. Nachname</div><input class="fi" id="az-name" placeholder="Vorname Nachname" oninput="upAz()"></div>
-      <div><div class="fl">Reisepassnr.</div><input class="fi" id="az-pass" placeholder="z.B. 17450" oninput="upAz()"></div>
+    <div id="az-fields" style="display:none;">
+      <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="az-info"></div>
+      <div><div class="fl">Datum der Kundigung</div><input class="fi" type="date" id="az-datum" oninput="upAz()" style="max-width:220px;margin-bottom:11px;"></div>
+      <div class="pl">Vorschau</div>
+      <div class="ob" id="az-pre" style="min-height:90px;"></div>
+      <div class="brow">
+        <button class="btn" onclick="cp('az-pre')" style="border-color:var(--g);font-weight:bold;"><i class="ti ti-copy"></i> Nachricht kopieren</button>
+        <button class="btn ok"><i class="ti ti-send"></i> UBERTRAGEN</button>
+      </div>
+      <div class="hint">Arbeitszeugnis als Anhang beifugen!</div>
     </div>
-    <div class="ir">
-      <div><div class="fl">Rang</div><input class="fi" id="az-rang" placeholder="z.B. 17. Commander" oninput="upAz()"></div>
-      <div><div class="fl">Datum der Kundigung</div><input class="fi" type="date" id="az-datum" oninput="upAz()"></div>
-    </div>
-    <div class="pl">Vorschau -- Discord-Nachricht</div>
-    <div class="ob" id="az-pre" style="min-height:90px;">Felder ausfullen ...</div>
-    <div class="brow">
-      <button class="btn" onclick="cp('az-pre')" style="border-color:var(--g);font-weight:bold;"><i class="ti ti-copy"></i> Nachricht kopieren</button>
-      <button class="btn ok"><i class="ti ti-send"></i> UBERTRAGEN</button>
-    </div>
-    <div class="hint">Arbeitszeugnis als Anhang beifugen!</div>
+    <input type="hidden" id="az-name"><input type="hidden" id="az-pass"><input type="hidden" id="az-rang">
   </div></div>
 </div>
 
 <!-- SANKTION -->
 <div class="view" id="v-san">
   <div class="mh"><h1>Sanktion</h1><div class="badge">MODUL</div></div>
-  <div class="absbox">
-    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
-    <div class="ir3">
-      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-san-name" placeholder="@DeinName" oninput="saveAbsF();upSa()"></div>
-      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-san-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upSa()"></div>
-      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-san-abt" placeholder="z.B. HR" oninput="saveAbsF();upSa()"></div>
-    </div>
-  </div>
   <div class="pan"><div class="pan-h"><div class="pan-t">[ Sanktion ausstellen ]</div></div>
     <div class="pan-b">
-      <div style="margin-bottom:9px;"><div class="fl">Mitarbeiter wahlen (optional)</div>
-        <select class="fi" id="sa-sel" onchange="fillFromMA('sa')"><option value="">-- Mitarbeiter wahlen --</option></select>
+      <div style="margin-bottom:11px;">
+        <div class="fl">Reisepassnummer eingeben</div>
+        <div style="display:flex;gap:8px;">
+          <input class="fi" id="sa-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('sa')">
+          <div id="sa-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
+        </div>
       </div>
-      <div class="ir">
-        <div><div class="fl">Dienstnummer</div><input class="fi" id="sa-dn" placeholder="XX" oninput="upSa()"></div>
-        <div><div class="fl">Name</div><input class="fi" id="sa-name" placeholder="Vorname Nachname" oninput="upSa()"></div>
+      <div id="sa-fields" style="display:none;">
+        <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="sa-info"></div>
+        <div><div class="fl">Sanktionsart</div>
+          <select class="fi" id="sa-art" onchange="upSa()" style="margin-bottom:9px;">
+            <option value="">-- wahlen --</option>
+            <option>Mundliche Verwarnung</option><option>Schriftliche Verwarnung</option>
+            <option>Gehaltskürzung</option><option>Versetzung</option>
+            <option>Suspendierung</option><option>Zwangspensionierung</option>
+          </select>
+        </div>
+        <div><div class="fl">Begrundung</div><textarea class="fi" id="sa-grund" rows="3" placeholder="Begrundung ..." oninput="upSa()" style="resize:vertical;margin-bottom:11px;"></textarea></div>
+        <div class="pl">Vorschau</div>
+        <div class="ob" id="sa-pre"></div>
+        <div class="brow"><button class="btn" onclick="cp('sa-pre')"><i class="ti ti-copy"></i> Kopieren</button></div>
       </div>
-      <div><div class="fl">Sanktionsart</div>
-        <select class="fi" id="sa-art" onchange="upSa()" style="margin-bottom:9px;">
-          <option value="">-- wahlen --</option>
-          <option>Mundliche Verwarnung</option><option>Schriftliche Verwarnung</option>
-          <option>Gehaltskürzung</option><option>Versetzung</option>
-          <option>Suspendierung</option><option>Zwangspensionierung</option>
-        </select>
-      </div>
-      <div><div class="fl">Begrundung</div><textarea class="fi" id="sa-grund" rows="3" placeholder="Begrundung ..." oninput="upSa()" style="resize:vertical;margin-bottom:11px;"></textarea></div>
-      <div class="pl">Vorschau</div>
-      <div class="ob" id="sa-pre">Felder ausfullen ...</div>
-      <div class="brow"><button class="btn" onclick="cp('sa-pre')"><i class="ti ti-copy"></i> Kopieren</button></div>
-      <div class="hint">Quelle: Sanktionskatalog (Google Sheets)</div>
+      <input type="hidden" id="sa-dn"><input type="hidden" id="sa-name">
     </div>
   </div>
 </div>
@@ -386,31 +369,23 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 <!-- PERSONALAKTE -->
 <div class="view" id="v-pa">
   <div class="mh"><h1>Personalakte-Generator</h1><div class="badge">MODUL</div></div>
-  <div class="absbox">
-    <div class="abtitle"><i class="ti ti-user-circle" style="font-size:13px"></i> Absender -- deine Daten</div>
-    <div class="ir3">
-      <div><div class="fl b">Dein Name / Ping</div><input class="fi bl" id="abs-pa-name" placeholder="@DeinName" oninput="saveAbsF();upPa()"></div>
-      <div><div class="fl b">Dein Rang</div><input class="fi bl" id="abs-pa-rang" placeholder="z.B. 23. SAIC" oninput="saveAbsF();upPa()"></div>
-      <div><div class="fl b">Deine Abteilung</div><input class="fi bl" id="abs-pa-abt" placeholder="z.B. HR" oninput="saveAbsF();upPa()"></div>
-    </div>
-  </div>
   <div class="pan"><div class="pan-h"><div class="pan-t">[ Akte anlegen ]</div></div>
     <div class="pan-b">
-      <div style="margin-bottom:9px;"><div class="fl">Mitarbeiter wahlen (optional)</div>
-        <select class="fi" id="pa-sel" onchange="fillFromMA('pa')"><option value="">-- Mitarbeiter wahlen --</option></select>
+      <div style="margin-bottom:11px;">
+        <div class="fl">Reisepassnummer eingeben</div>
+        <div style="display:flex;gap:8px;">
+          <input class="fi" id="pa-pass-in" placeholder="z.B. 17450" style="max-width:220px;" oninput="lookupPass('pa')">
+          <div id="pa-found" style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;"></div>
+        </div>
       </div>
-      <div class="ir">
-        <div><div class="fl">Dienstnummer</div><input class="fi" id="pa-dn" placeholder="XX" oninput="upPa()"></div>
-        <div><div class="fl">Name</div><input class="fi" id="pa-name" placeholder="Vorname Nachname" oninput="upPa()"></div>
+      <div id="pa-fields" style="display:none;">
+        <div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px 13px;margin-bottom:11px;font-size:11px;line-height:1.9;" id="pa-info"></div>
+        <div><div class="fl">Eintrittsdatum</div><input class="fi" type="date" id="pa-datum" oninput="upPa()" style="max-width:220px;margin-bottom:11px;"></div>
+        <div class="pl">Vorschau</div>
+        <div class="ob" id="pa-pre" style="min-height:80px;"></div>
+        <div class="brow"><button class="btn" onclick="cp('pa-pre')"><i class="ti ti-copy"></i> Kopieren</button></div>
       </div>
-      <div class="ir">
-        <div><div class="fl">Rang</div><input class="fi" id="pa-rang" placeholder="z.B. 17. Commander" oninput="upPa()"></div>
-        <div><div class="fl">Eintrittsdatum</div><input class="fi" type="date" id="pa-datum" oninput="upPa()"></div>
-      </div>
-      <div><div class="fl">Abteilung</div><input class="fi" id="pa-abt" placeholder="z.B. CIRG, Human Resources" oninput="upPa()" style="margin-bottom:11px;"></div>
-      <div class="pl">Vorschau</div>
-      <div class="ob" id="pa-pre" style="min-height:80px;">Felder ausfullen ...</div>
-      <div class="brow"><button class="btn" onclick="cp('pa-pre')"><i class="ti ti-copy"></i> Kurzformat kopieren</button></div>
+      <input type="hidden" id="pa-dn"><input type="hidden" id="pa-name"><input type="hidden" id="pa-rang"><input type="hidden" id="pa-abt">
     </div>
   </div>
 </div>
@@ -762,29 +737,59 @@ function saveModal(){
 }
 document.getElementById('ma-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
-// --- SELECTS ---
-function refreshSelects(){
-  ['ra-sel','ku-sel','az-sel','sa-sel','pa-sel'].forEach(id=>{
-    const s=document.getElementById(id);if(!s)return;
-    const cur=s.value;while(s.options.length>1)s.remove(1);
-    MA.forEach(m=>{const o=document.createElement('option');o.value=m.id;o.textContent=(m.dn||m.id)+' | '+m.name;s.appendChild(o);});
-    s.value=cur;
-  });
+// --- ABSENDER ---
+function loadAbs(){try{const d=localStorage.getItem('fib_abs');if(d)return JSON.parse(d);}catch(e){}return{name:'',rang:'',abt:''};}
+function saveAbsF(){
+  const name=gv('cfg-name'),rang=gv('cfg-rang'),abt=gv('cfg-abt');
+  try{localStorage.setItem('fib_abs',JSON.stringify({name,rang,abt}));}catch(e){}
 }
+function syncFromCfg(){saveAbsF();[upRa,upEs,upKu,upAz,upSa,upPa].forEach(f=>f());}
+function loadAbsIntoFields(){const a=loadAbs();sv2('cfg-name',a.name||'');sv2('cfg-rang',a.rang||'');sv2('cfg-abt',a.abt||'');}
+function absLine(){
+  const name=gv('cfg-name'),rang=gv('cfg-rang'),abt=gv('cfg-abt');
+  if(!name&&!abt&&!rang) return '';
+  let line='\n\n';
+  if(name) line+=name+'\n';
+  if(abt)  line+=abt+'\n';
+  if(rang) line+=rang;
+  return line.trimEnd();
+}
+
+// --- PASS LOOKUP ---
+function lookupPass(pfx){
+  const inp=document.getElementById(pfx+'-pass-in');if(!inp)return;
+  const val=inp.value.trim();
+  const foundEl=document.getElementById(pfx+'-found');
+  const fieldsEl=document.getElementById(pfx+'-fields');
+  const infoEl=document.getElementById(pfx+'-info');
+  if(!val){if(foundEl)foundEl.innerHTML='';if(fieldsEl)fieldsEl.style.display='none';return;}
+  const m=MA.find(x=>x.id===val);
+  if(!m){
+    if(foundEl)foundEl.innerHTML='<span style="color:var(--re)"><i class="ti ti-x" style="font-size:12px"></i> Nicht gefunden</span>';
+    if(fieldsEl)fieldsEl.style.display='none';
+    return;
+  }
+  if(foundEl)foundEl.innerHTML=`<span style="color:var(--gr)"><i class="ti ti-check" style="font-size:12px"></i> <b>${m.name}</b></span>`;
+  if(infoEl) infoEl.innerHTML=`<span style="color:var(--g)">Name:</span> <b>${m.name}</b> &nbsp;·&nbsp; <span style="color:var(--g)">DN:</span> ${m.dn||'--'} &nbsp;·&nbsp; <span style="color:var(--g)">Rang:</span> ${m.rank} &nbsp;·&nbsp; <span style="color:var(--g)">Abteilung:</span> ${m.abt||'--'} &nbsp;·&nbsp; <span style="color:var(--g)">Strike:</span> ${m.strike||'0/3'}`;
+  if(fieldsEl)fieldsEl.style.display='block';
+  if(pfx==='ra'){sv2('ra-dn',m.dn||'');sv2('ra-name',m.name);sv2('ra-old',m.rank);upRa();}
+  if(pfx==='es'){sv2('es-dn',m.dn||'');sv2('es-name',m.name);upEs();}
+  if(pfx==='ku'){sv2('ku-dn',m.dn||'');sv2('ku-name',m.name);sv2('ku-rang',m.rank);upKu();}
+  if(pfx==='az'){sv2('az-name',m.name);sv2('az-pass',m.id);sv2('az-rang',m.rank);upAz();}
+  if(pfx==='sa'){sv2('sa-dn',m.dn||'');sv2('sa-name',m.name);upSa();}
+  if(pfx==='pa'){sv2('pa-dn',m.dn||'');sv2('pa-name',m.name);sv2('pa-rang',m.rank);sv2('pa-abt',m.abt==='--'?'':m.abt||'');
+    const dv=m.date&&m.date.includes('.')?m.date.split('.').reverse().join('-'):(m.date||'');
+    const dtEl=document.getElementById('pa-datum');if(dtEl)dtEl.value=dv;
+    upPa();
+  }
+}
+
+// --- SELECTS ---
+function refreshSelects(){}
 function fillSelects(){
-  refreshSelects();
   ['ra-old','ra-new','es-rang'].forEach(id=>{const s=document.getElementById(id);if(!s)return;RANKS.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;s.appendChild(o);});});
 }
-function fillFromMA(pfx){
-  const sel=document.getElementById(pfx+'-sel');if(!sel)return;
-  const m=MA.find(x=>x.id===sel.value);if(!m)return;
-  if(pfx==='ra'){sv2('ra-name',m.name);sv2('ra-dn',m.dn||'');sv2('ra-old',m.rank);}
-  if(pfx==='ku'){sv2('ku-name',m.name);sv2('ku-dn',m.dn||'');sv2('ku-rang',m.rank);}
-  if(pfx==='az'){sv2('az-name',m.name);sv2('az-pass',m.id);sv2('az-rang',m.rank);sv2('az-abt',m.abt==='--'?'':m.abt||'');}
-  if(pfx==='sa'){sv2('sa-name',m.name);sv2('sa-dn',m.dn||'');}
-  if(pfx==='pa'){sv2('pa-name',m.name);sv2('pa-dn',m.dn||'');sv2('pa-rang',m.rank);sv2('pa-abt',m.abt==='--'?'':m.abt||'');}
-  const fns={ra:upRa,ku:upKu,az:upAz,sa:upSa,pa:upPa};if(fns[pfx])fns[pfx]();
-}
+function fillFromMA(){}
 
 // --- UTILS ---
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
@@ -850,12 +855,7 @@ function updateTplPreview(){
   const pre = document.getElementById('tpl-preview');
   if(!ed||!pre) return;
   const sample = {...TPL_SAMPLE};
-  // get real absender if filled
-  const absN = gv('abs-rang-name')||gv('cfg-name')||'';
-  const absR = gv('abs-rang-rang')||gv('cfg-rang')||'';
-  const absA = gv('abs-rang-abt')||gv('cfg-abt')||'';
-  const parts=[];if(absR)parts.push(absR);if(absN)parts.push(absN);if(absA)parts.push('| '+absA);
-  sample.absender = parts.length ? '\n\n-# Ausgestellt von: '+parts.join(' ') : '';
+  sample.absender = absLine();
   pre.textContent = applyTplVars(ed.value, sample);
 }
 
@@ -886,27 +886,27 @@ function renderTpl(key, vars){
 }
 
 function upRa(){
-  const vars={dn:gv('ra-dn')||'XX',name:gv('ra-name')||'Name',alter_rang:gv('ra-old')||'Alter Rang',neuer_rang:gv('ra-new')||'Neuer Rang',datum:gd(),grund:gv('ra-grund')||'--',rang:gv('ra-old')||'--',abteilung:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine('rang')};
+  const vars={dn:gv('ra-dn')||'XX',name:gv('ra-name')||'Name',alter_rang:gv('ra-old')||'Alter Rang',neuer_rang:gv('ra-new')||'Neuer Rang',datum:gd(),grund:gv('ra-grund')||'--',rang:gv('ra-old')||'--',abteilung:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine()};
   setOb('ra-pre', renderTpl('rang',vars).trimEnd());
 }
 function upEs(){
-  const vars={dn:gv('es-dn')||'XX',name:gv('es-name')||'Name',rang:gv('es-rang')||'Rang',abteilung:gv('es-abt')||'Abteilung',datum:gd(),grund:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine('ein')};
+  const vars={dn:gv('es-dn')||'XX',name:gv('es-name')||'Name',rang:gv('es-rang')||'Rang',abteilung:gv('es-abt')||'Abteilung',datum:gd(),grund:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine()};
   setOb('es-pre', renderTpl('ein',vars).trimEnd());
 }
 function upKu(){
-  const vars={dn:gv('ku-dn')||'XX',name:gv('ku-name')||'Name',rang:gv('ku-rang')||'--',datum:gd(),grund:gv('ku-grund')||'--',abteilung:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine('kue')};
+  const vars={dn:gv('ku-dn')||'XX',name:gv('ku-name')||'Name',rang:gv('ku-rang')||'--',datum:gd(),grund:gv('ku-grund')||'--',abteilung:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine()};
   setOb('ku-pre', renderTpl('kue',vars).trimEnd());
 }
 function upAz(){
-  const vars={name:gv('az-name')||'Vor- u. Nachname',pass:gv('az-pass')||'--',rang:gv('az-rang')||'--',datum:fmtD(gv('az-datum'))||'--',dn:'--',abteilung:'--',grund:'--',alter_rang:'--',neuer_rang:'--',sanktion:'--',eintritt:gd(),absender:absLine('az')};
+  const vars={name:gv('az-name')||'Vor- u. Nachname',pass:gv('az-pass')||'--',rang:gv('az-rang')||'--',datum:fmtD(gv('az-datum'))||'--',dn:'--',abteilung:'--',grund:'--',alter_rang:'--',neuer_rang:'--',sanktion:'--',eintritt:gd(),absender:absLine()};
   setOb('az-pre', renderTpl('az',vars).trimEnd());
 }
 function upSa(){
-  const vars={dn:gv('sa-dn')||'XX',name:gv('sa-name')||'Name',sanktion:gv('sa-art')||'--',datum:gd(),grund:gv('sa-grund')||'--',rang:'--',abteilung:'--',alter_rang:'--',neuer_rang:'--',pass:'--',eintritt:gd(),absender:absLine('san')};
+  const vars={dn:gv('sa-dn')||'XX',name:gv('sa-name')||'Name',sanktion:gv('sa-art')||'--',datum:gd(),grund:gv('sa-grund')||'--',rang:'--',abteilung:'--',alter_rang:'--',neuer_rang:'--',pass:'--',eintritt:gd(),absender:absLine()};
   setOb('sa-pre', renderTpl('san',vars).trimEnd());
 }
 function upPa(){
-  const vars={dn:gv('pa-dn')||'XX',name:gv('pa-name')||'Name',rang:gv('pa-rang')||'--',abteilung:gv('pa-abt')||'--',eintritt:fmtD(gv('pa-datum'))||gd(),datum:gd(),grund:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',absender:absLine('pa')};
+  const vars={dn:gv('pa-dn')||'XX',name:gv('pa-name')||'Name',rang:gv('pa-rang')||'--',abteilung:gv('pa-abt')||'--',eintritt:fmtD(gv('pa-datum'))||gd(),datum:gd(),grund:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',absender:absLine()};
   setOb('pa-pre', renderTpl('pa',vars).trimEnd());
 }
 // ============================================================
