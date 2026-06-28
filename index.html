@@ -110,7 +110,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 <div class="root">
 <div class="topbar">
   <div class="topbar-brand">FEDERAL INVESTIGATION BUREAU &#10022; GRANDRP DE01 &#10022; PERSONALABTEILUNG</div>
-  <div class="topbar-right"><span class="dg"></span><span id="clk">00:00:00</span></div>
+  <div class="topbar-right"><span class="dg" id="cloud-dot" style="background:var(--mu)"></span><span id="cloud-status" style="color:var(--mu)">OFFLINE</span>&nbsp;&nbsp;<span id="clk">00:00:00</span></div>
 </div>
 <div class="layout">
 <div class="sb">
@@ -611,6 +611,17 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
         <button class="btn bl sm" onclick="syncFromCfg();showToast('Profil gespeichert')"><i class="ti ti-device-floppy"></i> In alle Module ubernehmen</button>
       </div>
       <div>
+        <div class="fl" style="margin-bottom:5px;">Cloud-Sync (Firebase) — Gemeinsame Daten fur alle</div>
+        <div style="font-size:11px;color:var(--mu);line-height:1.85;background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:11px 13px;margin-bottom:9px;">
+          Firebase ist fest eingebaut — <b style="color:var(--tx)">kein Setup nötig</b>.<br>
+          Jeder der die Seite öffnet sieht automatisch dieselben Daten.<br>
+          Status: <span id="cloud-status-cfg" style="color:var(--mu)">--</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn sm bl" onclick="cloudLoad().then(()=>{filtered=[...MA];buildMA();klRender();})"><i class="ti ti-refresh"></i> Daten neu laden</button>
+        </div>
+      </div>
+      <div>
         <div class="fl" style="margin-bottom:5px;">Mitarbeiterdaten</div>
         <div style="font-size:11px;color:var(--mu);line-height:1.85;background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:11px 13px;">
           Alle Anderungen am Mitarbeiterverzeichnis werden lokal im Browser gespeichert (localStorage).<br>
@@ -629,7 +640,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 <div class="bottombar">
   <div class="bl2"><span class="dg"></span> Verbunden // <span id="bclk">00:00:00</span></div>
   <div style="color:var(--g);font-weight:bold;">GrandRP DE01 . FIB Personalabteilung</div>
-  <div style="color:var(--mu);">Sicheres System . Offline-Betrieb</div>
+  <div style="color:var(--mu);">Sicheres System . Cloud-Betrieb</div>
 </div>
 </div>
 
@@ -772,11 +783,124 @@ const DEF=[
 ];
 
 // ===================== MITARBEITER =====================
-function loadMA(){try{const d=localStorage.getItem('fib_ma');if(d)return JSON.parse(d);}catch(e){}return DEF.map(m=>({...m}));}
-function saveMA(){try{localStorage.setItem('fib_ma',JSON.stringify(MA));}catch(e){}}
-function resetData(){if(!confirm('Alle Anderungen zurucksetzen? Dies kann nicht ruckgangig gemacht werden.'))return;localStorage.removeItem('fib_ma');MA=DEF.map(m=>({...m}));filtered=[...MA];filterMA();refreshSelects();showToast('Zuruckgesetzt');}
+// Cloud-Storage via Firebase Firestore
+// Konfiguration fest eingebaut — jeder der die Seite öffnet sieht dieselben Daten
 
-let MA=loadMA(),filtered=[...MA],maPage=1;const PER=15;
+const FB_CFG = {
+  apiKey: "AIzaSyCjEshCZt8zXldiTfGiiCOz_mtRE30UGOY",
+  authDomain: "fib-lst-d75cd.firebaseapp.com",
+  projectId: "fib-lst-d75cd",
+  storageBucket: "fib-lst-d75cd.firebasestorage.app",
+  messagingSenderId: "293546236665",
+  appId: "1:293546236665:web:cb2599998ef01ef6a2a028"
+};
+
+// Firebase über CDN laden
+let db = null;
+let fbReady = false;
+let _unsubscribe = null; // Live-Listener stoppen falls nötig
+let _isPushing = false;  // Verhindert eigene Änderungen als "extern" zu behandeln
+
+async function initFirebase() {
+  try {
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, doc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const app = initializeApp(FB_CFG);
+    db = getFirestore(app);
+    window._fbDoc  = () => doc(db, 'fib', 'data');
+    window._fbSet  = setDoc;
+    window._fbListen = onSnapshot;
+    fbReady = true;
+    return true;
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    return false;
+  }
+}
+
+// Einmaliges Laden + danach Live-Listener starten
+async function cloudLoad() {
+  setCloudStatus('loading');
+  try {
+    if (!fbReady) await initFirebase();
+    if (!fbReady) throw new Error('Firebase nicht bereit');
+
+    // Stoppe alten Listener falls vorhanden
+    if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
+
+    // Live-Listener starten — feuert sofort einmal (initialer Load)
+    // und danach bei jeder Änderung durch andere Nutzer
+    _unsubscribe = window._fbListen(window._fbDoc(), (snap) => {
+      if (_isPushing) return; // Eigene Saves ignorieren
+      if (snap.exists()) {
+        const d = snap.data();
+        if (Array.isArray(d.ma)) MA = d.ma;
+        if (Array.isArray(d.kl)) KL_DATA = d.kl;
+      }
+      filtered = [...MA];
+      buildMA();
+      klRender();
+      setCloudStatus('ok');
+    }, (err) => {
+      console.error('onSnapshot error:', err);
+      setCloudStatus('err');
+    });
+
+    return true;
+  } catch(e) {
+    console.error('cloudLoad error:', e);
+    try { const s = localStorage.getItem('fib_ma'); if (s) MA = JSON.parse(s); } catch(e2) {}
+    try { const s = localStorage.getItem('fib_kl'); if (s) KL_DATA = JSON.parse(s); } catch(e2) {}
+    setCloudStatus('err');
+    return false;
+  }
+}
+
+async function cloudPush() {
+  try {
+    if (!fbReady) await initFirebase();
+    if (!fbReady) throw new Error('Firebase nicht bereit');
+    _isPushing = true;
+    setCloudStatus('saving');
+    await window._fbSet(window._fbDoc(), { ma: MA, kl: KL_DATA });
+    setCloudStatus('ok');
+    setTimeout(() => { _isPushing = false; }, 500);
+  } catch(e) {
+    console.error('cloudPush error:', e);
+    _isPushing = false;
+    try { localStorage.setItem('fib_ma', JSON.stringify(MA)); } catch(e2) {}
+    try { localStorage.setItem('fib_kl', JSON.stringify(KL_DATA)); } catch(e2) {}
+    setCloudStatus('err');
+  }
+}
+
+function setCloudStatus(s) {
+  const map = {
+    ok:      ['var(--gr)', 'ONLINE — Verbunden'],
+    err:     ['var(--re)', 'FEHLER — Verbindung prüfen'],
+    loading: ['#f0a500',   'Lade ...'],
+    saving:  ['#f0a500',   'Speichert ...'],
+    off:     ['var(--mu)', 'OFFLINE']
+  };
+  const [col, txt] = map[s] || ['var(--mu)', s];
+  const el  = document.getElementById('cloud-status');
+  const dot = document.getElementById('cloud-dot');
+  const el2 = document.getElementById('cloud-status-cfg');
+  if (el)  { el.style.color  = col; el.textContent  = txt; }
+  if (dot) { dot.style.background = col; }
+  if (el2) { el2.style.color = col; el2.textContent = txt; }
+}
+
+// Kein saveCloudCfg / loadCloudCfgFields mehr nötig — Firebase ist fest eingebaut
+function saveCloudCfg() { showToast('Firebase ist bereits eingebaut — kein Setup nötig!'); }
+function loadCloudCfgFields() {}
+
+function loadMA(){return DEF.map(m=>({...m}));}
+function saveMA(){cloudPush();}
+function resetData(){
+  if(!confirm('Alle Anderungen zurucksetzen?'))return;
+  MA=DEF.map(m=>({...m}));filtered=[...MA];filterMA();refreshSelects();cloudPush();showToast('Zuruckgesetzt');
+}
 
 function gv(id){const e=document.getElementById(id);return e?e.value:'';}
 function sv2(id,v){const e=document.getElementById(id);if(e)e.value=v;}
@@ -956,7 +1080,7 @@ let KL_DATA=[];
 let KL_ORGA='Alle';
 
 function klLoad(){try{const d=localStorage.getItem('fib_kl');if(d)KL_DATA=JSON.parse(d);}catch(e){}}
-function klSave(){try{localStorage.setItem('fib_kl',JSON.stringify(KL_DATA));}catch(e){}}
+function klSave(){cloudPush();}
 
 function klAdd(){
   const orga=gv('kl-orga'),name=gv('kl-name').trim(),id=gv('kl-id').trim(),rang=gv('kl-rang').trim(),tel=gv('kl-tel').trim();
@@ -1223,15 +1347,21 @@ function upPa(){
 }
 
 // ===================== INIT =====================
+let MA=DEF.map(m=>({...m}));
+let filtered=[...MA];
+let maPage=1;
+const PER=15;
+
 try{const c=localStorage.getItem('fib_color');if(c){setCol(c);document.getElementById('colpick').value=c;}}catch(e){}
 tick();setInterval(tick,1000);
 fillSelects();
-buildMA();
 loadAbsIntoFields();
-klLoad();
-klRender();
+loadCloudCfgFields();
 [upAz,upRa,upEs,upKu,upSa,upPa].forEach(f=>f());
 showTplTab('rang',document.querySelector('.tpl-tab'));
+
+// Startet Firebase Live-Listener — lädt Daten initial und bei jeder Änderung automatisch
+cloudLoad();
 </script>
 </body>
 </html>
