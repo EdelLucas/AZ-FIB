@@ -905,44 +905,67 @@ const SHEET_ID = '1uzAA-_O2JtDBs3bpRG9Mqbva67dqh45LPDjPEf8-njQ';
 const SHEET_GID = '1591796957';
 let sheetSyncInterval = null;
 
+function parseCSVLine(line) {
+  const cols = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { cols.push(cur.trim().replace(/^"|"$/g,'')); cur = ''; }
+    else { cur += c; }
+  }
+  cols.push(cur.trim().replace(/^"|"$/g,''));
+  return cols;
+}
+
 async function syncFromSheet() {
+  const ss = document.getElementById('sheet-status');
   try {
+    if(ss){ ss.textContent='Sheet: Lade ...'; ss.style.color='#f0a500'; }
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error('Sheet nicht erreichbar');
     const csv = await res.text();
-    const rows = csv.trim().split('\n').map(r => {
-      // CSV-Zeilen parsen (berücksichtigt Anführungszeichen)
-      const cols = [];
-      let cur = '', inQ = false;
-      for (let i = 0; i < r.length; i++) {
-        const c = r[i];
-        if (c === '"') { inQ = !inQ; }
-        else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-        else { cur += c; }
+    const rows = csv.split('\n');
+
+    // Spalten laut Sheet (0-basiert, Buchstabe → Index):
+    // A=0,B=1,C=2,D=3,E=4,F=5,G=6,H=7,I=8,J=9,K=10,L=11,M=12,N=13,O=14,P=15,Q=16,R=17,S=18
+    // B=ID(1), C=Name(2), D=Ranks(3), E=DN(4), H=Division's(7), K=Strike(10), L=Invite Date(11), M=Last Rank(12), P=Abt1(15), Q=Abt2(16)
+
+    // Header steht in Zeile 9 (Index 8), Daten ab Zeile 10 (Index 9)
+    // Wir suchen die Header-Zeile dynamisch (enthält "ID" und "Name")
+    let dataStart = 9; // Standard: Zeile 10 (0-basiert = 9)
+    for (let i = 0; i < Math.min(rows.length, 15); i++) {
+      const r = parseCSVLine(rows[i]);
+      if (r.some(c => c.trim().toUpperCase() === 'ID') && r.some(c => c.trim().toUpperCase() === 'NAME')) {
+        dataStart = i + 1; // Daten fangen eine Zeile nach dem Header an
+        break;
       }
-      cols.push(cur.trim());
-      return cols;
-    });
+    }
 
-    if (rows.length < 2) return; // Nur Header, keine Daten
-
-    // Header-Zeile: ID, Name, Ranks, DN, Division's, Strike, Invite Date, Last Rank, Abteilungen
-    // Index:         0    1      2    3       4         5         6           7           8
     const newMA = [];
-    for (let i = 1; i < rows.length; i++) {
-      const r = rows[i];
-      if (!r[0] && !r[1]) continue; // Leere Zeile überspringen
+    for (let i = dataStart; i < rows.length; i++) {
+      if (!rows[i] || !rows[i].trim()) continue;
+      const r = parseCSVLine(rows[i]);
+
+      const id   = (r[1]||'').trim();
+      const name = (r[2]||'').trim();
+      if (!id && !name) continue; // Leere Zeile überspringen
+
+      const abt1 = (r[15]||'').trim();
+      const abt2 = (r[16]||'').trim();
+      const abt  = [abt1, abt2].filter(Boolean).join(' | ');
+
       newMA.push({
-        id:     (r[0]||'').replace(/"/g,'').trim(),
-        name:   (r[1]||'').replace(/"/g,'').trim(),
-        rank:   (r[2]||'').replace(/"/g,'').trim(),
-        dn:     (r[3]||'').replace(/"/g,'').trim(),
-        div:    (r[4]||'').replace(/"/g,'').trim(),
-        strike: (r[5]||'0/3').replace(/"/g,'').trim(),
-        date:   (r[6]||'').replace(/"/g,'').trim(),
-        ausb:   (r[7]||'').replace(/"/g,'').trim(),
-        abt:    (r[8]||'').replace(/"/g,'').trim(),
+        id,
+        name,
+        rank:   (r[3] ||'').trim(),
+        dn:     (r[4] ||'').trim(),
+        div:    (r[7] ||'').trim(),
+        strike: (r[10]||'0/3').trim(),
+        date:   (r[11]||'').trim(),
+        ausb:   (r[12]||'').trim(), // Last Rank als Ausbildung
+        abt,
         status: 'Aktiv',
         notes:  ''
       });
@@ -952,11 +975,10 @@ async function syncFromSheet() {
       MA = newMA;
       filtered = [...MA];
       buildMA();
-      const dc = document.getElementById('dash-count'); if (dc) dc.textContent = MA.length;
-      const cc = document.getElementById('cfg-count');  if (cc) cc.textContent = MA.length;
-      const b  = document.getElementById('ma-badge');   if (b)  b.textContent  = MA.length + ' AGENTEN';
-      const ss = document.getElementById('sheet-status');
-      if (ss) {
+      const dc = document.getElementById('dash-count'); if(dc) dc.textContent = MA.length;
+      const cc = document.getElementById('cfg-count');  if(cc) cc.textContent = MA.length;
+      const b  = document.getElementById('ma-badge');   if(b)  b.textContent  = MA.length + ' AGENTEN';
+      if(ss){
         const now = new Date();
         const t = [now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
         ss.textContent = 'Sheet: ✓ ' + t;
@@ -965,20 +987,19 @@ async function syncFromSheet() {
     }
   } catch(e) {
     console.warn('Sheet sync error:', e);
+    if(ss){ ss.textContent='Sheet: ✗ Fehler'; ss.style.color='var(--re)'; }
   }
 }
 
 function startSheetSync() {
-  syncFromSheet(); // sofort beim Start
+  syncFromSheet();
   if (sheetSyncInterval) clearInterval(sheetSyncInterval);
-  sheetSyncInterval = setInterval(syncFromSheet, 30000); // alle 30 Sekunden
+  sheetSyncInterval = setInterval(syncFromSheet, 30000);
 }
 
-// saveMA pusht NICHT mehr die MA-Daten zu Firebase — MA kommt vom Sheet
-// Nur KL_DATA wird über Firebase geteilt
-function saveMA() { /* MA wird nur vom Google Sheet gelesen */ }
+function saveMA() { /* MA kommt nur vom Google Sheet */ }
 function resetData(){
-  if(!confirm('Ansicht zurücksetzen und Sheet neu laden?'))return;
+  if(!confirm('Mitarbeiterliste vom Sheet neu laden?'))return;
   syncFromSheet();
   showToast('Sheet wird neu geladen...');
 }
