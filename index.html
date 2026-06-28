@@ -110,7 +110,14 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 <div class="root">
 <div class="topbar">
   <div class="topbar-brand">FEDERAL INVESTIGATION BUREAU &#10022; GRANDRP DE01 &#10022; PERSONALABTEILUNG</div>
-  <div class="topbar-right"><span class="dg" id="cloud-dot" style="background:var(--mu)"></span><span id="cloud-status" style="color:var(--mu)">OFFLINE</span>&nbsp;&nbsp;<span id="clk">00:00:00</span></div>
+  <div class="topbar-right">
+    <span style="font-size:10px;color:var(--mu);" id="sheet-status">Sheet: --</span>
+    &nbsp;·&nbsp;
+    <span class="dg" id="cloud-dot" style="background:var(--mu)"></span>
+    <span id="cloud-status" style="color:var(--mu)">OFFLINE</span>
+    &nbsp;&nbsp;
+    <span id="clk">00:00:00</span>
+  </div>
 </div>
 <div class="layout">
 <div class="sb">
@@ -831,14 +838,12 @@ async function cloudLoad() {
     // Live-Listener starten — feuert sofort einmal (initialer Load)
     // und danach bei jeder Änderung durch andere Nutzer
     _unsubscribe = window._fbListen(window._fbDoc(), (snap) => {
-      if (_isPushing) return; // Eigene Saves ignorieren
+      if (_isPushing) return;
       if (snap.exists()) {
         const d = snap.data();
-        if (Array.isArray(d.ma)) MA = d.ma;
+        // MA kommt vom Google Sheet — nur KL_DATA aus Firebase
         if (Array.isArray(d.kl)) KL_DATA = d.kl;
       }
-      filtered = [...MA];
-      buildMA();
       klRender();
       setCloudStatus('ok');
     }, (err) => {
@@ -862,7 +867,7 @@ async function cloudPush() {
     if (!fbReady) throw new Error('Firebase nicht bereit');
     _isPushing = true;
     setCloudStatus('saving');
-    await window._fbSet(window._fbDoc(), { ma: MA, kl: KL_DATA });
+    await window._fbSet(window._fbDoc(), { kl: KL_DATA });
     setCloudStatus('ok');
     setTimeout(() => { _isPushing = false; }, 500);
   } catch(e) {
@@ -895,11 +900,87 @@ function setCloudStatus(s) {
 function saveCloudCfg() { showToast('Firebase ist bereits eingebaut — kein Setup nötig!'); }
 function loadCloudCfgFields() {}
 
-function loadMA(){return DEF.map(m=>({...m}));}
-function saveMA(){cloudPush();}
+// ===================== GOOGLE SHEETS LIVE SYNC =====================
+const SHEET_ID = '1uzAA-_O2JtDBs3bpRG9Mqbva67dqh45LPDjPEf8-njQ';
+const SHEET_GID = '1591796957';
+let sheetSyncInterval = null;
+
+async function syncFromSheet() {
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Sheet nicht erreichbar');
+    const csv = await res.text();
+    const rows = csv.trim().split('\n').map(r => {
+      // CSV-Zeilen parsen (berücksichtigt Anführungszeichen)
+      const cols = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < r.length; i++) {
+        const c = r[i];
+        if (c === '"') { inQ = !inQ; }
+        else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+        else { cur += c; }
+      }
+      cols.push(cur.trim());
+      return cols;
+    });
+
+    if (rows.length < 2) return; // Nur Header, keine Daten
+
+    // Header-Zeile: ID, Name, Ranks, DN, Division's, Strike, Invite Date, Last Rank, Abteilungen
+    // Index:         0    1      2    3       4         5         6           7           8
+    const newMA = [];
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r[0] && !r[1]) continue; // Leere Zeile überspringen
+      newMA.push({
+        id:     (r[0]||'').replace(/"/g,'').trim(),
+        name:   (r[1]||'').replace(/"/g,'').trim(),
+        rank:   (r[2]||'').replace(/"/g,'').trim(),
+        dn:     (r[3]||'').replace(/"/g,'').trim(),
+        div:    (r[4]||'').replace(/"/g,'').trim(),
+        strike: (r[5]||'0/3').replace(/"/g,'').trim(),
+        date:   (r[6]||'').replace(/"/g,'').trim(),
+        ausb:   (r[7]||'').replace(/"/g,'').trim(),
+        abt:    (r[8]||'').replace(/"/g,'').trim(),
+        status: 'Aktiv',
+        notes:  ''
+      });
+    }
+
+    if (newMA.length > 0) {
+      MA = newMA;
+      filtered = [...MA];
+      buildMA();
+      const dc = document.getElementById('dash-count'); if (dc) dc.textContent = MA.length;
+      const cc = document.getElementById('cfg-count');  if (cc) cc.textContent = MA.length;
+      const b  = document.getElementById('ma-badge');   if (b)  b.textContent  = MA.length + ' AGENTEN';
+      const ss = document.getElementById('sheet-status');
+      if (ss) {
+        const now = new Date();
+        const t = [now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+        ss.textContent = 'Sheet: ✓ ' + t;
+        ss.style.color = 'var(--gr)';
+      }
+    }
+  } catch(e) {
+    console.warn('Sheet sync error:', e);
+  }
+}
+
+function startSheetSync() {
+  syncFromSheet(); // sofort beim Start
+  if (sheetSyncInterval) clearInterval(sheetSyncInterval);
+  sheetSyncInterval = setInterval(syncFromSheet, 30000); // alle 30 Sekunden
+}
+
+// saveMA pusht NICHT mehr die MA-Daten zu Firebase — MA kommt vom Sheet
+// Nur KL_DATA wird über Firebase geteilt
+function saveMA() { /* MA wird nur vom Google Sheet gelesen */ }
 function resetData(){
-  if(!confirm('Alle Anderungen zurucksetzen?'))return;
-  MA=DEF.map(m=>({...m}));filtered=[...MA];filterMA();refreshSelects();cloudPush();showToast('Zuruckgesetzt');
+  if(!confirm('Ansicht zurücksetzen und Sheet neu laden?'))return;
+  syncFromSheet();
+  showToast('Sheet wird neu geladen...');
 }
 
 function gv(id){const e=document.getElementById(id);return e?e.value:'';}
@@ -1085,10 +1166,30 @@ function klSave(){cloudPush();}
 function klAdd(){
   const orga=gv('kl-orga'),name=gv('kl-name').trim(),id=gv('kl-id').trim(),rang=gv('kl-rang').trim(),tel=gv('kl-tel').trim();
   if(!orga||!name){showToast('Orga und Name sind Pflichtfelder!');return;}
+
+  // Duplikat-Prüfung: gleicher Name UND gleiche Orga
+  const dup = KL_DATA.find(e =>
+    e.name.toLowerCase() === name.toLowerCase() && e.orga === orga
+  );
+  if(dup){
+    showToast('⚠️ '+name+' ist in '+orga+' bereits eingetragen!');
+    // Felder rot markieren
+    const nf=document.getElementById('kl-name');
+    const of2=document.getElementById('kl-orga');
+    [nf,of2].forEach(el=>{if(el){el.style.borderColor='var(--re)';setTimeout(()=>el.style.borderColor='',2000);}});
+    return;
+  }
+
+  // Orga-Tab auf die neue Orga setzen
+  const savedOrga = orga;
   KL_DATA.push({orga,name,id,rang,tel});
   klSave();
-  sv2('kl-orga','');sv2('kl-name','');sv2('kl-id','');sv2('kl-rang','');sv2('kl-tel','');
-  klRender();
+  // Formular leeren aber Orga behalten
+  sv2('kl-name','');sv2('kl-id','');sv2('kl-rang','');sv2('kl-tel','');
+  // Tab auf die eingetragene Orga wechseln
+  const tab = document.querySelector(`#kl-orga-tabs .orga-tab[data-orga="${savedOrga}"]`);
+  if(tab) klSwitch(tab);
+  else klRender();
   showToast('Eintrag hinzugefugt');
 }
 
@@ -1360,8 +1461,10 @@ loadCloudCfgFields();
 [upAz,upRa,upEs,upKu,upSa,upPa].forEach(f=>f());
 showTplTab('rang',document.querySelector('.tpl-tab'));
 
-// Startet Firebase Live-Listener — lädt Daten initial und bei jeder Änderung automatisch
+// Startet Firebase Live-Listener — lädt KL-Daten initial und bei jeder Änderung automatisch
 cloudLoad();
+// Startet Google Sheet Live-Sync für Mitarbeiterliste (alle 30 Sek.)
+startSheetSync();
 </script>
 </body>
 </html>
