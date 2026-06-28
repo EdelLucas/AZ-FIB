@@ -1247,22 +1247,21 @@ function klRender(){
     empty.style.display='block';
   } else {
     empty.style.display='none';
-    body.innerHTML=list.map((e,li)=>{
+    body.innerHTML=list.map((e)=>{
       const ri=KL_DATA.indexOf(e);
       const col=KL_ORGA_COLORS[e.orga]||'var(--mu)';
       const nameSafe=e.name.replace(/'/g,"\\'");
-      const isFirst=ri===0;
-      const isLast=ri===KL_DATA.length-1;
-      return`<tr>
-        <td><span style="display:inline-block;font-size:10px;padding:1px 8px;border-radius:2px;border:1px solid ${col}55;background:${col}20;color:${col};font-weight:bold;letter-spacing:.05em">${e.orga}</span></td>
+      return`<tr draggable="true" data-ri="${ri}" class="kl-drag-row" style="cursor:grab;">
+        <td>
+          <span style="color:var(--mu);font-size:14px;vertical-align:middle;margin-right:5px;cursor:grab" title="Ziehen zum Sortieren">⠿</span>
+          <span style="display:inline-block;font-size:10px;padding:1px 8px;border-radius:2px;border:1px solid ${col}55;background:${col}20;color:${col};font-weight:bold;letter-spacing:.05em">${e.orga}</span>
+        </td>
         <td style="font-weight:bold">${e.name}</td>
         <td style="color:var(--mu);font-size:11px">${e.id||'--'}</td>
         <td style="font-size:11px">${e.rang||'--'}</td>
         <td style="color:var(--bl);font-size:11px">${e.tel||'--'}</td>
         <td style="text-align:center;white-space:nowrap">
           <div style="display:flex;gap:3px;justify-content:center;">
-            <button class="btn sm" onclick="klMove(${ri},-1)" title="Nach oben" ${isFirst?'style="opacity:.3;pointer-events:none"':''}><i class="ti ti-arrow-up"></i></button>
-            <button class="btn sm" onclick="klMove(${ri},1)" title="Nach unten" ${isLast?'style="opacity:.3;pointer-events:none"':''}><i class="ti ti-arrow-down"></i></button>
             <button class="btn sm bl" onclick="klCopyName('${nameSafe}')" title="Name kopieren"><i class="ti ti-user"></i></button>
             <button class="btn sm" onclick="klOpenEdit(${ri})" title="Bearbeiten" style="color:var(--g);border-color:var(--gd)"><i class="ti ti-edit"></i></button>
             <button class="btn sm ng" onclick="klDel(${ri})" title="Loschen"><i class="ti ti-trash"></i></button>
@@ -1270,6 +1269,9 @@ function klRender(){
         </td>
       </tr>`;
     }).join('');
+
+    // Drag & Drop initialisieren
+    klInitDrag();
   }
 
   // Tab-Zahler aktualisieren
@@ -1287,15 +1289,68 @@ function klRender(){
   });
 }
 
-function klCopyName(name){
-  navigator.clipboard.writeText(name).then(()=>showToast('Name kopiert: '+name)).catch(()=>{});
+function klInitDrag(){
+  const rows=document.querySelectorAll('.kl-drag-row');
+  let dragSrc=null;
+
+  rows.forEach(row=>{
+    row.addEventListener('dragstart',function(e){
+      dragSrc=this;
+      this.style.opacity='0.4';
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain', this.dataset.ri);
+    });
+    row.addEventListener('dragend',function(){
+      this.style.opacity='1';
+      document.querySelectorAll('.kl-drag-row').forEach(r=>{
+        r.style.borderTop='';
+        r.style.borderBottom='';
+      });
+    });
+    row.addEventListener('dragover',function(e){
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      document.querySelectorAll('.kl-drag-row').forEach(r=>{r.style.borderTop='';r.style.borderBottom='';});
+      // Zeige Linie oben oder unten je nach Mausposition
+      const rect=this.getBoundingClientRect();
+      const mid=rect.top+rect.height/2;
+      if(e.clientY<mid) this.style.borderTop='2px solid var(--g)';
+      else this.style.borderBottom='2px solid var(--g)';
+    });
+    row.addEventListener('dragleave',function(){
+      this.style.borderTop='';
+      this.style.borderBottom='';
+    });
+    row.addEventListener('drop',function(e){
+      e.preventDefault();
+      if(dragSrc===this)return;
+      const fromRi=parseInt(e.dataTransfer.getData('text/plain'));
+      const toRi=parseInt(this.dataset.ri);
+      if(isNaN(fromRi)||isNaN(toRi)||fromRi===toRi)return;
+
+      // Bestimme ob vor oder nach dem Ziel eingefügt werden soll
+      const rect=this.getBoundingClientRect();
+      const insertAfter=e.clientY>=(rect.top+rect.height/2);
+
+      // Element aus Array entfernen
+      const item=KL_DATA.splice(fromRi,1)[0];
+
+      // Neue Position berechnen (nach dem Entfernen verschiebt sich der Index)
+      let insertAt=KL_DATA.indexOf(KL_DATA.find((_,i)=>i===(fromRi<toRi?toRi-1:toRi)));
+      // Einfacher: direkt über den aktuellen toRi-Wert nach Entfernen
+      let newIdx=toRi>fromRi?toRi-1:toRi;
+      if(insertAfter) newIdx++;
+      newIdx=Math.max(0,Math.min(newIdx,KL_DATA.length));
+
+      KL_DATA.splice(newIdx,0,item);
+      klSave();
+      klRender();
+    });
+  });
 }
 
-function klMove(ri,dir){
-  const ti=ri+dir;
-  if(ti<0||ti>=KL_DATA.length)return;
-  const tmp=KL_DATA[ri];KL_DATA[ri]=KL_DATA[ti];KL_DATA[ti]=tmp;
-  klSave();klRender();
+function klCopyName(name){
+  navigator.clipboard.writeText(name).then(()=>showToast('Name kopiert: '+name)).catch(()=>{});
 }
 
 function klOpenEdit(ri){
