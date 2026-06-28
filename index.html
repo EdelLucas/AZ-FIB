@@ -88,6 +88,13 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 .modal h2{color:var(--g);font-size:14px;letter-spacing:.08em;margin-bottom:14px;border-bottom:1px solid var(--bd);padding-bottom:8px;}
 .absbox{background:rgba(58,143,212,0.05);border:1px solid rgba(58,143,212,0.25);border-radius:5px;padding:10px 13px;margin-bottom:12px;}
 .abtitle{font-size:10px;color:var(--bl);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
+/* Klassifizierung */
+.orga-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:11px;}
+.orga-tab{font-size:11px;padding:4px 11px;border:1px solid var(--bd);background:var(--p2);color:var(--mu);border-radius:3px;cursor:pointer;font-family:'Courier New',monospace;transition:.15s;display:inline-flex;align-items:center;gap:5px;}
+.orga-tab:hover{color:var(--g);border-color:var(--gd);}
+.orga-tab.act{color:var(--g);border-color:var(--g);background:var(--gg);}
+.orga-cnt{font-size:9px;padding:0 4px;border-radius:2px;background:rgba(201,168,76,.18);color:var(--g);border:1px solid var(--gd);}
+.kl-empty{color:var(--mu);font-size:11px;padding:18px 0;text-align:center;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--gd);}
 @media(max-width:768px){.sb{width:46px;}.ni span,.nl,.sb-title,.sb-sub{display:none;}.sb-emblem{width:30px;height:30px;font-size:10px;}.sb-logo{padding:7px 4px;}.srow{grid-template-columns:1fr 1fr;}.mg{grid-template-columns:1fr;}.ir{grid-template-columns:1fr;}.ir3{grid-template-columns:1fr 1fr;}.topbar-brand{font-size:9px;letter-spacing:.05em;}}
 .edit-card{background:var(--p2);border:1px solid var(--bd);border-radius:5px;padding:10px 13px;display:grid;grid-template-columns:1fr 1fr;gap:7px;}
@@ -123,6 +130,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <div class="ni" onclick="sv('az',this)"><i class="ti ti-file-certificate"></i><span>AZ-System</span></div>
     <div class="ni" onclick="sv('san',this)"><i class="ti ti-gavel"></i><span>Sanktion</span></div>
     <div class="ni" onclick="sv('pa',this)"><i class="ti ti-id-badge"></i><span>Personalakte</span></div>
+    <div class="ni" onclick="sv('kl',this)"><i class="ti ti-shield-lock"></i><span>Klassifizierung</span></div>
   </div>
   <div class="nv"><div class="nl">System</div>
     <div class="ni" onclick="sv('tpl',this)"><i class="ti ti-template"></i><span>Vorlagen-Editor</span></div>
@@ -152,6 +160,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <div class="mc" onclick="sv('az',null)" style="border-color:var(--gd)"><div class="mt"><i class="ti ti-file-certificate"></i>AZ-System</div><div class="md">Arbeitszeugnisse ausstellen</div><div class="ma"><button class="btn sm" style="border-color:var(--g)">&gt; Offnen</button></div></div>
     <div class="mc" onclick="sv('san',null)"><div class="mt"><i class="ti ti-gavel"></i>Sanktion</div><div class="md">Verwarnungen &amp; Sanktionskatalog</div><div class="ma"><button class="btn sm">&gt; Offnen</button></div></div>
     <div class="mc" onclick="sv('pa',null)"><div class="mt"><i class="ti ti-id-badge"></i>Personalakte-Generator</div><div class="md">Vollstandige Personalakten</div><div class="ma"><button class="btn sm">&gt; Offnen</button></div></div>
+    <div class="mc" onclick="sv('kl',null)"><div class="mt"><i class="ti ti-shield-lock"></i>Klassifizierung</div><div class="md">Organisationsubergreifende Kontakte</div><div class="ma"><button class="btn sm">&gt; Offnen</button></div></div>
   </div>
   <div class="pan">
     <div class="pan-h"><div class="pan-t">[ Abteilungsubersicht ]</div><button class="btn sm" onclick="sv('ma',null)"><i class="ti ti-external-link"></i> Mitarbeiterverz.</button></div>
@@ -421,6 +430,88 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
   </div>
 </div>
 
+<!-- KLASSIFIZIERUNG -->
+<div class="view" id="v-kl">
+  <div class="mh"><h1>Klassifizierung</h1><div class="badge">ORGA-KONTAKTE</div></div>
+
+  <!-- Formular -->
+  <div class="pan">
+    <div class="pan-h"><div class="pan-t">[ Neuen Eintrag anlegen ]</div></div>
+    <div class="pan-b">
+      <div class="ir">
+        <div>
+          <div class="fl">Organisation *</div>
+          <select class="fi" id="kl-orga">
+            <option value="">-- wahlen --</option>
+            <option>FIB</option>
+            <option>LSPD</option>
+            <option>SAHP</option>
+            <option>LI</option>
+            <option>EMS</option>
+            <option>NG</option>
+            <option>GOV</option>
+          </select>
+        </div>
+        <div>
+          <div class="fl">Name *</div>
+          <input class="fi" id="kl-name" placeholder="Vor- u. Nachname">
+        </div>
+      </div>
+      <div class="ir3">
+        <div>
+          <div class="fl">Pass-ID</div>
+          <input class="fi" id="kl-id" placeholder="z.B. 12345">
+        </div>
+        <div>
+          <div class="fl">Rang</div>
+          <input class="fi" id="kl-rang" placeholder="z.B. Officer I">
+        </div>
+        <div>
+          <div class="fl">Telefonnummer</div>
+          <input class="fi" id="kl-tel" placeholder="z.B. 555-1234">
+        </div>
+      </div>
+      <div class="brow" style="margin-top:4px;">
+        <button class="btn ok" onclick="klAdd()"><i class="ti ti-plus"></i> Eintrag hinzufugen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabelle mit Orga-Tabs -->
+  <div class="pan">
+    <div class="pan-h">
+      <div class="pan-t" id="kl-list-title">[ Alle Eintrage ]</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="sw" style="min-width:160px;"><i class="ti ti-search"></i>
+          <input class="fi si" id="kl-search" placeholder="Suche ..." oninput="klRender()" style="font-size:11px;padding:4px 8px 4px 28px;">
+        </div>
+        <span style="font-size:10px;color:var(--mu);" id="kl-count"></span>
+      </div>
+    </div>
+    <div class="pan-b" style="padding-bottom:6px;">
+      <div class="orga-tabs" id="kl-orga-tabs">
+        <div class="orga-tab act" data-orga="Alle" onclick="klSwitch(this)">Alle</div>
+        <div class="orga-tab" data-orga="FIB" onclick="klSwitch(this)">FIB</div>
+        <div class="orga-tab" data-orga="LSPD" onclick="klSwitch(this)">LSPD</div>
+        <div class="orga-tab" data-orga="SAHP" onclick="klSwitch(this)">SAHP</div>
+        <div class="orga-tab" data-orga="LI" onclick="klSwitch(this)">LI</div>
+        <div class="orga-tab" data-orga="EMS" onclick="klSwitch(this)">EMS</div>
+        <div class="orga-tab" data-orga="NG" onclick="klSwitch(this)">NG</div>
+        <div class="orga-tab" data-orga="GOV" onclick="klSwitch(this)">GOV</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tbl" id="kl-tbl">
+          <thead><tr>
+            <th>Orga</th><th>Name</th><th>Pass-ID</th><th>Rang</th><th>Telefon</th><th style="text-align:center">Aktion</th>
+          </tr></thead>
+          <tbody id="kl-body"></tbody>
+        </table>
+      </div>
+      <div id="kl-empty" class="kl-empty" style="display:none;">Keine Eintrage vorhanden.</div>
+    </div>
+  </div>
+</div>
+
 <!-- VORLAGEN-EDITOR -->
 <div class="view" id="v-tpl">
   <div class="mh"><h1>Vorlagen-Editor</h1><div class="badge">ALLE MODULE</div></div>
@@ -440,7 +531,6 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <span style="color:var(--g)">{eintritt}</span> Eintrittsdatum
   </div>
 
-  <!-- TAB-LEISTE -->
   <div style="display:flex;gap:4px;flex-wrap:wrap;" id="tpl-tabs">
     <button class="btn sm tpl-tab act-tab" onclick="showTplTab('rang',this)"><i class="ti ti-award"></i> Ranganpassung</button>
     <button class="btn sm tpl-tab" onclick="showTplTab('ein',this)"><i class="ti ti-user-plus"></i> Einstellung</button>
@@ -652,6 +742,7 @@ const DEF=[
 {id:"253176",name:"Gimo Jimmbo",rank:"17. Commander",dn:"707",div:"Command",abt:"FIBCO",ausb:"",strike:"0/3",date:"26.05.2026",status:"Aktiv",notes:""},
 ];
 
+// ===================== MITARBEITER =====================
 function loadMA(){try{const d=localStorage.getItem('fib_ma');if(d)return JSON.parse(d);}catch(e){}return DEF.map(m=>({...m}));}
 function saveMA(){try{localStorage.setItem('fib_ma',JSON.stringify(MA));}catch(e){}}
 function resetData(){if(!confirm('Alle Anderungen zurucksetzen? Dies kann nicht ruckgangig gemacht werden.'))return;localStorage.removeItem('fib_ma');MA=DEF.map(m=>({...m}));filtered=[...MA];filterMA();refreshSelects();showToast('Zuruckgesetzt');}
@@ -667,28 +758,20 @@ function rankCls(r){const n=parseInt(r);if(n>=26)return'rh';if(n>=20)return'rm';
 
 // --- ABSENDER ---
 function loadAbs(){try{const d=localStorage.getItem('fib_abs');if(d)return JSON.parse(d);}catch(e){}return{name:'',rang:'',abt:''};}
-function saveAbsF(){
-  const name=gv('abs-rang-name')||gv('abs-ein-name')||gv('abs-kue-name')||gv('abs-az-name')||gv('abs-san-name')||gv('abs-pa-name');
-  const rang=gv('abs-rang-rang')||gv('abs-ein-rang')||gv('abs-kue-rang')||gv('abs-az-rang')||gv('abs-san-rang')||gv('abs-pa-rang');
-  const abt=gv('abs-rang-abt')||gv('abs-ein-abt')||gv('abs-kue-abt')||gv('abs-az-abt')||gv('abs-san-abt')||gv('abs-pa-abt');
-  try{localStorage.setItem('fib_abs',JSON.stringify({name,rang,abt}));}catch(e){}
-  sv2('cfg-name',name);sv2('cfg-rang',rang);sv2('cfg-abt',abt);
-}
 function syncFromCfg(){
   const name=gv('cfg-name'),rang=gv('cfg-rang'),abt=gv('cfg-abt');
-  ['rang','ein','kue','az','san','pa'].forEach(p=>{sv2('abs-'+p+'-name',name);sv2('abs-'+p+'-rang',rang);sv2('abs-'+p+'-abt',abt);});
   try{localStorage.setItem('fib_abs',JSON.stringify({name,rang,abt}));}catch(e){}
   [upRa,upEs,upKu,upAz,upSa,upPa].forEach(f=>f());
 }
-function loadAbsIntoFields(){
-  const a=loadAbs();
-  ['rang','ein','kue','az','san','pa'].forEach(p=>{sv2('abs-'+p+'-name',a.name||'');sv2('abs-'+p+'-rang',a.rang||'');sv2('abs-'+p+'-abt',a.abt||'');});
-  sv2('cfg-name',a.name||'');sv2('cfg-rang',a.rang||'');sv2('cfg-abt',a.abt||'');
-}
-function absLine(p){
-  const name=gv('abs-'+p+'-name'),rang=gv('abs-'+p+'-rang'),abt=gv('abs-'+p+'-abt');
-  const parts=[];if(rang)parts.push(rang);if(name)parts.push(name);if(abt)parts.push('| '+abt);
-  return parts.length?'\n\n-# Ausgestellt von: '+parts.join(' '):'';
+function loadAbsIntoFields(){const a=loadAbs();sv2('cfg-name',a.name||'');sv2('cfg-rang',a.rang||'');sv2('cfg-abt',a.abt||'');}
+function absLine(){
+  const name=gv('cfg-name'),rang=gv('cfg-rang'),abt=gv('cfg-abt');
+  if(!name&&!abt&&!rang)return'';
+  let line='\n\n';
+  if(name)line+=name+'\n';
+  if(abt)line+=abt+'\n';
+  if(rang)line+=rang;
+  return line.trimEnd();
 }
 
 // --- TABLE ---
@@ -768,26 +851,7 @@ function saveModal(){
 }
 document.getElementById('ma-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
-// --- ABSENDER ---
-function loadAbs(){try{const d=localStorage.getItem('fib_abs');if(d)return JSON.parse(d);}catch(e){}return{name:'',rang:'',abt:''};}
-function saveAbsF(){
-  const name=gv('cfg-name'),rang=gv('cfg-rang'),abt=gv('cfg-abt');
-  try{localStorage.setItem('fib_abs',JSON.stringify({name,rang,abt}));}catch(e){}
-}
-function syncFromCfg(){saveAbsF();[upRa,upEs,upKu,upAz,upSa,upPa].forEach(f=>f());}
-function loadAbsIntoFields(){const a=loadAbs();sv2('cfg-name',a.name||'');sv2('cfg-rang',a.rang||'');sv2('cfg-abt',a.abt||'');}
-function absLine(){
-  const name=gv('cfg-name'),rang=gv('cfg-rang'),abt=gv('cfg-abt');
-  if(!name&&!abt&&!rang) return '';
-  let line='\n\n';
-  if(name) line+=name+'\n';
-  if(abt)  line+=abt+'\n';
-  if(rang) line+=rang;
-  return line.trimEnd();
-}
-
 // --- PASS LOOKUP ---
-// also accepts name search (partial, case-insensitive)
 function lookupPass(pfx){
   const inp=document.getElementById(pfx+'-pass-in');if(!inp)return;
   const val=inp.value.trim();
@@ -798,7 +862,6 @@ function lookupPass(pfx){
     if(fieldsEl)fieldsEl.style.display='none';
     return;
   }
-  // exact ID match first, then name substring
   let m=MA.find(x=>x.id===val);
   if(!m){
     const q=val.toLowerCase();
@@ -817,39 +880,30 @@ function lookupPass(pfx){
   }
   if(foundEl)foundEl.innerHTML=`<span style="color:var(--gr);font-size:11px"><i class="ti ti-check" style="font-size:11px"></i> <b>${m.name}</b> · ${m.rank}</span>`;
   if(fieldsEl)fieldsEl.style.display='block';
-  // fill editable cards
   if(pfx==='ra'){
     sv2('ra-name',m.name);sv2('ra-dn',m.dn||'');
     sv2('ra-name-ed',m.name);sv2('ra-dn-ed',m.dn||'');
     sv2('ra-abt-ed',m.abt||'');sv2('ra-strike-ed',m.strike||'0/3');
-    // pre-select current rank as "alter rang", next rank as "neuer rang" suggestion
     sv2('ra-old',m.rank);
     const ri=RANKS.indexOf(m.rank);
     sv2('ra-new',ri>0?RANKS[ri-1]:'');
     upRa();
   }
-  if(pfx==='es'){
-    sv2('es-dn',m.dn||'');sv2('es-name',m.name);
-    sv2('es-name-ed',m.name);sv2('es-dn-ed',m.dn||'');
-    upEs();
-  }
+  if(pfx==='es'){sv2('es-dn',m.dn||'');sv2('es-name',m.name);sv2('es-name-ed',m.name);sv2('es-dn-ed',m.dn||'');upEs();}
   if(pfx==='ku'){
     sv2('ku-dn',m.dn||'');sv2('ku-name',m.name);sv2('ku-rang',m.rank);
     sv2('ku-name-ed',m.name);sv2('ku-dn-ed',m.dn||'');
-    sv2('ku-rang-ed',m.rank);sv2('ku-abt-ed',m.abt||'');
-    upKu();
+    sv2('ku-rang-ed',m.rank);sv2('ku-abt-ed',m.abt||'');upKu();
   }
   if(pfx==='az'){
     sv2('az-name',m.name);sv2('az-pass',m.id);sv2('az-rang',m.rank);
     sv2('az-name-ed',m.name);sv2('az-pass-ed',m.id);
-    sv2('az-rang-ed',m.rank);sv2('az-abt-ed',m.abt||'');
-    upAz();
+    sv2('az-rang-ed',m.rank);sv2('az-abt-ed',m.abt||'');upAz();
   }
   if(pfx==='sa'){
     sv2('sa-dn',m.dn||'');sv2('sa-name',m.name);
     sv2('sa-name-ed',m.name);sv2('sa-dn-ed',m.dn||'');
-    sv2('sa-rang-ed',m.rank);sv2('sa-strike-ed',m.strike||'0/3');
-    upSa();
+    sv2('sa-rang-ed',m.rank);sv2('sa-strike-ed',m.strike||'0/3');upSa();
   }
   if(pfx==='pa'){
     sv2('pa-dn',m.dn||'');sv2('pa-name',m.name);sv2('pa-rang',m.rank);sv2('pa-abt',m.abt==='--'?'':m.abt||'');
@@ -862,14 +916,94 @@ function lookupPass(pfx){
   }
 }
 
-// --- SELECTS ---
 function refreshSelects(){}
 function fillSelects(){
   ['ra-old','ra-new','es-rang'].forEach(id=>{const s=document.getElementById(id);if(!s)return;RANKS.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;s.appendChild(o);});});
 }
-function fillFromMA(){}
 
-// --- UTILS ---
+// ===================== KLASSIFIZIERUNG =====================
+const KL_ORGA_COLORS={FIB:'#c9a84c',LSPD:'#3a8fd4',SAHP:'#4db36a',LI:'#b34dce',EMS:'#e74c3c',NG:'#4dcecb',GOV:'#e0972f'};
+let KL_DATA=[];
+let KL_ORGA='Alle';
+
+function klLoad(){try{const d=localStorage.getItem('fib_kl');if(d)KL_DATA=JSON.parse(d);}catch(e){}}
+function klSave(){try{localStorage.setItem('fib_kl',JSON.stringify(KL_DATA));}catch(e){}}
+
+function klAdd(){
+  const orga=gv('kl-orga'),name=gv('kl-name').trim(),id=gv('kl-id').trim(),rang=gv('kl-rang').trim(),tel=gv('kl-tel').trim();
+  if(!orga||!name){showToast('Orga und Name sind Pflichtfelder!');return;}
+  KL_DATA.push({orga,name,id,rang,tel});
+  klSave();
+  sv2('kl-orga','');sv2('kl-name','');sv2('kl-id','');sv2('kl-rang','');sv2('kl-tel','');
+  klRender();
+  showToast('Eintrag hinzugefugt');
+}
+
+function klDel(i){
+  if(!confirm('Eintrag wirklich loschen?'))return;
+  KL_DATA.splice(i,1);
+  klSave();
+  klRender();
+  showToast('Geloscht');
+}
+
+function klSwitch(el){
+  document.querySelectorAll('#kl-orga-tabs .orga-tab').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+  KL_ORGA=el.dataset.orga;
+  klRender();
+}
+
+function klRender(){
+  const q=(gv('kl-search')||'').toLowerCase();
+  let list=KL_ORGA==='Alle'?KL_DATA:KL_DATA.filter(e=>e.orga===KL_ORGA);
+  if(q)list=list.filter(e=>(e.name||'').toLowerCase().includes(q)||(e.id||'').includes(q)||(e.rang||'').toLowerCase().includes(q)||(e.tel||'').includes(q));
+
+  const body=document.getElementById('kl-body');
+  const empty=document.getElementById('kl-empty');
+  const count=document.getElementById('kl-count');
+  const title=document.getElementById('kl-list-title');
+
+  title.textContent=KL_ORGA==='Alle'?'[ Alle Eintrage ]':'[ '+KL_ORGA+' ]';
+  count.textContent=list.length+' Eintrage';
+
+  if(!list.length){
+    body.innerHTML='';
+    empty.style.display='block';
+  } else {
+    empty.style.display='none';
+    body.innerHTML=list.map(e=>{
+      const ri=KL_DATA.indexOf(e);
+      const col=KL_ORGA_COLORS[e.orga]||'var(--mu)';
+      return`<tr>
+        <td><span style="display:inline-block;font-size:10px;padding:1px 8px;border-radius:2px;border:1px solid ${col}55;background:${col}20;color:${col};font-weight:bold;letter-spacing:.05em">${e.orga}</span></td>
+        <td style="font-weight:bold">${e.name}</td>
+        <td style="color:var(--mu);font-size:11px">${e.id||'--'}</td>
+        <td style="font-size:11px">${e.rang||'--'}</td>
+        <td style="color:var(--bl);font-size:11px">${e.tel||'--'}</td>
+        <td style="text-align:center">
+          <button class="btn sm ng" onclick="klDel(${ri})"><i class="ti ti-trash"></i></button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Tab-Zahler aktualisieren
+  ['Alle','FIB','LSPD','SAHP','LI','EMS','NG','GOV'].forEach(o=>{
+    const tab=document.querySelector(`#kl-orga-tabs .orga-tab[data-orga="${o}"]`);
+    if(!tab)return;
+    const cnt=o==='Alle'?KL_DATA.length:KL_DATA.filter(e=>e.orga===o).length;
+    let badge=tab.querySelector('.orga-cnt');
+    if(cnt>0){
+      if(!badge){badge=document.createElement('span');badge.className='orga-cnt';tab.appendChild(badge);}
+      badge.textContent=cnt;
+    } else {
+      if(badge)badge.remove();
+    }
+  });
+}
+
+// ===================== UTILS =====================
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 function cp(id){const e=document.getElementById(id);if(!e)return;navigator.clipboard.writeText(e.textContent).then(()=>showToast('In Zwischenablage kopiert')).catch(()=>{});}
 function sv(name,el){
@@ -879,6 +1013,7 @@ function sv(name,el){
   if(el&&el.classList&&el.classList.contains('ni'))el.classList.add('act');
   else document.querySelectorAll('.ni').forEach(n=>{if((n.getAttribute('onclick')||'').includes("'"+name+"'"))n.classList.add('act');});
   if(name==='ma')filterMA();
+  if(name==='kl')klRender();
 }
 function setCol(h){
   document.documentElement.style.setProperty('--g',h);
@@ -894,121 +1029,112 @@ function tick(){
 }
 
 // ===================== VORLAGEN-EDITOR =====================
-const TPL_DEFAULTS = {
-  rang: `-# Ranganpassung . FIB Personalabteilung\n\n**Mitarbeiter:** {dn} | {name}\n**Von:** {alter_rang}\n**Nach:** {neuer_rang}\n**Datum:** {datum}\n**Begruendung:** {grund}{absender}`,
-  ein:  `-# Einstellung . FIB Personalabteilung\n\n**Dienstnummer:** {dn}\n**Name:** {name}\n**Rang:** {rang}\n**Abteilung:** @{abteilung}\n**Einstellungsdatum:** {datum}\n\nWillkommen im Federal Investigation Bureau!{absender}`,
-  kue:  `-# Kuendigung . FIB Personalabteilung\n\n**Mitarbeiter:** {dn} | {name}\n**Rang:** {rang}\n**Datum:** {datum}\n**Grund:** {grund}\n\nDer Mitarbeiter wird mit sofortiger Wirkung aus dem Dienst entlassen.{absender}`,
-  az:   `Das Federal Investigation Bureau (FIB),\nuebermittelt hiermit das Arbeitszeugnis von:\n\n**Vor- u. Nachname:** {name}\n**Reisepassnr.:** {pass}\n**Rang:** {rang}\n**Datum der Kuendigung:** {datum}\n\n(Arbeitszeugnis wird als Anhang beigefuegt){absender}`,
-  san:  `-# Sanktion . FIB Personalabteilung\n\n**Mitarbeiter:** {dn} | {name}\n**Sanktionsart:** {sanktion}\n**Datum:** {datum}\n**Begruendung:** {grund}{absender}`,
-  pa:   `-# Personalakte . FIB\n\n**Dienstnummer:** {dn}\n**Name:** {name}\n**Rang:** {rang}\n**Abteilung:** {abteilung}\n**Eintrittsdatum:** {eintritt}\n**Strike:** 0/3\n**Status:** Aktiv{absender}`,
+const TPL_DEFAULTS={
+  rang:`-# Ranganpassung . FIB Personalabteilung\n\n**Mitarbeiter:** {dn} | {name}\n**Von:** {alter_rang}\n**Nach:** {neuer_rang}\n**Datum:** {datum}\n**Begruendung:** {grund}{absender}`,
+  ein: `-# Einstellung . FIB Personalabteilung\n\n**Dienstnummer:** {dn}\n**Name:** {name}\n**Rang:** {rang}\n**Abteilung:** @{abteilung}\n**Einstellungsdatum:** {datum}\n\nWillkommen im Federal Investigation Bureau!{absender}`,
+  kue: `-# Kuendigung . FIB Personalabteilung\n\n**Mitarbeiter:** {dn} | {name}\n**Rang:** {rang}\n**Datum:** {datum}\n**Grund:** {grund}\n\nDer Mitarbeiter wird mit sofortiger Wirkung aus dem Dienst entlassen.{absender}`,
+  az:  `Das Federal Investigation Bureau (FIB),\nuebermittelt hiermit das Arbeitszeugnis von:\n\n**Vor- u. Nachname:** {name}\n**Reisepassnr.:** {pass}\n**Rang:** {rang}\n**Datum der Kuendigung:** {datum}\n\n(Arbeitszeugnis wird als Anhang beigefuegt){absender}`,
+  san: `-# Sanktion . FIB Personalabteilung\n\n**Mitarbeiter:** {dn} | {name}\n**Sanktionsart:** {sanktion}\n**Datum:** {datum}\n**Begruendung:** {grund}{absender}`,
+  pa:  `-# Personalakte . FIB\n\n**Dienstnummer:** {dn}\n**Name:** {name}\n**Rang:** {rang}\n**Abteilung:** {abteilung}\n**Eintrittsdatum:** {eintritt}\n**Strike:** 0/3\n**Status:** Aktiv{absender}`,
 };
-const TPL_LABELS = {rang:'Ranganpassung',ein:'Einstellung',kue:'Kündigung',az:'AZ-System',san:'Sanktion',pa:'Personalakte'};
-const TPL_SAMPLE = {dn:'42',name:'Max Mustermann',rang:'17. Commander',alter_rang:'16. Lieutenant Commander',neuer_rang:'17. Commander',datum:gd(),grund:'Herausragende Leistungen im Dienst',abteilung:'Human Resources',pass:'99999',sanktion:'Schriftliche Verwarnung',eintritt:gd(),absender:''};
+const TPL_LABELS={rang:'Ranganpassung',ein:'Einstellung',kue:'Kündigung',az:'AZ-System',san:'Sanktion',pa:'Personalakte'};
+const TPL_SAMPLE={dn:'42',name:'Max Mustermann',rang:'17. Commander',alter_rang:'16. Lieutenant Commander',neuer_rang:'17. Commander',datum:gd(),grund:'Herausragende Leistungen im Dienst',abteilung:'Human Resources',pass:'99999',sanktion:'Schriftliche Verwarnung',eintritt:gd(),absender:''};
 
-function loadTpls(){try{const d=localStorage.getItem('fib_tpl');if(d)return JSON.parse(d);}catch(e){}return {};}
+function loadTpls(){try{const d=localStorage.getItem('fib_tpl');if(d)return JSON.parse(d);}catch(e){}return{};}
 function saveTpls(t){try{localStorage.setItem('fib_tpl',JSON.stringify(t));}catch(e){}}
 
-let TPLS = loadTpls();
-let curTplKey = 'rang';
+let TPLS=loadTpls();
+let curTplKey='rang';
 
-function getTpl(key){return TPLS[key]!==undefined ? TPLS[key] : TPL_DEFAULTS[key];}
+function getTpl(key){return TPLS[key]!==undefined?TPLS[key]:TPL_DEFAULTS[key];}
 
-function showTplTab(key, btn){
-  curTplKey = key;
+function showTplTab(key,btn){
+  curTplKey=key;
   document.querySelectorAll('.tpl-tab').forEach(b=>b.classList.remove('act-tab'));
-  if(btn) btn.classList.add('act-tab');
-  const lbl = TPL_LABELS[key]||key;
-  const title = document.getElementById('tpl-pan-title');
-  if(title) title.querySelector('.pan-t').textContent = '[ '+lbl+' — Vorlage bearbeiten ]';
-  const ed = document.getElementById('tpl-editor');
-  if(ed){ ed.value = getTpl(key); updateTplPreview(); }
+  if(btn)btn.classList.add('act-tab');
+  const lbl=TPL_LABELS[key]||key;
+  const title=document.getElementById('tpl-pan-title');
+  if(title)title.querySelector('.pan-t').textContent='[ '+lbl+' — Vorlage bearbeiten ]';
+  const ed=document.getElementById('tpl-editor');
+  if(ed){ed.value=getTpl(key);updateTplPreview();}
 }
 
-function applyTplVars(tpl, vars){
-  return tpl.replace(/\{(\w+)\}/g, (_,k)=> vars[k]!==undefined ? vars[k] : '{'+k+'}');
-}
+function applyTplVars(tpl,vars){return tpl.replace(/\{(\w+)\}/g,(_,k)=>vars[k]!==undefined?vars[k]:'{'+k+'}');}
 
 function updateTplPreview(){
-  const ed = document.getElementById('tpl-editor');
-  const pre = document.getElementById('tpl-preview');
-  if(!ed||!pre) return;
-  // use real current values from whichever module fields are filled
-  const sample = {
-    name: gv('ra-name')||gv('ku-name')||gv('az-name')||gv('sa-name')||gv('pa-name')||TPL_SAMPLE.name,
-    dn:   gv('ra-dn')||gv('ku-dn')||gv('sa-dn')||gv('pa-dn')||TPL_SAMPLE.dn,
-    rang: gv('ra-old')||gv('ku-rang')||gv('az-rang')||gv('pa-rang')||TPL_SAMPLE.rang,
-    alter_rang: gv('ra-old')||TPL_SAMPLE.alter_rang,
-    neuer_rang: gv('ra-new')||TPL_SAMPLE.neuer_rang,
-    datum: gd(),
-    grund: gv('ra-grund')||gv('ku-grund')||gv('sa-grund')||TPL_SAMPLE.grund,
-    abteilung: gv('es-abt')||gv('pa-abt')||TPL_SAMPLE.abteilung,
-    pass: gv('az-pass')||TPL_SAMPLE.pass,
-    sanktion: gv('sa-art')||TPL_SAMPLE.sanktion,
-    eintritt: fmtD(gv('pa-datum'))||gd(),
-    absender: absLine(),
+  const ed=document.getElementById('tpl-editor');
+  const pre=document.getElementById('tpl-preview');
+  if(!ed||!pre)return;
+  const sample={
+    name:gv('ra-name')||gv('ku-name')||gv('az-name')||gv('sa-name')||gv('pa-name')||TPL_SAMPLE.name,
+    dn:gv('ra-dn')||gv('ku-dn')||gv('sa-dn')||gv('pa-dn')||TPL_SAMPLE.dn,
+    rang:gv('ra-old')||gv('ku-rang')||gv('az-rang')||gv('pa-rang')||TPL_SAMPLE.rang,
+    alter_rang:gv('ra-old')||TPL_SAMPLE.alter_rang,
+    neuer_rang:gv('ra-new')||TPL_SAMPLE.neuer_rang,
+    datum:gd(),
+    grund:gv('ra-grund')||gv('ku-grund')||gv('sa-grund')||TPL_SAMPLE.grund,
+    abteilung:gv('es-abt')||gv('pa-abt')||TPL_SAMPLE.abteilung,
+    pass:gv('az-pass')||TPL_SAMPLE.pass,
+    sanktion:gv('sa-art')||TPL_SAMPLE.sanktion,
+    eintritt:fmtD(gv('pa-datum'))||gd(),
+    absender:absLine(),
   };
-  pre.textContent = applyTplVars(ed.value, sample);
+  pre.textContent=applyTplVars(ed.value,sample);
 }
 
 function saveTpl(){
-  const ed = document.getElementById('tpl-editor');
-  if(!ed) return;
-  TPLS[curTplKey] = ed.value;
-  saveTpls(TPLS);
+  const ed=document.getElementById('tpl-editor');if(!ed)return;
+  TPLS[curTplKey]=ed.value;saveTpls(TPLS);
   showToast('Vorlage "'+TPL_LABELS[curTplKey]+'" gespeichert');
-  // re-trigger previews so live modules update
   [upRa,upEs,upKu,upAz,upSa,upPa].forEach(f=>f());
 }
 
 function resetTpl(key){
-  if(!confirm('Vorlage "'+TPL_LABELS[key]+'" auf Standard zurücksetzen?')) return;
-  delete TPLS[key];
-  saveTpls(TPLS);
-  const ed = document.getElementById('tpl-editor');
-  if(ed){ ed.value = TPL_DEFAULTS[key]; updateTplPreview(); }
+  if(!confirm('Vorlage "'+TPL_LABELS[key]+'" auf Standard zurücksetzen?'))return;
+  delete TPLS[key];saveTpls(TPLS);
+  const ed=document.getElementById('tpl-editor');
+  if(ed){ed.value=TPL_DEFAULTS[key];updateTplPreview();}
   showToast('Standard wiederhergestellt');
   [upRa,upEs,upKu,upAz,upSa,upPa].forEach(f=>f());
 }
 
-// ---- Override preview functions to use custom templates ----
-function renderTpl(key, vars){
-  const tpl = getTpl(key);
-  return applyTplVars(tpl, vars);
-}
+function renderTpl(key,vars){return applyTplVars(getTpl(key),vars);}
 
 function upRa(){
   const vars={dn:gv('ra-dn')||'XX',name:gv('ra-name')||'Name',alter_rang:gv('ra-old')||'Alter Rang',neuer_rang:gv('ra-new')||'Neuer Rang',datum:gd(),grund:gv('ra-grund')||'--',rang:gv('ra-old')||'--',abteilung:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine()};
-  setOb('ra-pre', renderTpl('rang',vars).trimEnd());
+  setOb('ra-pre',renderTpl('rang',vars).trimEnd());
 }
 function upEs(){
   const vars={dn:gv('es-dn')||'XX',name:gv('es-name')||'Name',rang:gv('es-rang')||'Rang',abteilung:gv('es-abt')||'Abteilung',datum:gd(),grund:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine()};
-  setOb('es-pre', renderTpl('ein',vars).trimEnd());
+  setOb('es-pre',renderTpl('ein',vars).trimEnd());
 }
 function upKu(){
   const vars={dn:gv('ku-dn')||'XX',name:gv('ku-name')||'Name',rang:gv('ku-rang')||'--',datum:gd(),grund:gv('ku-grund')||'--',abteilung:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',eintritt:gd(),absender:absLine()};
-  setOb('ku-pre', renderTpl('kue',vars).trimEnd());
+  setOb('ku-pre',renderTpl('kue',vars).trimEnd());
 }
 function upAz(){
   const vars={name:gv('az-name')||'Vor- u. Nachname',pass:gv('az-pass')||'--',rang:gv('az-rang')||'--',datum:fmtD(gv('az-datum'))||'--',dn:'--',abteilung:'--',grund:'--',alter_rang:'--',neuer_rang:'--',sanktion:'--',eintritt:gd(),absender:absLine()};
-  setOb('az-pre', renderTpl('az',vars).trimEnd());
+  setOb('az-pre',renderTpl('az',vars).trimEnd());
 }
 function upSa(){
   const vars={dn:gv('sa-dn')||'XX',name:gv('sa-name')||'Name',sanktion:gv('sa-art')||'--',datum:gd(),grund:gv('sa-grund')||'--',rang:'--',abteilung:'--',alter_rang:'--',neuer_rang:'--',pass:'--',eintritt:gd(),absender:absLine()};
-  setOb('sa-pre', renderTpl('san',vars).trimEnd());
+  setOb('sa-pre',renderTpl('san',vars).trimEnd());
 }
 function upPa(){
   const vars={dn:gv('pa-dn')||'XX',name:gv('pa-name')||'Name',rang:gv('pa-rang')||'--',abteilung:gv('pa-abt')||'--',eintritt:fmtD(gv('pa-datum'))||gd(),datum:gd(),grund:'--',alter_rang:'--',neuer_rang:'--',pass:'--',sanktion:'--',absender:absLine()};
-  setOb('pa-pre', renderTpl('pa',vars).trimEnd());
+  setOb('pa-pre',renderTpl('pa',vars).trimEnd());
 }
-// ============================================================
 
-// INIT
+// ===================== INIT =====================
 try{const c=localStorage.getItem('fib_color');if(c){setCol(c);document.getElementById('colpick').value=c;}}catch(e){}
 tick();setInterval(tick,1000);
-fillSelects();buildMA();loadAbsIntoFields();
+fillSelects();
+buildMA();
+loadAbsIntoFields();
+klLoad();
+klRender();
 [upAz,upRa,upEs,upKu,upSa,upPa].forEach(f=>f());
-// init template editor
-showTplTab('rang', document.querySelector('.tpl-tab'));
+showTplTab('rang',document.querySelector('.tpl-tab'));
 </script>
 </body>
 </html>
