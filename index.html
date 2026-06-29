@@ -621,57 +621,49 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 <div class="view" id="v-cid">
   <div class="mh"><h1>CID Beweise</h1><div class="badge">ABTEILUNG</div></div>
 
-  <!-- Neuen Beweis eintragen -->
   <div class="pan">
-    <div class="pan-h"><div class="pan-t">[ Neuen Beweis eintragen ]</div></div>
+    <div class="pan-h"><div class="pan-t">[ Neuen Eintrag erfassen ]</div></div>
     <div class="pan-b">
-      <div class="ir">
-        <div><div class="fl">Beweis-ID *</div><input class="fi" id="cid-nr" placeholder="z.B. CID-BW-2026-001"></div>
-        <div><div class="fl">Zugehöriger Fall</div><input class="fi" id="cid-fall" placeholder="Fall-Nr. oder Beschreibung"></div>
-      </div>
-      <div class="ir">
-        <div><div class="fl">Beweisart</div>
-          <select class="fi" id="cid-art">
-            <option>Dokument</option>
-            <option>Foto / Video</option>
-            <option>Zeugenbericht</option>
-            <option>Gegenstand</option>
-            <option>Digitale Daten</option>
-            <option>Aussage</option>
-            <option>Sonstiges</option>
+      <div class="ir3">
+        <div>
+          <div class="fl">Orga *</div>
+          <select class="fi" id="cid-orga">
+            <option value="">-- wählen --</option>
+            <option>FIB</option><option>LSPD</option><option>SAHP</option>
+            <option>LI</option><option>EMS</option><option>NG</option><option>GOV</option>
           </select>
         </div>
-        <div><div class="fl">Sichergestellt von</div><input class="fi" id="cid-agent" placeholder="Agent / Pass-ID"></div>
+        <div><div class="fl">Beamter *</div><input class="fi" id="cid-beamter" placeholder="Name des Beamten"></div>
+        <div><div class="fl">Reisepass (Beschuldigter)</div><input class="fi" id="cid-pass" placeholder="Pass-ID"></div>
       </div>
-      <div><div class="fl">Beschreibung *</div>
-        <textarea class="fi" id="cid-desc" rows="3" placeholder="Was wurde sichergestellt? Wo? Wann? Relevanz ..." style="resize:vertical;margin-bottom:9px;"></textarea>
+      <div class="ir3">
+        <div><div class="fl">Kennzeichen</div><input class="fi" id="cid-kfz" placeholder="z.B. LS-123-AB"></div>
+        <div><div class="fl">Tatdatum</div><input class="fi" type="date" id="cid-tatdat"></div>
+        <div><div class="fl">Tatzeit</div><input class="fi" type="time" id="cid-tatzeit"></div>
       </div>
-      <div class="ir">
-        <div><div class="fl">Verdächtiger / Bezug</div><input class="fi" id="cid-person" placeholder="Name oder Pass-ID"></div>
-        <div><div class="fl">Status</div>
-          <select class="fi" id="cid-status">
-            <option>Gesichert</option>
-            <option>In Analyse</option>
-            <option>Freigegeben</option>
-            <option>Vernichtet</option>
-          </select>
-        </div>
+      <div>
+        <div class="fl">Tatvorwürfe *</div>
+        <textarea class="fi" id="cid-tat" rows="3" placeholder="Welche Tatvorwürfe? Paragraphen, Beschreibung ..." style="resize:vertical;margin-bottom:9px;"></textarea>
+      </div>
+      <div>
+        <div class="fl">Clip / Beweis-Link</div>
+        <input class="fi" id="cid-clip" placeholder="z.B. https://medal.tv/... oder Dateiname" style="margin-bottom:9px;">
       </div>
       <div class="brow">
-        <button class="btn ok" onclick="cidAdd()"><i class="ti ti-plus"></i> Beweis eintragen</button>
+        <button class="btn ok" onclick="cidAdd()"><i class="ti ti-plus"></i> Eintrag speichern</button>
       </div>
     </div>
   </div>
 
-  <!-- Beweise Liste -->
+  <!-- Liste -->
   <div class="pan">
     <div class="pan-h">
-      <div class="pan-t">[ Beweisliste ]</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <select class="fi" id="cid-filter" onchange="cidRender()" style="font-size:11px;padding:3px 7px;width:auto;">
-          <option value="">Alle Status</option>
-          <option>Gesichert</option><option>In Analyse</option>
-          <option>Freigegeben</option><option>Vernichtet</option>
+      <div class="pan-t">[ Einträge ]</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select class="fi" id="cid-filter-orga" onchange="cidRender()" style="font-size:11px;padding:3px 7px;width:auto;">
+          <option value="">Alle Orgas</option>
+          <option>FIB</option><option>LSPD</option><option>SAHP</option>
+          <option>LI</option><option>EMS</option><option>NG</option><option>GOV</option>
         </select>
         <div class="sw" style="min-width:150px;"><i class="ti ti-search"></i>
           <input class="fi si" id="cid-search" placeholder="Suche ..." oninput="cidRender()" style="font-size:11px;padding:4px 8px 4px 28px;">
@@ -683,12 +675,14 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div style="overflow-x:auto;">
         <table class="tbl">
           <thead><tr>
-            <th>Beweis-ID</th><th>Fall</th><th>Art</th><th>Beschreibung</th><th>Person</th><th>Agent</th><th>Status</th><th>Datum</th><th style="text-align:center">Aktion</th>
+            <th>Zeitstempel</th><th>Orga</th><th>Beamter</th><th>Reisepass</th>
+            <th>Kennzeichen</th><th>Tatdatum</th><th>Tatzeit</th>
+            <th>Tatvorwürfe</th><th>Clip</th><th style="text-align:center">Aktion</th>
           </tr></thead>
           <tbody id="cid-body"></tbody>
         </table>
       </div>
-      <div id="cid-empty" class="kl-empty" style="display:none;">Keine Beweise eingetragen.</div>
+      <div id="cid-empty" class="kl-empty" style="display:none;">Keine Einträge vorhanden.</div>
     </div>
   </div>
 </div>
@@ -1628,61 +1622,113 @@ let CID_DATA = [];
 function cidSave(){ cloudPush(); }
 
 function cidAdd(){
-  const nr=gv('cid-nr').trim(), desc=gv('cid-desc').trim();
-  if(!nr||!desc){showToast('Beweis-ID und Beschreibung sind Pflichtfelder!');return;}
-  if(CID_DATA.find(e=>e.nr.toLowerCase()===nr.toLowerCase())){
-    showToast('⚠️ Beweis-ID '+nr+' bereits vorhanden!');
-    const el=document.getElementById('cid-nr');
-    if(el){el.style.borderColor='var(--re)';setTimeout(()=>el.style.borderColor='',2000);}
-    return;
-  }
-  CID_DATA.push({nr,fall:gv('cid-fall').trim(),art:gv('cid-art'),agent:gv('cid-agent').trim(),desc,person:gv('cid-person').trim(),status:gv('cid-status'),date:gd()});
+  const orga=gv('cid-orga'), beamter=gv('cid-beamter').trim(), tat=gv('cid-tat').trim();
+  if(!orga||!beamter||!tat){showToast('Orga, Beamter und Tatvorwürfe sind Pflichtfelder!');return;}
+
+  // Zeitstempel automatisch
+  const now=new Date();
+  const ts=[
+    String(now.getDate()).padStart(2,'0'),
+    String(now.getMonth()+1).padStart(2,'0'),
+    now.getFullYear()
+  ].join('.')+' '+[
+    String(now.getHours()).padStart(2,'0'),
+    String(now.getMinutes()).padStart(2,'0')
+  ].join(':');
+
+  CID_DATA.push({
+    ts,
+    orga,
+    beamter,
+    pass:    gv('cid-pass').trim(),
+    kfz:     gv('cid-kfz').trim(),
+    tatdat:  gv('cid-tatdat'),
+    tatzeit: gv('cid-tatzeit'),
+    tat,
+    clip:    gv('cid-clip').trim()
+  });
+
   cidSave();
-  ['cid-nr','cid-fall','cid-agent','cid-desc','cid-person'].forEach(id=>sv2(id,''));
-  sv2('cid-art','Dokument');sv2('cid-status','Gesichert');
+  ['cid-pass','cid-kfz','cid-tat','cid-clip','cid-beamter'].forEach(id=>sv2(id,''));
+  sv2('cid-orga','');
+  const td=document.getElementById('cid-tatdat'); if(td) td.value='';
+  const tt=document.getElementById('cid-tatzeit'); if(tt) tt.value='';
   cidRender();
-  showToast('Beweis eingetragen');
+  showToast('Eintrag gespeichert');
 }
 
 function cidDel(i){
-  if(!confirm('Beweis wirklich löschen?'))return;
+  if(!confirm('Eintrag wirklich löschen?'))return;
   CID_DATA.splice(i,1);cidSave();cidRender();showToast('Gelöscht');
 }
 
 function cidRender(){
   const q=(gv('cid-search')||'').toLowerCase();
-  const f=gv('cid-filter');
+  const fo=gv('cid-filter-orga');
   let list=CID_DATA.filter(e=>{
-    const okQ=!q||(e.nr||'').toLowerCase().includes(q)||(e.fall||'').toLowerCase().includes(q)||(e.person||'').toLowerCase().includes(q)||(e.agent||'').toLowerCase().includes(q)||(e.desc||'').toLowerCase().includes(q);
-    const okF=!f||e.status===f;
-    return okQ&&okF;
+    const okQ=!q||
+      (e.beamter||'').toLowerCase().includes(q)||
+      (e.orga||'').toLowerCase().includes(q)||
+      (e.pass||'').includes(q)||
+      (e.kfz||'').toLowerCase().includes(q)||
+      (e.tat||'').toLowerCase().includes(q);
+    const okO=!fo||e.orga===fo;
+    return okQ&&okO;
   });
+
   const body=document.getElementById('cid-body');
   const empty=document.getElementById('cid-empty');
   const count=document.getElementById('cid-count');
-  if(count)count.textContent=list.length+' Beweise';
-  const statusCol={Gesichert:'var(--gr)','In Analyse':'#f0a500',Freigegeben:'var(--bl)',Vernichtet:'var(--re)'};
-  const artIcon={Dokument:'ti-file-text','Foto / Video':'ti-camera','Zeugenbericht':'ti-message',Gegenstand:'ti-box','Digitale Daten':'ti-device-laptop',Aussage:'ti-microphone',Sonstiges:'ti-dots'};
-  if(!list.length){if(body)body.innerHTML='';if(empty)empty.style.display='block';return;}
-  if(empty)empty.style.display='none';
-  if(body)body.innerHTML=list.map(e=>{
+  if(count) count.textContent=list.length+' Einträge';
+
+  const KL_ORGA_COL={FIB:'#c9a84c',LSPD:'#3a8fd4',SAHP:'#4db36a',LI:'#b34dce',EMS:'#e74c3c',NG:'#4dcecb',GOV:'#e0972f'};
+
+  if(!list.length){
+    if(body) body.innerHTML='';
+    if(empty) empty.style.display='block';
+    return;
+  }
+  if(empty) empty.style.display='none';
+  if(body) body.innerHTML=list.map(e=>{
     const i=CID_DATA.indexOf(e);
-    const col=statusCol[e.status]||'var(--mu)';
-    const icon=artIcon[e.art]||'ti-file';
+    const col=KL_ORGA_COL[e.orga]||'var(--mu)';
+    const tatShort=e.tat&&e.tat.length>40?e.tat.slice(0,40)+'...':e.tat||'--';
+    const clipHtml=e.clip
+      ? (e.clip.startsWith('http')
+          ? `<a href="${e.clip}" target="_blank" style="color:var(--bl);font-size:11px;text-decoration:none;"><i class="ti ti-external-link"></i> Link</a>`
+          : `<span style="font-size:11px;color:var(--mu)">${e.clip}</span>`)
+      : '<span style="color:var(--mu);font-size:11px">--</span>';
+    const tatDatFmt=e.tatdat?e.tatdat.split('-').reverse().join('.'):'--';
     return`<tr>
-      <td style="color:var(--g);font-size:11px;white-space:nowrap">${e.nr}</td>
-      <td style="font-size:11px;color:var(--mu)">${e.fall||'--'}</td>
-      <td style="font-size:11px;white-space:nowrap"><i class="ti ${icon}" style="font-size:12px;margin-right:3px"></i>${e.art}</td>
-      <td style="font-size:11px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.desc}">${e.desc}</td>
-      <td style="font-size:11px;color:var(--mu)">${e.person||'--'}</td>
-      <td style="font-size:11px;color:var(--mu)">${e.agent||'--'}</td>
-      <td><span style="display:inline-block;font-size:10px;padding:1px 7px;border-radius:2px;border:1px solid ${col}55;background:${col}18;color:${col}">${e.status}</span></td>
-      <td style="font-size:11px;color:var(--mu);white-space:nowrap">${e.date||'--'}</td>
-      <td style="text-align:center">
-        <button class="btn sm ng" onclick="cidDel(${i})" title="Löschen"><i class="ti ti-trash"></i></button>
+      <td style="font-size:10px;color:var(--mu);white-space:nowrap">${e.ts||'--'}</td>
+      <td><span style="display:inline-block;font-size:10px;padding:1px 7px;border-radius:2px;border:1px solid ${col}55;background:${col}20;color:${col};font-weight:bold">${e.orga}</span></td>
+      <td style="font-size:11px;font-weight:bold;white-space:nowrap">${e.beamter}</td>
+      <td style="font-size:11px;color:var(--mu)">${e.pass||'--'}</td>
+      <td style="font-size:11px;color:var(--mu)">${e.kfz||'--'}</td>
+      <td style="font-size:11px;color:var(--mu);white-space:nowrap">${tatDatFmt}</td>
+      <td style="font-size:11px;color:var(--mu);white-space:nowrap">${e.tatzeit||'--'}</td>
+      <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.tat||''}">${tatShort}</td>
+      <td>${clipHtml}</td>
+      <td style="text-align:center;white-space:nowrap">
+        <div style="display:flex;gap:3px;justify-content:center;">
+          <button class="btn sm" onclick="cidExpand(${i})" title="Details" style="color:var(--g);border-color:var(--gd)"><i class="ti ti-eye"></i></button>
+          <button class="btn sm ng" onclick="cidDel(${i})" title="Löschen"><i class="ti ti-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+    <tr id="cid-exp-${i}" style="display:none">
+      <td colspan="10" style="background:var(--p2);padding:10px 14px;font-size:11px;color:var(--mu);border-bottom:1px solid var(--bd)">
+        <b style="color:var(--tx)">Vollständige Tatvorwürfe:</b><br>${(e.tat||'').replace(/\n/g,'<br>')}
+        ${e.clip?`<br><br><b style="color:var(--tx)">Clip:</b> <a href="${e.clip}" target="_blank" style="color:var(--bl)">${e.clip}</a>`:''}
       </td>
     </tr>`;
   }).join('');
+}
+
+function cidExpand(i){
+  const row=document.getElementById('cid-exp-'+i);
+  if(!row)return;
+  row.style.display=row.style.display==='none'?'table-row':'none';
 }
 
 // ===================== UTILS =====================
