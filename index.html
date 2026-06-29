@@ -556,33 +556,67 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 <div class="view" id="v-fibco">
   <div class="mh"><h1>FIBCO Fallakte</h1><div class="badge">ABTEILUNG</div></div>
 
-  <!-- Neue Akte anlegen -->
   <div class="pan">
     <div class="pan-h"><div class="pan-t">[ Neue Fallakte anlegen ]</div></div>
     <div class="pan-b">
-      <div class="ir">
-        <div><div class="fl">Fall-Nummer *</div><input class="fi" id="fc-nr" placeholder="z.B. FIBCO-2026-001"></div>
-        <div><div class="fl">Titel *</div><input class="fi" id="fc-titel" placeholder="Kurzbeschreibung des Falls"></div>
+
+      <!-- Kopfzeile -->
+      <div class="ir3">
+        <div><div class="fl">Name *</div><input class="fi" id="fc-name" placeholder="Vor- u. Nachname" oninput="fcPreview()"></div>
+        <div><div class="fl">CO-ID *</div><input class="fi" id="fc-coid" placeholder="z.B. CO-ID-1" oninput="fcPreview()"></div>
+        <div><div class="fl">Datum der Straftat</div><input class="fi" type="date" id="fc-tatdat" oninput="fcPreview()"></div>
       </div>
-      <div class="ir">
-        <div><div class="fl">Verdächtiger / Betroffener</div><input class="fi" id="fc-person" placeholder="Name oder Pass-ID"></div>
-        <div><div class="fl">Status</div>
-          <select class="fi" id="fc-status">
-            <option>Offen</option>
-            <option>In Bearbeitung</option>
-            <option>Abgeschlossen</option>
-            <option>Archiviert</option>
-          </select>
-        </div>
+      <div class="ir3">
+        <div><div class="fl">Codename</div><input class="fi" id="fc-codename" placeholder="Codename" oninput="fcPreview()"></div>
+        <div><div class="fl">Telefonnummer</div><input class="fi" id="fc-tel" placeholder="Telefonnummer" oninput="fcPreview()"></div>
+        <div><div class="fl">Behörde</div><input class="fi" id="fc-behoerde" placeholder="z.B. LSPD" oninput="fcPreview()"></div>
       </div>
-      <div><div class="fl">Fallbeschreibung</div>
-        <textarea class="fi" id="fc-desc" rows="3" placeholder="Details zum Fall ..." style="resize:vertical;margin-bottom:9px;"></textarea>
+      <div class="ir3">
+        <div><div class="fl">Familie / Gang</div><input class="fi" id="fc-familie" placeholder="z.B. The Families" oninput="fcPreview()"></div>
+        <div><div class="fl">Reisepass</div><input class="fi" id="fc-reisepass" placeholder="Pass-ID" oninput="fcPreview()"></div>
+        <div><div class="fl">Dienstausweis</div><input class="fi" id="fc-dienstausweis" placeholder="Ausweis-Nr." oninput="fcPreview()"></div>
       </div>
-      <div><div class="fl">Zuständiger Agent (Pass-ID oder Name)</div>
-        <input class="fi" id="fc-agent" placeholder="z.B. Felix Cunningham" style="margin-bottom:9px;">
+      <div class="ir3">
+        <div><div class="fl">Personalakte (Link)</div><input class="fi" id="fc-personalakte" placeholder="https://..." oninput="fcPreview()"></div>
+        <div><div class="fl">PDA Hauptseite (Link)</div><input class="fi" id="fc-pda-main" placeholder="https://..." oninput="fcPreview()"></div>
+        <div><div class="fl">PDA Fahrzeugliste (Link)</div><input class="fi" id="fc-pda-fz" placeholder="https://..." oninput="fcPreview()"></div>
       </div>
+
+      <hr style="border:none;border-top:1px solid var(--bd);margin:10px 0;">
+
+      <!-- Sektionen -->
+      <div style="margin-bottom:9px;"><div class="fl">Vorfall — Am TT.MM.YYYY um HH:MM Uhr […]</div>
+        <textarea class="fi" id="fc-vorfall" rows="3" placeholder="Vorfallbeschreibung ..." style="resize:vertical;" oninput="fcPreview()"></textarea>
+      </div>
+      <div style="margin-bottom:9px;"><div class="fl">Befragung Tatverdächtiger</div>
+        <textarea class="fi" id="fc-befragung" rows="3" placeholder="- ABC&#10;- ..." style="resize:vertical;" oninput="fcPreview()"></textarea>
+      </div>
+      <div style="margin-bottom:9px;"><div class="fl">Zeugen-/aussagen</div>
+        <textarea class="fi" id="fc-zeugen" rows="3" placeholder="- ABC&#10;- ..." style="resize:vertical;" oninput="fcPreview()"></textarea>
+      </div>
+      <div style="margin-bottom:9px;"><div class="fl">Beweissammlung</div>
+        <textarea class="fi" id="fc-beweise" rows="3" placeholder="- ABC&#10;- ..." style="resize:vertical;" oninput="fcPreview()"></textarea>
+      </div>
+      <div style="margin-bottom:9px;"><div class="fl">Tatvorwurf</div>
+        <textarea class="fi" id="fc-tatvorwurf" rows="3" placeholder="- ABC&#10;- ..." style="resize:vertical;" oninput="fcPreview()"></textarea>
+      </div>
+      <div style="margin-bottom:9px;"><div class="fl">Schlussbetrachtung</div>
+        <textarea class="fi" id="fc-schluss" rows="3" placeholder="TEXT ..." style="resize:vertical;" oninput="fcPreview()"></textarea>
+      </div>
+      <div style="margin-bottom:9px;">
+        <div class="fl">Status</div>
+        <select class="fi" id="fc-status" onchange="fcPreview()" style="max-width:220px;">
+          <option>Offen</option><option>In Bearbeitung</option>
+          <option>Abgeschlossen</option><option>Archiviert</option>
+        </select>
+      </div>
+
+      <!-- Vorschau -->
+      <div class="pl" style="margin-top:12px;">Vorschau — Vorlage</div>
+      <div class="ob" id="fc-pre" style="min-height:120px;font-size:11px;line-height:1.9;"></div>
       <div class="brow">
-        <button class="btn ok" onclick="fcAdd()"><i class="ti ti-plus"></i> Akte anlegen</button>
+        <button class="btn" onclick="cp('fc-pre')"><i class="ti ti-copy"></i> Vorlage kopieren</button>
+        <button class="btn ok" onclick="fcAdd()"><i class="ti ti-plus"></i> Akte speichern</button>
       </div>
     </div>
   </div>
@@ -607,7 +641,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div style="overflow-x:auto;">
         <table class="tbl">
           <thead><tr>
-            <th>Fall-Nr.</th><th>Titel</th><th>Person</th><th>Agent</th><th>Status</th><th>Datum</th><th style="text-align:center">Aktion</th>
+            <th>CO-ID</th><th>Name</th><th>Tatdatum</th><th>Familie</th><th>Status</th><th>Erstellt</th><th style="text-align:center">Aktion</th>
           </tr></thead>
           <tbody id="fc-body"></tbody>
         </table>
@@ -641,13 +675,26 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
         <div><div class="fl">Tatdatum</div><input class="fi" type="date" id="cid-tatdat"></div>
         <div><div class="fl">Tatzeit</div><input class="fi" type="time" id="cid-tatzeit"></div>
       </div>
+      <div class="ir">
+        <div>
+          <div class="fl">Gang / Gruppe</div>
+          <select class="fi" id="cid-gang">
+            <option value="">-- keine / unbekannt --</option>
+            <option>Marabunta Grande</option>
+            <option>The Ballas Gang</option>
+            <option>The Bloods Gang</option>
+            <option>Los Santos Vagos</option>
+            <option>The Families</option>
+          </select>
+        </div>
+        <div>
+          <div class="fl">Clip / Beweis-Link</div>
+          <input class="fi" id="cid-clip" placeholder="z.B. https://medal.tv/... oder Dateiname">
+        </div>
+      </div>
       <div>
         <div class="fl">Tatvorwürfe *</div>
         <textarea class="fi" id="cid-tat" rows="3" placeholder="Welche Tatvorwürfe? Paragraphen, Beschreibung ..." style="resize:vertical;margin-bottom:9px;"></textarea>
-      </div>
-      <div>
-        <div class="fl">Clip / Beweis-Link</div>
-        <input class="fi" id="cid-clip" placeholder="z.B. https://medal.tv/... oder Dateiname" style="margin-bottom:9px;">
       </div>
       <div class="brow">
         <button class="btn ok" onclick="cidAdd()"><i class="ti ti-plus"></i> Eintrag speichern</button>
