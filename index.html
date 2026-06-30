@@ -123,6 +123,8 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 .profile-card:hover{border-color:var(--gd);background:var(--gg);}
 .avatar{width:46px;height:46px;border-radius:50%;border:2px solid var(--gd);object-fit:cover;flex-shrink:0;background:var(--p1);}
 .avatar-ph{width:46px;height:46px;border-radius:50%;border:2px solid var(--gd);flex-shrink:0;background:var(--p1);display:flex;align-items:center;justify-content:center;color:var(--g);font-size:15px;font-weight:bold;}
+.avatar-mini{width:20px;height:20px;border-radius:50%;border:1px solid var(--gd);object-fit:cover;margin-right:5px;}
+.avatar-mini-ph{width:20px;height:20px;border-radius:50%;border:1px solid var(--gd);background:var(--p1);display:flex;align-items:center;justify-content:center;color:var(--g);font-size:9px;font-weight:bold;margin-right:5px;}
 .pc-name{font-size:12px;color:var(--tx);font-weight:bold;}
 .pc-pos{font-size:10px;color:var(--mu);margin-top:1px;}
 .pc-roles{margin-top:5px;display:flex;gap:3px;flex-wrap:wrap;}
@@ -194,7 +196,8 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <span class="dg" id="cloud-dot" style="background:var(--mu)"></span>
     <span id="cloud-status" style="color:var(--mu)">OFFLINE</span>
     &nbsp;&nbsp;
-    <span id="user-chip" style="color:var(--g);cursor:pointer;" onclick="goToAccountSystem()" title="Klicken fur Benutzerverwaltung"></span>
+    <span id="user-avatar-wrap" style="cursor:pointer;display:inline-flex;align-items:center;" onclick="goToAccountSystem()" title="Klicken fur Mein Profil"></span>
+    <span id="user-chip" style="color:var(--g);cursor:pointer;" onclick="goToAccountSystem()" title="Klicken fur Mein Profil"></span>
     &nbsp;
     <button class="btn sm ng" onclick="doLogout()" title="Abmelden"><i class="ti ti-logout"></i></button>
     &nbsp;&nbsp;
@@ -1470,6 +1473,16 @@ function applyRoleVisibility(){
   });
   const chip=document.getElementById('user-chip');
   if(chip) chip.textContent=(currentName||currentUser||'')+' · '+(currentRoles.join(', ')||'--');
+  updateTopbarAvatar();
+}
+function updateTopbarAvatar(){
+  const wrap=document.getElementById('user-avatar-wrap');
+  if(!wrap)return;
+  const name=currentName||currentUser||'';
+  const photo=(currentProfile&&currentProfile.photo)||'';
+  wrap.innerHTML = photo
+    ? `<img src="${photo}" class="avatar-mini">`
+    : `<span class="avatar-mini-ph">${initials(name)}</span>`;
 }
 
 function initials(name){
