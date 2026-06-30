@@ -104,10 +104,40 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 .tpl-tab{opacity:.6;transition:.15s;}
 .tpl-tab:hover{opacity:1;}
 .act-tab{opacity:1;background:var(--gg)!important;border-color:var(--g)!important;}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;}
+#login-screen.hide{display:none;}
+.login-box{width:min(360px,92vw);background:var(--p1);border:1px solid var(--gd);border-radius:8px;padding:26px 24px;}
+.login-emblem{width:54px;height:54px;border:2px solid var(--g);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;color:var(--g);}
+.login-title{text-align:center;color:var(--g);font-size:13px;letter-spacing:.1em;font-weight:bold;margin-bottom:2px;}
+.login-sub{text-align:center;color:var(--mu);font-size:10px;letter-spacing:.08em;margin-bottom:20px;}
+.login-err{font-size:11px;color:var(--re);min-height:14px;margin-top:8px;text-align:center;}
+.login-foot{font-size:10px;color:var(--mu);text-align:center;margin-top:14px;line-height:1.6;}
+#app-root.hide{display:none;}
+.role-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 7px;border-radius:2px;border:1px solid var(--gd);background:var(--gg);color:var(--g);cursor:pointer;}
+.role-chip input{accent-color:var(--g);}
+.userrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap;}
 </style>
 </head>
 <body>
 
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-emblem">FIB</div>
+    <div class="login-title">PERSONALABTEILUNG</div>
+    <div class="login-sub">GRANDRP DE01 &middot; ZUGANG ERFORDERLICH</div>
+    <div class="fl">Zugangskennung</div>
+    <input class="fi" id="login-email" placeholder="z.B. admin" style="margin-bottom:9px;" autocomplete="username">
+    <div class="fl">Passwort</div>
+    <input class="fi" id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+    <div class="login-err" id="login-err"></div>
+    <button class="btn ok" id="login-btn" onclick="doLogin()" style="width:100%;justify-content:center;margin-top:14px;"><i class="ti ti-login"></i> ANMELDEN</button>
+    <div class="login-foot">Zugang nur fur autorisiertes FIB-Personal.<br>Kein Account? Wende dich an die Systemadministration.</div>
+  </div>
+</div>
+
+<div id="app-root" class="hide">
 <div class="root">
 <div class="topbar">
   <div class="topbar-brand">FEDERAL INVESTIGATION BUREAU &#10022; GRANDRP DE01 &#10022; PERSONALABTEILUNG</div>
@@ -116,6 +146,10 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     &nbsp;·&nbsp;
     <span class="dg" id="cloud-dot" style="background:var(--mu)"></span>
     <span id="cloud-status" style="color:var(--mu)">OFFLINE</span>
+    &nbsp;&nbsp;
+    <span id="user-chip" style="color:var(--g);"></span>
+    &nbsp;
+    <button class="btn sm ng" onclick="doLogout()" title="Abmelden"><i class="ti ti-logout"></i></button>
     &nbsp;&nbsp;
     <span id="clk">00:00:00</span>
   </div>
@@ -133,19 +167,19 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <div class="ni" onclick="sv('kl',this)"><i class="ti ti-shield-lock"></i><span>Klassifizierung</span></div>
   </div>
   <div class="nv"><div class="nl">Personal</div>
-    <div class="ni" onclick="sv('rang',this)"><i class="ti ti-award"></i><span>Ranganpassung</span></div>
-    <div class="ni" onclick="sv('ein',this)"><i class="ti ti-user-plus"></i><span>Einstellung</span></div>
-    <div class="ni" onclick="sv('kue',this)"><i class="ti ti-user-minus"></i><span>Kündigung</span></div>
-    <div class="ni" onclick="sv('san',this)"><i class="ti ti-gavel"></i><span>Sanktion</span></div>
-    <div class="ni" onclick="sv('pa',this)"><i class="ti ti-id-badge"></i><span>Personalakte</span></div>
-    <div class="ni" onclick="sv('az',this)"><i class="ti ti-file-certificate"></i><span>AZ-System</span></div>
+    <div class="ni" data-roles="hr" onclick="sv('rang',this)"><i class="ti ti-award"></i><span>Ranganpassung</span></div>
+    <div class="ni" data-roles="hr" onclick="sv('ein',this)"><i class="ti ti-user-plus"></i><span>Einstellung</span></div>
+    <div class="ni" data-roles="hr" onclick="sv('kue',this)"><i class="ti ti-user-minus"></i><span>Kündigung</span></div>
+    <div class="ni" data-roles="hr" onclick="sv('san',this)"><i class="ti ti-gavel"></i><span>Sanktion</span></div>
+    <div class="ni" data-roles="hr" onclick="sv('pa',this)"><i class="ti ti-id-badge"></i><span>Personalakte</span></div>
+    <div class="ni" data-roles="hr" onclick="sv('az',this)"><i class="ti ti-file-certificate"></i><span>AZ-System</span></div>
   </div>
   <div class="nv"><div class="nl">Abteilungen</div>
-    <div class="ni" onclick="sv('fibco',this)"><i class="ti ti-folder-open"></i><span>FIBCO Fallakte</span></div>
-    <div class="ni" onclick="sv('cid',this)"><i class="ti ti-microscope"></i><span>CID Beweise</span></div>
+    <div class="ni" data-roles="fibco" onclick="sv('fibco',this)"><i class="ti ti-folder-open"></i><span>FIBCO Fallakte</span></div>
+    <div class="ni" data-roles="cid" onclick="sv('cid',this)"><i class="ti ti-microscope"></i><span>CID Beweise</span></div>
   </div>
   <div class="nv"><div class="nl">System</div>
-    <div class="ni" onclick="sv('tpl',this)"><i class="ti ti-template"></i><span>Vorlagen-Editor</span></div>
+    <div class="ni" data-roles="hr" onclick="sv('tpl',this)"><i class="ti ti-template"></i><span>Vorlagen-Editor</span></div>
     <div class="ni" onclick="sv('cfg',this)"><i class="ti ti-settings"></i><span>Einstellungen</span></div>
   </div>
 </div>
@@ -826,6 +860,34 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
           <a href="https://docs.google.com/spreadsheets/d/1uzAA-_O2JtDBs3bpRG9Mqbva67dqh45LPDjPEf8-njQ/edit" target="_blank" class="btn sm"><i class="ti ti-external-link"></i> Google Sheets offnen</a>
         </div>
       </div>
+      <div id="admin-panel" style="display:none;">
+        <div class="fl" style="margin-bottom:5px;color:var(--g);">Benutzerverwaltung (nur Admin)</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:10px;line-height:1.7;">
+          Rollen steuern welche Module ein Account sieht:
+          <b style="color:var(--tx)">HR</b> = Personal-Module, <b style="color:var(--tx)">FIBCO</b> = FIBCO Fallakte,
+          <b style="color:var(--tx)">CID</b> = CID Beweise, <b style="color:var(--tx)">Admin</b> = alles inkl. Benutzerverwaltung.<br>
+          Kein Backend — neue Accounts mussen als Code-Zeile auf GitHub eingefugt werden (Anleitung unten beim Generieren).
+        </div>
+        <div class="edit-card" style="grid-template-columns:1fr 1fr;margin-bottom:9px;">
+          <div class="ec-row"><span class="ec-lbl">Zugangskennung</span><input class="fi ec-inp" id="adm-email" placeholder="z.B. jschmidt"></div>
+          <div class="ec-row"><span class="ec-lbl">Passwort</span><input class="fi ec-inp" id="adm-pass" placeholder="min. 6 Zeichen"></div>
+          <div class="ec-row"><span class="ec-lbl">Anzeigename</span><input class="fi ec-inp" id="adm-name" placeholder="Vor- u. Nachname"></div>
+          <div class="ec-row"><span class="ec-lbl">Rollen</span>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:4px;">
+              <label class="role-chip"><input type="checkbox" value="hr" class="adm-role"> HR</label>
+              <label class="role-chip"><input type="checkbox" value="fibco" class="adm-role"> FIBCO</label>
+              <label class="role-chip"><input type="checkbox" value="cid" class="adm-role"> CID</label>
+              <label class="role-chip"><input type="checkbox" value="admin" class="adm-role"> Admin</label>
+            </div>
+          </div>
+        </div>
+        <button class="btn ok sm" onclick="adminCreateUser()"><i class="ti ti-code"></i> Code generieren</button>
+        <div class="hint" id="adm-create-msg"></div>
+
+        <div class="pl" style="margin-top:16px;">Bestehende Accounts (im Code hinterlegt)</div>
+        <div id="adm-userlist" style="margin-top:6px;"></div>
+        <div class="hint">Zum Entfernen eines Accounts dessen Zeile im <code>USERS</code>-Array auf GitHub loschen und committen.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -892,6 +954,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     </div>
   </div>
 </div>
+</div><!-- /app-root -->
 
 <script>
 const RANKS=["30. Director of FIB","29. Deputy Director of FIB","28. Assistant Director of FIB","27. Divisional Director","26. Inspector of the FIB","25. Supervisory Head Agent","24. Supervisory Agent","23. Special Agent in Charge","22. Division Chief","21. Deputy Division Chief","20. Senior Special Agent","19. Tactical Operator","18. Department Specialist","17. Commander","16. Lieutenant Commander","15. Special Senior Agent","14. Master Special Agent","13. Senior Special Agent","12. Operational Agent","11. Field Agent","10. Senior Agent","9. Agent II","8. Agent I","7. Junior Agent","6. Probationary Agent","5. Analyst","4. Associate Analyst","3. Recruit II","2. Recruit I","1. Trainee"];
@@ -998,7 +1061,7 @@ let _isPushing = false;  // Verhindert eigene Änderungen als "extern" zu behand
 async function initFirebase() {
   try {
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const { getFirestore, doc, setDoc, onSnapshot, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { getFirestore, doc, setDoc, getDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const app = initializeApp(FB_CFG);
     db = getFirestore(app);
     window._fbDoc  = () => doc(db, 'fib', 'data');
@@ -1012,6 +1075,136 @@ async function initFirebase() {
     console.error('Firebase init error:', e);
     return false;
   }
+}
+
+// ===================== LOGIN (Accounts direkt im Code, ueber GitHub verwaltet) =====================
+// Die Accounts (Zugangskennung, Passwort-Hash, Rollen) stehen unten im USERS-Array.
+// Kein Firebase, kein Backend -- du verwaltest Accounts, indem du diese Datei direkt
+// auf GitHub bearbeitest (Stift-Symbol -> aendern -> "Commit changes"). Wenn die Seite
+// per GitHub Pages gehostet wird, ist die Aenderung nach ca. 30-60 Sek. live.
+//
+// Achtung: Wer den Quelltext der Seite oeffnet ("Seitenquelltext anzeigen"), sieht die
+// Passwort-Hashes. Das reicht als Zugangshuerde (Link/Repo nicht oeffentlich bekannt),
+// ist aber KEINE belastbare Sicherheit fuer wirklich sensible Daten.
+//
+// Neuen Nutzer anlegen:
+//   1) Als Admin einloggen -> Einstellungen -> Benutzerverwaltung -> Daten eingeben -> "Code generieren"
+//   2) Die erzeugte Zeile kopieren
+//   3) Auf GitHub: Datei index.html oeffnen -> Stift-Symbol (Bearbeiten) -> Zeile ins
+//      USERS-Array unten einfuegen -> "Commit changes"
+//
+// Allerersten Admin-Account anlegen (Bootstrap):
+//   1) Browser-Konsole oeffnen (F12 -> Console)
+//   2) Eingeben: fibHash('DeinPasswort').then(h=>console.log(h))
+//   3) Den ausgegebenen Hash unten beim admin-Eintrag als passHash eintragen (Standard-Hash ersetzen!)
+
+const USERS = [
+  // Beispiel-Admin -- Zugangskennung "admin", Passwort "fib2026" -- BITTE AENDERN!
+  { username:'admin', name:'Administrator', roles:['admin'],
+    passHash:'15221d5e748afa63d8ad7b6110dba4b9fbf27f995b25964abb0f5ae1d889d478' },
+];
+
+let currentUser = null;   // Username (string) des eingeloggten Nutzers
+let currentRoles = [];    // z.B. ['hr','fibco']
+let currentName = '';
+
+async function fibHash(str){
+  const enc=new TextEncoder().encode(str);
+  const buf=await crypto.subtle.digest('SHA-256',enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+window.fibHash = fibHash; // damit man es bei Bedarf in der Browser-Konsole nutzen kann
+
+// --- LOGIN / LOGOUT ---
+async function doLogin(){
+  const user=gv('login-email').trim().toLowerCase();
+  const pass=gv('login-pass');
+  const errEl=document.getElementById('login-err');
+  const btn=document.getElementById('login-btn');
+  errEl.textContent='';
+  if(!user||!pass){errEl.textContent='Bitte Zugangskennung und Passwort eingeben.';return;}
+  btn.disabled=true;btn.textContent='Anmelden ...';
+  const hash=await fibHash(pass);
+  const found=USERS.find(u=>u.username.toLowerCase()===user && u.passHash===hash);
+  btn.disabled=false;btn.innerHTML='<i class="ti ti-login"></i> ANMELDEN';
+  if(!found){errEl.textContent='Zugangskennung oder Passwort falsch.';return;}
+  currentUser=found.username;currentRoles=found.roles;currentName=found.name;
+  try{localStorage.setItem('fib_session',JSON.stringify({u:found.username}));}catch(e){}
+  showApp();
+}
+function doLogout(){
+  currentUser=null;currentRoles=[];currentName='';
+  try{localStorage.removeItem('fib_session');}catch(e){}
+  document.getElementById('app-root').classList.add('hide');
+  document.getElementById('login-screen').classList.remove('hide');
+  sv2('login-pass','');
+}
+function tryRestoreSession(){
+  try{
+    const raw=localStorage.getItem('fib_session');
+    if(!raw)return false;
+    const s=JSON.parse(raw);
+    const found=USERS.find(u=>u.username===s.u);
+    if(!found)return false;
+    currentUser=found.username;currentRoles=found.roles;currentName=found.name;
+    showApp();
+    return true;
+  }catch(e){return false;}
+}
+function showApp(){
+  document.getElementById('login-screen').classList.add('hide');
+  document.getElementById('app-root').classList.remove('hide');
+  applyRoleVisibility();
+  startAppData();
+  sv('dash',null);
+}
+
+function hasRole(r){
+  if(!currentRoles)return false;
+  return currentRoles.includes('admin')||currentRoles.includes(r);
+}
+
+// Sidebar + Module nach Rolle ein-/ausblenden
+function applyRoleVisibility(){
+  document.querySelectorAll('.ni[data-roles]').forEach(el=>{
+    const need=el.getAttribute('data-roles');
+    el.style.display = hasRole(need) ? '' : 'none';
+  });
+  const adm=document.getElementById('admin-panel');
+  if(adm) adm.style.display = hasRole('admin') ? 'block' : 'none';
+  if(hasRole('admin')) renderUserList();
+  const chip=document.getElementById('user-chip');
+  if(chip) chip.textContent=(currentName||currentUser||'')+' · '+(currentRoles.join(', ')||'--');
+}
+
+// --- ADMIN: Benutzerverwaltung (generiert Code-Snippet zum Einfuegen auf GitHub) ---
+async function adminCreateUser(){
+  if(!hasRole('admin')){showToast('Keine Berechtigung');return;}
+  const username=gv('adm-email').trim();
+  const pass=gv('adm-pass');
+  const name=gv('adm-name').trim();
+  const roles=Array.from(document.querySelectorAll('.adm-role:checked')).map(c=>c.value);
+  const msgEl=document.getElementById('adm-create-msg');
+  if(!username||!pass){msgEl.textContent='Zugangskennung und Passwort sind Pflicht.';msgEl.style.color='var(--re)';return;}
+  if(pass.length<6){msgEl.textContent='Passwort sollte min. 6 Zeichen haben.';msgEl.style.color='var(--re)';return;}
+  if(!roles.length){msgEl.textContent='Mindestens eine Rolle wahlen.';msgEl.style.color='var(--re)';return;}
+  if(USERS.find(u=>u.username.toLowerCase()===username.toLowerCase())){msgEl.textContent='Zugangskennung bereits vergeben.';msgEl.style.color='var(--re)';return;}
+  const hash=await fibHash(pass);
+  const snippet=`  { username:'${username}', name:'${name.replace(/'/g,"\\'")}', roles:${JSON.stringify(roles)}, passHash:'${hash}' },`;
+  msgEl.innerHTML='Code generiert — auf GitHub die Datei <code>index.html</code> oeffnen, Stift-Symbol klicken, diese Zeile in das <b style="color:var(--tx)">USERS</b>-Array einfugen und committen:'+
+    `<textarea class="fi" rows="3" style="margin-top:6px;font-size:10px;" readonly onclick="this.select()">${snippet}</textarea>`;
+  msgEl.style.color='var(--g)';
+  showToast('Code generiert — siehe unten');
+}
+
+function renderUserList(){
+  const box=document.getElementById('adm-userlist');
+  if(!box)return;
+  if(!USERS.length){box.innerHTML='<div class="kl-empty">Keine Accounts im Code hinterlegt.</div>';return;}
+  box.innerHTML=USERS.map(u=>`<div class="userrow">
+    <div><b style="color:var(--tx)">${u.name||u.username}</b> <span style="color:var(--mu);font-size:11px">@${u.username}</span><br>
+    <span style="font-size:10px;color:var(--g)">${u.roles.join(', ')||'--'}</span></div>
+  </div>`).join('');
 }
 
 // Einmaliges Laden + danach Live-Listener starten
@@ -1929,6 +2122,11 @@ function cidExpand(i){
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 function cp(id){const e=document.getElementById(id);if(!e)return;navigator.clipboard.writeText(e.textContent).then(()=>showToast('In Zwischenablage kopiert')).catch(()=>{});}
 function sv(name,el){
+  const target=document.querySelector(`.ni[onclick*="'${name}'"]`);
+  if(target && target.hasAttribute('data-roles') && !hasRole(target.getAttribute('data-roles'))){
+    showToast('Kein Zugriff auf dieses Modul');
+    return;
+  }
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('act'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));
   const vEl=document.getElementById('v-'+name);if(vEl)vEl.classList.add('act');
@@ -2063,10 +2261,26 @@ klRender();
 [upAz,upRa,upEs,upKu,upSa,upPa].forEach(f=>f());
 showTplTab('rang',document.querySelector('.tpl-tab'));
 
-// Startet Firebase Live-Listener — lädt KL/FC/CID-Daten initial und bei jeder Änderung automatisch
-cloudLoad();
-// Startet Google Sheet Live-Sync für Mitarbeiterliste (alle 30 Sek.)
-startSheetSync();
+// Login-Enter-Taste
+['login-email','login-pass'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+});
+
+let _dataStarted=false;
+function startAppData(){
+  if(_dataStarted)return;
+  _dataStarted=true;
+  // Startet Firebase Live-Listener — lädt KL/FC/CID-Daten initial und bei jeder Änderung automatisch
+  cloudLoad();
+  // Startet Google Sheet Live-Sync für Mitarbeiterliste (alle 30 Sek.)
+  startSheetSync();
+}
+
+// Versuche gespeicherte Login-Session wiederherzustellen (Login selbst braucht kein Firebase).
+// Firebase/Firestore wird weiterhin nur fur den Cloud-Datenabgleich (KL/FC/CID) genutzt
+// und erst gestartet, sobald jemand erfolgreich eingeloggt ist (siehe startAppData()).
+tryRestoreSession();
 </script>
 </body>
 </html>
