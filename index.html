@@ -180,7 +180,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <input class="fi" id="pwchange-confirm" type="password" placeholder="••••••••" autocomplete="new-password">
     <div class="login-err" id="pwchange-err"></div>
     <button class="btn ok" id="pwchange-btn" onclick="submitPasswordChange()" style="width:100%;justify-content:center;margin-top:14px;"><i class="ti ti-device-floppy"></i> PASSWORT SETZEN</button>
-    <div class="login-foot">Nach dem Setzen wird dieses Passwort in diesem Browser sofort aktiv. Damit es dauerhaft (auch auf anderen Geraten) gilt, muss ein Admin den angezeigten Code auf GitHub einpflegen.</div>
+    <div class="login-foot">Dein neues Passwort wird sofort gespeichert und gilt ab jetzt fur deinen Account — auch auf anderen Geraten.</div>
   </div>
 </div>
 
@@ -947,7 +947,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     Rollen steuern welche Module ein Account sieht:
     <b style="color:var(--tx)">HR</b> = Personal-Module, <b style="color:var(--tx)">FIBCO</b> = FIBCO Fallakte,
     <b style="color:var(--tx)">CID</b> = CID Beweise, <b style="color:var(--tx)">Admin</b> = alles inkl. Benutzerverwaltung.<br>
-    Zugangsdaten (Kennung/Passwort/Rollen) liegen aus Sicherheitsgrunden im Code (GitHub). Profil-Infos (Foto, Name, Bio, Position, Schulungen ...) speichern automatisch in der Cloud — kein Code-Edit notig.
+    Zugangsdaten und Profil-Infos speichern automatisch in der Cloud — kein Code-Edit, kein GitHub-Commit notig. Nur der Notfall-Zugang "admin" ist fest im Code hinterlegt (Sicherheitsnetz, falls die Cloud mal nicht erreichbar ist).
   </div>
   <button class="btn ok sm" onclick="openCreateUser()" style="width:fit-content;"><i class="ti ti-user-plus"></i> Neuen Account anlegen</button>
   <div class="pl" style="margin-top:6px;">Bestehende Accounts — Klick fur Profil, Passwort-Reset &amp; Bearbeiten</div>
@@ -1074,10 +1074,10 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <label class="role-chip" style="margin-bottom:11px;display:inline-flex;">
       <input type="checkbox" id="ue-mustchange"> Passwort ist nur ubergangsweise — Person muss es beim ersten Login andern
     </label>
-    <div class="hint">Foto, Name, Telefon, Bio usw. tragt die Person danach selbst unter "Mein Profil" ein — wird automatisch gespeichert, kein Code-Edit notig.</div>
+    <div class="hint">Foto, Name, Telefon, Bio usw. tragt die Person danach selbst unter "Mein Profil" ein.</div>
     <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:11px;">
       <button class="btn ng sm" onclick="closeEditUserModal()">Abbrechen</button>
-      <button class="btn ok sm" onclick="submitUserForm()"><i class="ti ti-code"></i> Code generieren</button>
+      <button class="btn ok sm" onclick="submitUserForm()"><i class="ti ti-device-floppy"></i> Speichern</button>
     </div>
     <div class="hint" id="ue-msg"></div>
   </div>
@@ -1268,44 +1268,37 @@ async function initFirebase() {
 }
 
 // ===================== ACCOUNTS =====================
-// ZUGANGSDATEN (Zugangskennung/Passwort-Hash/Rollen) stehen aus Sicherheitsgruenden
-// im Code unten im USERS-Array. Du verwaltest sie, indem du diese Datei direkt auf
-// GitHub bearbeitest (Stift-Symbol -> aendern -> "Commit changes"). Bei GitHub Pages
-// ist die Aenderung nach ca. 30-60 Sek. live.
+// Zugangsdaten (Zugangskennung/Passwort-Hash/Rollen) UND Profil-Daten (Foto, Name,
+// Telefon, Bio, Position, Schulungen ...) liegen beide in Firestore und werden
+// automatisch gespeichert -- kein Code-Edit, kein GitHub-Commit noetig.
+//   Collection "fib_users"     -> Zugangsdaten (Dokument-ID = Zugangskennung)
+//   Collection "fib_profiles"  -> Profil-Daten (Dokument-ID = Zugangskennung)
 //
-// PROFIL-DATEN (Foto, Name, Telefon, Bio, Position, Eintrittsdatum, Schulungen) liegen
-// dagegen in Firestore (Collection "fib_profiles", Dokument-ID = Zugangskennung) und
-// werden automatisch gespeichert -- kein Code-Edit noetig. Jede Person pflegt Foto/
-// Name/Telefon/Bio selbst unter "Mein Profil"; Admins pflegen Position/Eintrittsdatum/
-// Beforderung/Schulungen unter "Benutzerverwaltung -> Offizielle Daten bearbeiten".
+// Jede Person pflegt Foto/Name/Telefon/Bio selbst unter "Mein Profil". Admins legen
+// Accounts an und pflegen Rollen/Position/Eintrittsdatum/Beforderung/Schulungen unter
+// "Benutzerverwaltung" -- alles speichert sofort fur alle sichtbar.
 //
-// Achtung: Wer den Quelltext der Seite oeffnet ("Seitenquelltext anzeigen"), sieht die
-// Passwort-Hashes und die Firebase-Keys. Das reicht als Zugangshuerde (Link/Repo nicht
-// oeffentlich bekannt), ist aber KEINE belastbare Sicherheit fuer wirklich sensible Daten.
+// Achtung: Wer die Firebase-Keys im Quelltext kennt (stehen offen da), koennte
+// theoretisch direkt auf die Firestore-Collections zugreifen. Das reicht als
+// Zugangshuerde (Link/Repo nicht oeffentlich bekannt), ist aber KEINE belastbare
+// Sicherheit fuer wirklich sensible Daten.
 //
-// TEMPORAERE PASSWOERTER: Setzt ein Admin "mustChange":true, muss die Person beim
-// naechsten Login sofort ein neues Passwort vergeben. Da die Zugangsdaten codebasiert
-// sind, wird das neue Passwort als lokaler "Override" in diesem Browser gespeichert
-// (localStorage) und greift dort sofort. Damit es dauerhaft -- auch auf anderen
-// Geraeten -- gilt, muss ein Admin den danach angezeigten Hash auf GitHub einpflegen.
-//
-// Allerersten Admin-Account anlegen (Bootstrap):
-//   1) Browser-Konsole oeffnen (F12 -> Console)
-//   2) Eingeben: fibHash('DeinPasswort').then(h=>console.log(h))
-//   3) Den ausgegebenen Hash unten beim admin-Eintrag als passHash eintragen (Standard-Hash ersetzen!)
-
-const USERS = [
-  // Beispiel-Admin -- Zugangskennung "admin", Passwort "fib2026" -- BITTE AENDERN!
-  { username:'admin', roles:['admin'],
-    passHash:'15221d5e748afa63d8ad7b6110dba4b9fbf27f995b25964abb0f5ae1d889d478',
-    mustChange:false },
-];
+// NOTFALL-ZUGANG: Dieser eine Account ist fest im Code hinterlegt und funktioniert
+// IMMER, selbst wenn Firestore mal nicht erreichbar ist oder noch leer ist (Bootstrap).
+// Sobald du fur "admin" einen echten Account in der Benutzerverwaltung anlegst/speicherst,
+// hat der Firestore-Eintrag automatisch Vorrang vor diesem Notfall-Zugang.
+// Passwort andern: Browser-Konsole (F12) -> fibHash('DeinPasswort').then(h=>console.log(h))
+// -> Hash unten einsetzen.
+const FALLBACK_ADMIN = {
+  username:'admin', roles:['admin'], mustChange:false,
+  passHash:'15221d5e748afa63d8ad7b6110dba4b9fbf27f995b25964abb0f5ae1d889d478' // Standard: "fib2026" -- BITTE AENDERN!
+};
 
 let currentUser = null;     // Username (string) des eingeloggten Nutzers
 let currentRoles = [];      // z.B. ['hr','fibco']
 let currentName = '';       // aus dem Firestore-Profil geladen
 let currentProfile = {};    // komplettes Firestore-Profil des eingeloggten Nutzers
-let _pendingLoginUser = null; // Username, der gerade durch den Pflicht-Passwortwechsel muss
+let _pendingLoginUser = null; // Account-Objekt, das gerade durch den Pflicht-Passwortwechsel muss
 const PROFILE_DEFAULTS = {name:'',photo:'',passId:'',phone:'',position:'',hireDate:'',lastPromo:'',bio:'',trainings:[]};
 
 async function fibHash(str){
@@ -1315,15 +1308,42 @@ async function fibHash(str){
 }
 window.fibHash = fibHash; // damit man es bei Bedarf in der Browser-Konsole nutzen kann
 
-// --- Lokale Passwort-Overrides (fuer "temporaeres Passwort schon geaendert") ---
-function getOverrides(){try{return JSON.parse(localStorage.getItem('fib_pw_overrides')||'{}');}catch(e){return{};}}
-function setOverride(username,hash){
-  const o=getOverrides();o[username]=hash;
-  try{localStorage.setItem('fib_pw_overrides',JSON.stringify(o));}catch(e){}
+// --- Firestore: Zugangsdaten laden/speichern ---
+async function loadAccount(username){
+  username=(username||'').toLowerCase();
+  if(!username)return null;
+  try{
+    if(!fbReady) await initFirebase();
+    if(!fbReady) throw new Error('init-failed');
+    const snap=await window._fbGet(window._fbDocFn('fib_users',username));
+    if(snap.exists()) return {username,...snap.data()};
+  }catch(e){console.error('loadAccount error',e);}
+  if(username===FALLBACK_ADMIN.username) return {...FALLBACK_ADMIN};
+  return null;
 }
-function findUser(username){return USERS.find(u=>u.username.toLowerCase()===(username||'').toLowerCase());}
+async function loadAllAccounts(){
+  const list=[];
+  try{
+    if(!fbReady) await initFirebase();
+    if(!fbReady) throw new Error('init-failed');
+    const snap=await window._fbGetDocs(window._fbCollection(db,'fib_users'));
+    snap.forEach(d=>list.push({username:d.id,...d.data()}));
+  }catch(e){console.error('loadAllAccounts error',e);}
+  if(!list.find(u=>u.username.toLowerCase()===FALLBACK_ADMIN.username)) list.unshift({...FALLBACK_ADMIN});
+  return list;
+}
+async function saveAccount(username,data){
+  if(!fbReady) await initFirebase();
+  if(!fbReady) throw new Error('init-failed');
+  await window._fbSet(window._fbDocFn('fib_users',username.toLowerCase()),data,{merge:true});
+}
+async function deleteAccount(username){
+  if(!fbReady) await initFirebase();
+  if(!fbReady) throw new Error('init-failed');
+  await window._fbDeleteDoc(window._fbDocFn('fib_users',username.toLowerCase()));
+}
 
-// --- Firestore: Profil-Daten laden/speichern (automatisch, kein Code-Edit) ---
+// --- Firestore: Profil-Daten laden/speichern ---
 async function loadProfile(username){
   try{
     if(!fbReady) await initFirebase();
@@ -1361,15 +1381,13 @@ async function doLogin(){
   errEl.textContent='';
   if(!user||!pass){errEl.textContent='Bitte Zugangskennung und Passwort eingeben.';return;}
   btn.disabled=true;btn.textContent='Anmelden ...';
-  const hash=await fibHash(pass);
-  const found=findUser(user);
+  const found=await loadAccount(user);
   if(!found){btn.disabled=false;btn.innerHTML='<i class="ti ti-login"></i> ANMELDEN';errEl.textContent='Zugangskennung oder Passwort falsch.';return;}
-  const overrides=getOverrides();
-  const effectiveHash=overrides[found.username]||found.passHash;
+  const hash=await fibHash(pass);
   btn.disabled=false;btn.innerHTML='<i class="ti ti-login"></i> ANMELDEN';
-  if(hash!==effectiveHash){errEl.textContent='Zugangskennung oder Passwort falsch.';return;}
-  if(found.mustChange && !overrides[found.username]){
-    _pendingLoginUser=found.username;
+  if(hash!==found.passHash){errEl.textContent='Zugangskennung oder Passwort falsch.';return;}
+  if(found.mustChange){
+    _pendingLoginUser=found;
     document.getElementById('login-screen').classList.add('hide');
     document.getElementById('pwchange-screen').classList.add('show');
     return;
@@ -1377,7 +1395,7 @@ async function doLogin(){
   await completeLogin(found);
 }
 async function completeLogin(found){
-  currentUser=found.username;currentRoles=found.roles;
+  currentUser=found.username;currentRoles=found.roles||[];
   currentProfile=await loadProfile(found.username);
   currentName=currentProfile.name||found.username;
   try{localStorage.setItem('fib_session',JSON.stringify({u:found.username}));}catch(e){}
@@ -1395,8 +1413,9 @@ async function tryRestoreSession(){
     const raw=localStorage.getItem('fib_session');
     if(!raw)return false;
     const s=JSON.parse(raw);
-    const found=findUser(s.u);
-    if(!found)return false;
+    const found=await loadAccount(s.u);
+    if(!found){try{localStorage.removeItem('fib_session');}catch(e){}return false;}
+    if(found.mustChange)return false; // zur Sicherheit erneut einloggen lassen
     await completeLogin(found);
     return true;
   }catch(e){return false;}
@@ -1410,22 +1429,27 @@ function showApp(){
   sv('dash',null);
 }
 
-// Pflicht-Passwortwechsel abschicken (bei temporaerem Passwort)
+// Pflicht-Passwortwechsel abschicken (bei temporaerem Passwort) -- speichert jetzt
+// direkt in Firestore, kein Umweg mehr noetig.
 async function submitPasswordChange(){
   const p1=gv('pwchange-new'),p2=gv('pwchange-confirm');
   const errEl=document.getElementById('pwchange-err');
   errEl.textContent='';
   if(!p1||p1.length<6){errEl.textContent='Mindestens 6 Zeichen verwenden.';return;}
   if(p1!==p2){errEl.textContent='Passwörter stimmen nicht überein.';return;}
-  const found=findUser(_pendingLoginUser);
+  const found=_pendingLoginUser;
   if(!found){errEl.textContent='Fehler — bitte neu anmelden.';return;}
   const hash=await fibHash(p1);
-  setOverride(found.username,hash);
+  try{
+    await saveAccount(found.username,{passHash:hash,mustChange:false,roles:found.roles||[]});
+  }catch(e){
+    console.error('submitPasswordChange error',e);
+    errEl.textContent='Fehler beim Speichern. Verbindung prufen.';
+    return;
+  }
+  found.passHash=hash;found.mustChange=false;
   await completeLogin(found);
-  showToast('Passwort geandert — in diesem Browser sofort aktiv');
-  setTimeout(()=>{
-    alert('Dein neues Passwort gilt sofort auf diesem Gerat/Browser.\n\nDamit es dauerhaft (z.B. auch auf anderen Geraten) gilt, gib einem Admin bitte folgenden Hash zur Aktualisierung auf GitHub (Feld "passHash" bei deinem Account, "mustChange" dabei auf false setzen):\n\n'+hash);
-  },300);
+  showToast('Passwort geandert und gespeichert');
 }
 
 function hasRole(r){
@@ -1552,15 +1576,16 @@ async function saveSelfProfile(){
 }
 
 // ===================== BENUTZERVERWALTUNG (Admin) =====================
+let _allAccountsCache=[];
 let _allProfilesCache={};
 
 async function renderUserList(){
   const box=document.getElementById('adm-userlist');
   if(!box)return;
-  if(!USERS.length){box.innerHTML='<div class="kl-empty">Keine Accounts im Code hinterlegt.</div>';return;}
-  box.innerHTML='<div class="kl-empty">Lade Profile ...</div>';
-  _allProfilesCache=await loadAllProfiles();
-  box.innerHTML=USERS.map(u=>{
+  box.innerHTML='<div class="kl-empty">Lade Accounts ...</div>';
+  [_allAccountsCache,_allProfilesCache]=await Promise.all([loadAllAccounts(),loadAllProfiles()]);
+  if(!_allAccountsCache.length){box.innerHTML='<div class="kl-empty">Keine Accounts vorhanden.</div>';return;}
+  box.innerHTML=_allAccountsCache.map(u=>{
     const p=_allProfilesCache[u.username.toLowerCase()]||PROFILE_DEFAULTS;
     return `<div class="profile-card" onclick="openProfileModal('${u.username}')">
       ${avatarHtml(p.name||u.username,p.photo)}
@@ -1574,7 +1599,7 @@ async function renderUserList(){
 }
 
 async function openProfileModal(username){
-  const u=findUser(username);
+  const u=_allAccountsCache.find(x=>x.username.toLowerCase()===username.toLowerCase()) || await loadAccount(username);
   if(!u)return;
   document.getElementById('profile-modal').dataset.username=username;
   const p=_allProfilesCache[username.toLowerCase()] || await loadProfile(username);
@@ -1609,54 +1634,61 @@ document.getElementById('useredit-modal').addEventListener('click',function(e){i
 document.getElementById('selfedit-modal').addEventListener('click',function(e){if(e.target===this)closeSelfEdit();});
 document.getElementById('officialedit-modal').addEventListener('click',function(e){if(e.target===this)closeOfficialEdit();});
 
-// --- TEMPORAERES PASSWORT VERGEBEN (Admin, codebasiert) ---
+// --- TEMPORAERES PASSWORT VERGEBEN (Admin) -- speichert sofort, kein Code mehr ---
 async function adminIssueTempPassword(){
   const username=document.getElementById('profile-modal').dataset.username;
-  const u=findUser(username);
+  const u=_allAccountsCache.find(x=>x.username.toLowerCase()===username.toLowerCase());
   if(!u)return;
   const newPass=prompt('Temporares Passwort fur "'+username+'" eingeben (min. 6 Zeichen):');
   if(newPass===null)return;
   if(newPass.length<6){showToast('Passwort zu kurz (min. 6 Zeichen)');return;}
-  const hash=await fibHash(newPass);
-  const snippet=buildCredSnippet({...u,passHash:hash,mustChange:true});
   const box=document.getElementById('pm-codebox');
-  box.innerHTML='Temporares Passwort: <b style="color:var(--g)">'+newPass+'</b> (gib es der Person, sie muss es beim Login andern).<br>'+
-    'Auf GitHub die bestehende Zeile von <b style="color:var(--tx)">'+u.username+'</b> im <code>USERS</code>-Array durch diese ersetzen und committen:'+
-    `<textarea class="fi" rows="3" style="margin-top:6px;font-size:10px;" readonly onclick="this.select()">${snippet}</textarea>`+
-    '<div style="margin-top:4px;color:#f0a500">Solange das nicht committet ist, gilt fur die Person weiterhin ihr altes Passwort.</div>';
-  showToast('Temporares Passwort erzeugt — Code unten kopieren');
+  try{
+    const hash=await fibHash(newPass);
+    await saveAccount(username,{passHash:hash,mustChange:true,roles:u.roles||[]});
+    box.innerHTML='Temporares Passwort: <b style="color:var(--g)">'+newPass+'</b> — gib es der Person, sie muss es beim nachsten Login andern. Bereits gespeichert, sofort aktiv.';
+    showToast('Temporares Passwort gespeichert');
+    renderUserList();
+  }catch(e){
+    console.error('adminIssueTempPassword error',e);
+    box.innerHTML='<span style="color:var(--re)">Fehler beim Speichern. Verbindung prufen.</span>';
+  }
 }
 
 async function adminDeleteUserPrompt(){
   const username=document.getElementById('profile-modal').dataset.username;
   if(username===currentUser){showToast('Du kannst deinen eigenen Account hier nicht loschen');return;}
-  if(!confirm('Account "'+username+'" wirklich entfernen? Das Profil (Foto/Name/Schulungen) wird sofort aus der Cloud geloscht.'))return;
+  if(username.toLowerCase()===FALLBACK_ADMIN.username && !_allAccountsCache.find(x=>x.username.toLowerCase()===username.toLowerCase()&&x.passHash!==FALLBACK_ADMIN.passHash)){
+    if(!confirm('"admin" ist der im Code hinterlegte Notfall-Zugang. Es gibt nichts in der Cloud zu loschen. Trotzdem fortfahren?'))return;
+  } else if(!confirm('Account "'+username+'" wirklich vollstandig loschen?'))return;
   try{
-    if(!fbReady) await initFirebase();
-    await window._fbDeleteDoc(window._fbDocFn('fib_profiles',username.toLowerCase()));
-  }catch(e){console.error(e);}
-  const box=document.getElementById('pm-codebox');
-  box.innerHTML='Profil-Daten geloscht. Zum vollstandigen Entfernen noch die Zeile von <b style="color:var(--tx)">'+username+'</b> im <code>USERS</code>-Array auf GitHub loschen und committen.';
-  showToast('Profil geloscht — Zugangsdaten noch auf GitHub entfernen');
-  renderUserList();
+    await deleteAccount(username);
+    await window._fbDeleteDoc(window._fbDocFn('fib_profiles',username.toLowerCase())).catch(()=>{});
+    showToast('Account geloscht');
+    closeProfileModal();
+    renderUserList();
+  }catch(e){
+    console.error('adminDeleteUserPrompt error',e);
+    showToast('Fehler beim Loschen');
+  }
 }
 
-// ===================== ZUGANGSDATEN ANLEGEN / BEARBEITEN (codebasiert) =====================
+// ===================== ZUGANGSDATEN ANLEGEN / BEARBEITEN (Firestore, automatisch) =====================
 function openCreateUser(){
   document.getElementById('ue-title').textContent='Account anlegen';
   document.getElementById('ue-editing-username').value='';
   sv2('ue-username','');sv2('ue-pass','');
   document.querySelectorAll('.ue-role').forEach(c=>c.checked=false);
-  document.getElementById('ue-mustchange').checked=false;
+  document.getElementById('ue-mustchange').checked=true; // sinnvoller Standard: neuer Account startet mit Temp-Passwort
   document.getElementById('ue-username').disabled=false;
   document.getElementById('ue-pass-req').textContent='*';
   document.getElementById('ue-pass').placeholder='min. 6 Zeichen';
   document.getElementById('ue-msg').textContent='';
   document.getElementById('useredit-modal').classList.add('show');
 }
-function openEditUser(username){
+async function openEditUser(username){
   username=username||document.getElementById('profile-modal').dataset.username;
-  const u=findUser(username);
+  const u=_allAccountsCache.find(x=>x.username.toLowerCase()===username.toLowerCase()) || await loadAccount(username);
   if(!u)return;
   closeProfileModal();
   document.getElementById('ue-title').textContent='Zugangsdaten andern — '+u.username;
@@ -1673,11 +1705,6 @@ function openEditUser(username){
 }
 function closeEditUserModal(){document.getElementById('useredit-modal').classList.remove('show');}
 
-function buildCredSnippet(u){
-  const esc=s=>(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  return `  { username:'${esc(u.username)}', roles:${JSON.stringify(u.roles)}, passHash:'${u.passHash}', mustChange:${u.mustChange?'true':'false'} },`;
-}
-
 async function submitUserForm(){
   if(!hasRole('admin')){showToast('Keine Berechtigung');return;}
   const editingUsername=gv('ue-editing-username');
@@ -1689,24 +1716,29 @@ async function submitUserForm(){
   const msgEl=document.getElementById('ue-msg');
   if(!username){msgEl.textContent='Zugangskennung ist Pflicht.';msgEl.style.color='var(--re)';return;}
   if(!roles.length){msgEl.textContent='Mindestens eine Rolle wahlen.';msgEl.style.color='var(--re)';return;}
-  if(!isEdit && USERS.find(u=>u.username.toLowerCase()===username.toLowerCase())){msgEl.textContent='Zugangskennung bereits vergeben.';msgEl.style.color='var(--re)';return;}
   if(!isEdit && (!pass||pass.length<6)){msgEl.textContent='Passwort: min. 6 Zeichen.';msgEl.style.color='var(--re)';return;}
   if(isEdit && pass && pass.length<6){msgEl.textContent='Neues Passwort: min. 6 Zeichen (oder Feld leer lassen).';msgEl.style.color='var(--re)';return;}
-
-  let passHash;
-  if(isEdit){
-    const existing=findUser(username);
-    passHash = pass ? await fibHash(pass) : existing.passHash;
-  } else {
-    passHash = await fibHash(pass);
+  msgEl.textContent='Speichert ...';msgEl.style.color='var(--mu)';
+  try{
+    if(!isEdit){
+      const existing=await loadAccount(username);
+      if(existing){msgEl.textContent='Zugangskennung bereits vergeben.';msgEl.style.color='var(--re)';return;}
+    }
+    let passHash;
+    if(isEdit){
+      const existing=await loadAccount(username);
+      passHash = pass ? await fibHash(pass) : existing.passHash;
+    } else {
+      passHash = await fibHash(pass);
+    }
+    await saveAccount(username,{roles,passHash,mustChange});
+    msgEl.textContent='Gespeichert — Account ist sofort aktiv.';msgEl.style.color='var(--gr)';
+    showToast(isEdit?'Zugangsdaten aktualisiert':'Account angelegt');
+    setTimeout(()=>{closeEditUserModal();renderUserList();},700);
+  }catch(e){
+    console.error('submitUserForm error',e);
+    msgEl.textContent='Fehler beim Speichern. Verbindung prufen.';msgEl.style.color='var(--re)';
   }
-  const snippet=buildCredSnippet({username,roles,passHash,mustChange});
-  msgEl.innerHTML=(isEdit
-      ? 'Code generiert — auf GitHub die <b style="color:var(--tx)">bestehende Zeile</b> von <b>'+username+'</b> im USERS-Array durch diese hier ersetzen und committen:'
-      : 'Code generiert — auf GitHub diese Zeile neu in das <b style="color:var(--tx)">USERS</b>-Array einfugen und committen:')+
-    `<textarea class="fi" rows="3" style="margin-top:6px;font-size:10px;" readonly onclick="this.select()">${snippet}</textarea>`;
-  msgEl.style.color='var(--g)';
-  showToast('Code generiert — siehe unten');
 }
 
 // ===================== OFFIZIELLE DATEN BEARBEITEN (Admin, automatisch in Firestore) =====================
