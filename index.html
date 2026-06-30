@@ -2198,8 +2198,11 @@ function upPa(){
   setOb('pa-pre',renderTpl('pa',vars).trimEnd());
 }
 
-// ===================== AUTH & ZUGRIFFSVERWALTUNG =====================
-// Module die jede Abteilung sehen darf, gespeichert in Firebase unter fib/access -> {depts:{...}, logins:{...}}
+
+// ===================== AUTH & ZUGRIFFSVERWALTUNG (NEU, EINFACH) =====================
+// Komplett linearer Ablauf: erst ALLES laden, dann erst das Login-UI entscheiden.
+// Keine parallel laufenden Funktionen mehr -> keine Race Conditions.
+
 const ALL_MODS = ['dash','ma','kl','rang','ein','kue','san','pa','az','fibco','cid','tpl','cfg'];
 const DEPT_LIST = ['admin','HR','CIRG','CID','CO','PR','TD','IA','LAW','FIBCO'];
 const DEFAULT_DEPT_PERMS = {
@@ -2215,42 +2218,14 @@ const DEFAULT_DEPT_PERMS = {
   FIBCO: ['dash','ma','kl','fibco'],
 };
 
-let CURRENT_USER = null; // {id, name, dept, perms:[...]}
-let DEPT_PERMS = {};      // loaded from firebase
-let LOGINS = {};           // {passId: {dept, pwHash, pwSet:bool}}
+let CURRENT_USER = null;
+let DEPT_PERMS = {};
+let LOGINS = {};
 
 function simpleHash(str){
-  // Einfacher Hash, ausreichend für dieses RP-Tool (kein Klartext-Speichern)
   let h=0;
   for(let i=0;i<str.length;i++){h=((h<<5)-h+str.charCodeAt(i))|0;}
   return 'h'+Math.abs(h)+'_'+str.length;
-}
-
-async function loadAccessData(){
-  try{
-    if(!fbReady) await initFirebase();
-    const snap = await window._fbGet(window._fbDocFn('fib','access'));
-    if(snap.exists()){
-      const d = snap.data();
-      DEPT_PERMS = d.depts || {...DEFAULT_DEPT_PERMS};
-      LOGINS = d.logins || {};
-    } else {
-      DEPT_PERMS = {...DEFAULT_DEPT_PERMS};
-      LOGINS = {};
-      await saveAccessData();
-    }
-  }catch(e){
-    console.error('loadAccessData error:',e);
-    DEPT_PERMS = {...DEFAULT_DEPT_PERMS};
-    LOGINS = {};
-  }
-}
-
-async function saveAccessData(){
-  try{
-    if(!fbReady) await initFirebase();
-    await window._fbSet(window._fbDocFn('fib','access'), {depts:DEPT_PERMS, logins:LOGINS});
-  }catch(e){console.error('saveAccessData error:',e);}
 }
 
 function findMAById(id){
@@ -2259,92 +2234,44 @@ function findMAById(id){
   return MA.find(m=> String(m.id).trim() === norm );
 }
 
-async function doLogin(){
-  _authResolved = true; // verhindert dass parallel laufende initAuth() noch eingreift
-  const id = gv('li-id').trim();
-  const pw = gv('li-pw');
-  const errEl = document.getElementById('login-err');
-  errEl.classList.remove('show');
-
-  if(!id || !pw){ errEl.textContent='Bitte Pass-ID und Passwort eingeben.'; errEl.classList.add('show'); return; }
-
-  // sicherstellen, dass Sheet + Access-Daten geladen sind
-  if(MA.length===0) await syncFromSheet();
-  if(Object.keys(LOGINS).length===0 && Object.keys(DEPT_PERMS).length===0) await loadAccessData();
-
-  const ma = findMAById(id);
-  if(!ma){ errEl.textContent='Pass-ID nicht im Mitarbeiterverzeichnis gefunden.'; errEl.classList.add('show'); return; }
-
-  let login = LOGINS[id];
-  if(!login){
-    errEl.textContent='Für diese Pass-ID wurde noch kein Zugang angelegt. Wende dich an die Personalabteilung.';
-    errEl.classList.add('show');
-    return;
-  }
-
-  const hash = simpleHash(pw);
-  const validPw = login.pwSet ? (login.pwHash===hash) : (pw==='fib2026');
-  if(!validPw){ errEl.textContent='Falsches Passwort.'; errEl.classList.add('show'); return; }
-
-  CURRENT_USER = {id, name:ma.name, dept:login.dept, rank:ma.rank};
-
-  if(!login.pwSet){
-    // Erstanmeldung -> Passwort ändern erzwingen
-    document.getElementById('login-screen').classList.add('hide');
-    document.getElementById('pwchange-screen').classList.remove('hide');
-    return;
-  }
-
-  finishLogin();
-}
-
-async function doPwChange(){
-  const p1 = gv('pw-new');
-  const p2 = gv('pw-confirm');
-  const errEl = document.getElementById('pwchange-err');
-  errEl.classList.remove('show');
-  if(!p1 || p1.length<6){ errEl.textContent='Passwort muss mind. 6 Zeichen lang sein.'; errEl.classList.add('show'); return; }
-  if(p1!==p2){ errEl.textContent='Passwörter stimmen nicht überein.'; errEl.classList.add('show'); return; }
-
-  LOGINS[CURRENT_USER.id] = {...LOGINS[CURRENT_USER.id], pwHash:simpleHash(p1), pwSet:true};
-  await saveAccessData();
-  document.getElementById('pwchange-screen').classList.add('hide');
-  finishLogin();
-}
-
 function resolvePerms(dept){
   if(dept==='admin') return [...ALL_MODS,'zugriff'];
-  return (DEPT_PERMS[dept]) || DEFAULT_DEPT_PERMS[dept] || [];
+  return DEPT_PERMS[dept] || DEFAULT_DEPT_PERMS[dept] || [];
 }
 
-function finishLogin(){
-  // Sitzung im Browser merken (nicht serverseitig, rein für Komfort beim Reload)
-  try{ sessionStorage.setItem('fib_session', JSON.stringify(CURRENT_USER)); }catch(e){}
-
-  const perms = resolvePerms(CURRENT_USER.dept);
-  CURRENT_USER.perms = perms;
-
-  if(perms.length===0){
-    document.getElementById('login-screen').classList.add('hide');
-    document.getElementById('access-denied').classList.remove('hide');
-    return;
+async function loadAccessData(){
+  try{
+    if(!fbReady) await initFirebase();
+    const snap = await window._fbGet(window._fbDocFn('fib','access'));
+    if(snap.exists()){
+      const d = snap.data();
+      DEPT_PERMS = d.depts || {};
+      LOGINS = d.logins || {};
+    } else {
+      DEPT_PERMS = {};
+      LOGINS = {};
+    }
+  }catch(e){
+    console.error('loadAccessData error:', e);
+    DEPT_PERMS = {};
+    LOGINS = {};
   }
-
-  document.getElementById('login-screen').classList.add('hide');
-  document.getElementById('access-denied').classList.add('hide');
-  applyPermissions();
-  bootApp();
 }
 
-function doLogout(){
-  _authResolved = false;
-  CURRENT_USER = null;
-  try{ sessionStorage.removeItem('fib_session'); }catch(e){}
-  document.getElementById('access-denied').classList.add('hide');
-  document.getElementById('pwchange-screen').classList.add('hide');
-  document.getElementById('login-screen').classList.remove('hide');
-  sv2('li-id','');sv2('li-pw','');
-  const e=document.getElementById('login-err'); if(e)e.classList.remove('show');
+async function saveAccessData(){
+  try{
+    if(!fbReady) await initFirebase();
+    await window._fbSet(window._fbDocFn('fib','access'), {depts:DEPT_PERMS, logins:LOGINS});
+  }catch(e){ console.error('saveAccessData error:', e); }
+}
+
+// ---- UI Helpers ----
+function showScreen(id){
+  ['login-screen','pwchange-screen','setup-screen','access-denied'].forEach(s=>{
+    const el=document.getElementById(s);
+    if(!el) return;
+    if(s===id) el.classList.remove('hide'); else el.classList.add('hide');
+  });
 }
 
 function applyPermissions(){
@@ -2358,11 +2285,106 @@ function applyPermissions(){
   });
   const zgNi = document.getElementById('ni-zugriff');
   if(zgNi) zgNi.style.display = perms.includes('zugriff') ? 'flex' : 'none';
-
   const nameEl = document.getElementById('user-pill-name');
   const abtEl  = document.getElementById('user-pill-abt');
   if(nameEl) nameEl.textContent = CURRENT_USER.name;
   if(abtEl)  abtEl.textContent  = CURRENT_USER.dept==='admin' ? 'Administrator' : CURRENT_USER.dept;
+}
+
+function enterApp(){
+  const perms = resolvePerms(CURRENT_USER.dept);
+  CURRENT_USER.perms = perms;
+  if(perms.length===0){
+    showScreen('access-denied');
+    return;
+  }
+  try{ sessionStorage.setItem('fib_session', JSON.stringify({id:CURRENT_USER.id})); }catch(e){}
+  ['login-screen','pwchange-screen','setup-screen','access-denied'].forEach(s=>{
+    const el=document.getElementById(s); if(el) el.classList.add('hide');
+  });
+  applyPermissions();
+  bootApp();
+}
+
+// ---- Login ----
+async function doLogin(){
+  const id = gv('li-id').trim();
+  const pw = gv('li-pw');
+  const errEl = document.getElementById('login-err');
+  errEl.classList.remove('show');
+  if(!id || !pw){ errEl.textContent='Bitte Pass-ID und Passwort eingeben.'; errEl.classList.add('show'); return; }
+
+  const ma = findMAById(id);
+  if(!ma){ errEl.textContent='Pass-ID nicht im Mitarbeiterverzeichnis gefunden.'; errEl.classList.add('show'); return; }
+
+  const login = LOGINS[id];
+  if(!login){ errEl.textContent='Für diese Pass-ID wurde noch kein Zugang angelegt.'; errEl.classList.add('show'); return; }
+
+  const hash = simpleHash(pw);
+  const validPw = login.pwSet ? (login.pwHash===hash) : (pw==='fib2026');
+  if(!validPw){ errEl.textContent='Falsches Passwort.'; errEl.classList.add('show'); return; }
+
+  CURRENT_USER = {id, name:ma.name, dept:login.dept, rank:ma.rank};
+
+  if(!login.pwSet){
+    showScreen('pwchange-screen');
+    return;
+  }
+  enterApp();
+}
+
+async function doPwChange(){
+  const p1 = gv('pw-new');
+  const p2 = gv('pw-confirm');
+  const errEl = document.getElementById('pwchange-err');
+  errEl.classList.remove('show');
+  if(!p1 || p1.length<6){ errEl.textContent='Passwort muss mind. 6 Zeichen lang sein.'; errEl.classList.add('show'); return; }
+  if(p1!==p2){ errEl.textContent='Passwörter stimmen nicht überein.'; errEl.classList.add('show'); return; }
+
+  LOGINS[CURRENT_USER.id] = {...LOGINS[CURRENT_USER.id], pwHash:simpleHash(p1), pwSet:true};
+  await saveAccessData();
+  enterApp();
+}
+
+function doLogout(){
+  CURRENT_USER = null;
+  try{ sessionStorage.removeItem('fib_session'); }catch(e){}
+  sv2('li-id','');sv2('li-pw','');
+  const e=document.getElementById('login-err'); if(e)e.classList.remove('show');
+  showScreen('login-screen');
+}
+
+// ---- Ersteinrichtung ----
+function setupLookup(){
+  const id = gv('su-id').trim();
+  const el = document.getElementById('su-found');
+  if(!el) return;
+  if(!id){ el.innerHTML=''; return; }
+  const ma = findMAById(id);
+  if(ma) el.innerHTML = `<span style="color:var(--gr)"><i class="ti ti-check"></i> ${ma.name} · ${ma.rank}</span>`;
+  else el.innerHTML = `<span style="color:var(--re)"><i class="ti ti-x"></i> Pass-ID nicht im Mitarbeiterverzeichnis gefunden</span>`;
+}
+
+async function doSetup(){
+  const id = gv('su-id').trim();
+  const p1 = gv('su-pw1');
+  const p2 = gv('su-pw2');
+  const errEl = document.getElementById('setup-err');
+  errEl.classList.remove('show');
+
+  if(!id){ errEl.textContent='Bitte deine Pass-ID eingeben.'; errEl.classList.add('show'); return; }
+  const ma = findMAById(id);
+  if(!ma){ errEl.textContent='Pass-ID nicht im Mitarbeiterverzeichnis gefunden.'; errEl.classList.add('show'); return; }
+  if(!p1 || p1.length<6){ errEl.textContent='Passwort muss mind. 6 Zeichen lang sein.'; errEl.classList.add('show'); return; }
+  if(p1!==p2){ errEl.textContent='Passwörter stimmen nicht überein.'; errEl.classList.add('show'); return; }
+
+  LOGINS[id] = {dept:'admin', pwSet:true, pwHash:simpleHash(p1)};
+  if(Object.keys(DEPT_PERMS).length===0) DEPT_PERMS = {...DEFAULT_DEPT_PERMS};
+  await saveAccessData();
+
+  CURRENT_USER = {id, name:ma.name, dept:'admin', rank:ma.rank};
+  showToast('Administrator-Zugang erstellt');
+  enterApp();
 }
 
 // sv() override: blockiert Module ohne Berechtigung
@@ -2375,55 +2397,7 @@ sv = function(name, el){
   _origSv(name, el);
 };
 
-function setupLookup(){
-  const id = gv('su-id').trim();
-  const el = document.getElementById('su-found');
-  if(!el) return;
-  if(!id){ el.innerHTML=''; return; }
-  const ma = findMAById(id);
-  if(ma) el.innerHTML = `<span style="color:var(--gr)"><i class="ti ti-check"></i> ${ma.name} · ${ma.rank}</span>`;
-  else el.innerHTML = `<span style="color:var(--re)"><i class="ti ti-x"></i> Pass-ID nicht im Mitarbeiterverzeichnis gefunden</span>`;
-}
-
-async function doSetup(){
-  _authResolved = true; // verhindert dass parallel laufende initAuth() noch eingreift
-  const id = gv('su-id').trim();
-  const p1 = gv('su-pw1');
-  const p2 = gv('su-pw2');
-  const errEl = document.getElementById('setup-err');
-  errEl.classList.remove('show');
-
-  if(!id){ errEl.textContent='Bitte deine Pass-ID eingeben.'; errEl.classList.add('show'); return; }
-  if(MA.length===0) await syncFromSheet();
-  const ma = findMAById(id);
-  if(!ma){ errEl.textContent='Pass-ID nicht im Mitarbeiterverzeichnis gefunden.'; errEl.classList.add('show'); return; }
-  if(!p1 || p1.length<6){ errEl.textContent='Passwort muss mind. 6 Zeichen lang sein.'; errEl.classList.add('show'); return; }
-  if(p1!==p2){ errEl.textContent='Passwörter stimmen nicht überein.'; errEl.classList.add('show'); return; }
-
-  if(!fbReady) await initFirebase();
-  // Sicherheits-Check: falls inzwischen doch schon ein Login existiert, abbrechen
-  await loadAccessData();
-  if(Object.keys(LOGINS).length>0){
-    errEl.textContent='Es wurde bereits ein Zugang angelegt. Bitte normal einloggen.';
-    errEl.classList.add('show');
-    setTimeout(()=>{ document.getElementById('setup-screen').classList.add('hide'); document.getElementById('login-screen').classList.remove('hide'); }, 1800);
-    return;
-  }
-
-  LOGINS[id] = {dept:'admin', pwSet:true, pwHash:simpleHash(p1)};
-  if(Object.keys(DEPT_PERMS).length===0) DEPT_PERMS = {...DEFAULT_DEPT_PERMS};
-  await saveAccessData();
-
-  CURRENT_USER = {id, name:ma.name, dept:'admin', rank:ma.rank, perms:DEFAULT_DEPT_PERMS.admin};
-  try{ sessionStorage.setItem('fib_session', JSON.stringify(CURRENT_USER)); }catch(e){}
-
-  document.getElementById('setup-screen').classList.add('hide');
-  applyPermissions();
-  bootApp();
-  showToast('Administrator-Zugang erstellt');
-}
-
-
+// ===================== ZUGRIFFSVERWALTUNG UI =====================
 function zgRenderDeptTable(){
   const wrap = document.getElementById('zg-dept-table');
   if(!wrap) return;
@@ -2434,7 +2408,7 @@ function zgRenderDeptTable(){
   DEPT_LIST.filter(d=>d!=='admin').forEach(dept=>{
     html+=`<tr><td style="font-weight:bold;color:var(--g)">${dept}</td>`;
     Object.keys(modLabels).forEach(mod=>{
-      const checked = (DEPT_PERMS[dept]||[]).includes(mod);
+      const checked = (DEPT_PERMS[dept]||DEFAULT_DEPT_PERMS[dept]||[]).includes(mod);
       html+=`<td style="text-align:center"><input type="checkbox" ${checked?'checked':''} onchange="zgTogglePerm('${dept}','${mod}',this.checked)"></td>`;
     });
     html+='</tr>';
@@ -2444,7 +2418,7 @@ function zgRenderDeptTable(){
 }
 
 function zgTogglePerm(dept, mod, checked){
-  if(!DEPT_PERMS[dept]) DEPT_PERMS[dept]=[];
+  if(!DEPT_PERMS[dept]) DEPT_PERMS[dept] = [...(DEFAULT_DEPT_PERMS[dept]||[])];
   const set = new Set(DEPT_PERMS[dept]);
   if(checked) set.add(mod); else set.delete(mod);
   DEPT_PERMS[dept] = Array.from(set);
@@ -2503,7 +2477,6 @@ async function zgResetPw(id){
   showToast('Passwort zurückgesetzt — Standard: fib2026');
 }
 
-
 // ===================== INIT =====================
 let MA=DEF.map(m=>({...m}));
 let filtered=[...MA];
@@ -2519,67 +2492,52 @@ loadCloudCfgFields();
 showTplTab('rang',document.querySelector('.tpl-tab'));
 
 function bootApp(){
-  // Startet Firebase Live-Listener — lädt KL/FC/CID-Daten initial und bei jeder Änderung automatisch
   cloudLoad();
-  // Startet Google Sheet Live-Sync für Mitarbeiterliste (alle 30 Sek.)
   startSheetSync();
-  setTimeout(()=>{
-    if(CURRENT_USER && (CURRENT_USER.perms||[]).includes('zugriff')){
-      zgRenderDeptTable();
-      zgRenderLogins();
-    }
-  }, 800);
+  if(CURRENT_USER && (CURRENT_USER.perms||[]).includes('zugriff')){
+    zgRenderDeptTable();
+    zgRenderLogins();
+  }
 }
 
-// Beim Laden: Login-relevante Daten vorbereiten und ggf. Sitzung wiederherstellen
-var _authResolved = false; // wird true sobald Login/Setup manuell abgeschlossen wurde
-
-(async function initAuth(){
+// ---- EINZIGER, LINEARER STARTABLAUF (keine Parallelität mehr) ----
+async function startup(){
+  // 1. Mitarbeiterliste laden (für Pass-ID-Prüfung nötig)
   await syncFromSheet();
-  // Falls Sheet noch nicht geladen ist, kurz erneut versuchen
   if(MA.length===0){
-    await new Promise(r=>setTimeout(r,1200));
+    await new Promise(r=>setTimeout(r,1500));
     await syncFromSheet();
   }
+
+  // 2. Zugangsdaten laden
   await loadAccessData();
 
-  // Falls der Nutzer in der Zwischenzeit bereits manuell eingeloggt wurde (Setup/Login), nicht mehr eingreifen
-  if(_authResolved) return;
-
-  // Kein Login angelegt -> Ersteinrichtung anzeigen
+  // 3. Kein Login vorhanden -> Ersteinrichtung
   if(Object.keys(LOGINS).length===0){
-    document.getElementById('login-screen').classList.add('hide');
-    document.getElementById('setup-screen').classList.remove('hide');
+    showScreen('setup-screen');
     return;
   }
 
-  let restored=null;
-  try{ const s=sessionStorage.getItem('fib_session'); if(s) restored=JSON.parse(s); }catch(e){}
-  if(restored && restored.id){
-    const ma=findMAById(restored.id);
-    const login=LOGINS[restored.id];
-    if(_authResolved) return;
+  // 4. Vorhandene Sitzung prüfen
+  let restoredId=null;
+  try{ const s=sessionStorage.getItem('fib_session'); if(s) restoredId=JSON.parse(s).id; }catch(e){}
+
+  if(restoredId){
+    const ma = findMAById(restoredId);
+    const login = LOGINS[restoredId];
     if(ma && login){
-      CURRENT_USER = {id:restored.id, name:ma.name, dept:login.dept, rank:ma.rank};
-      const perms = resolvePerms(CURRENT_USER.dept);
-      CURRENT_USER.perms = perms;
-      if(perms.length===0){
-        document.getElementById('login-screen').classList.add('hide');
-        document.getElementById('access-denied').classList.remove('hide');
-      } else {
-        document.getElementById('login-screen').classList.add('hide');
-        applyPermissions();
-        bootApp();
-      }
+      CURRENT_USER = {id:restoredId, name:ma.name, dept:login.dept, rank:ma.rank};
+      enterApp();
       return;
-    } else {
-      // Session ungültig (z.B. MA noch nicht geladen oder Login gelöscht) -> sauber ausloggen statt falsch zu blockieren
-      console.warn('Session restore failed:', {found_ma: !!ma, found_login: !!login, ma_count: MA.length});
-      try{ sessionStorage.removeItem('fib_session'); }catch(e){}
-      document.getElementById('login-screen').classList.remove('hide');
     }
+    try{ sessionStorage.removeItem('fib_session'); }catch(e){}
   }
-})();
+
+  // 5. Keine gültige Sitzung -> normaler Login
+  showScreen('login-screen');
+}
+
+startup();
 </script>
 </body>
 </html>
