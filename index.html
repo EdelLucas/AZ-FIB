@@ -1090,6 +1090,14 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 <div class="modal-bg" id="selfedit-modal">
   <div class="modal" style="width:min(520px,96vw);">
     <h2>Mein Profil bearbeiten</h2>
+    <div class="absbox">
+      <div class="abtitle"><i class="ti ti-id-badge"></i> Aus Mitarbeiterverzeichnis ubernehmen</div>
+      <div style="display:flex;gap:8px;">
+        <input class="fi bl" id="se-passid" placeholder="Deine Pass-ID, z.B. 170940" style="max-width:220px;">
+        <button class="btn sm bl" onclick="lookupDirectoryForSelf()"><i class="ti ti-search"></i> Laden</button>
+      </div>
+      <div class="hint" id="se-lookup-msg">Fullt Name, Rang, Eintrittsdatum und Ausbildungen automatisch aus dem Mitarbeiterverzeichnis.</div>
+    </div>
     <div class="photo-upload-row">
       <img id="se-photo-preview" class="avatar" style="display:none;">
       <div id="se-photo-ph" class="avatar-ph">?</div>
@@ -1120,10 +1128,16 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <h2 id="oe-title">Offizielle Daten bearbeiten</h2>
     <input type="hidden" id="oe-username">
     <div class="ir3">
-      <div><div class="fl">ID / Pass-Nr.</div><input class="fi" id="oe-passid" placeholder="z.B. 170940"></div>
+      <div><div class="fl">ID / Pass-Nr.</div>
+        <div style="display:flex;gap:6px;">
+          <input class="fi" id="oe-passid" placeholder="z.B. 170940">
+          <button class="btn sm bl" onclick="lookupDirectoryForOfficial()" title="Aus Mitarbeiterverzeichnis ubernehmen"><i class="ti ti-search"></i></button>
+        </div>
+      </div>
       <div><div class="fl">Position / Rang</div><input class="fi" id="oe-position" placeholder="z.B. 24. Chief of Staff"></div>
       <div></div>
     </div>
+    <div class="hint" id="oe-lookup-msg" style="margin-bottom:6px;">Lupe klicken um Rang, Eintrittsdatum und Ausbildungen aus dem Mitarbeiterverzeichnis zu ubernehmen.</div>
     <div class="ir">
       <div><div class="fl">Eingestellt am</div><input class="fi" type="date" id="oe-hiredate"></div>
       <div><div class="fl">Letzte Beforderung</div><input class="fi" type="date" id="oe-lastpromo"></div>
@@ -1523,11 +1537,16 @@ async function renderMyProfile(){
 }
 
 let _sePhotoData='';
+let _seImportedExtra=null; // {passId,position,hireDate,trainings} aus Verzeichnis-Lookup
 function openSelfEdit(){
   const u=currentProfile||{};
   sv2('se-name',u.name||'');
   sv2('se-phone',u.phone||'');
   sv2('se-bio',u.bio||'');
+  sv2('se-passid',u.passId||'');
+  _seImportedExtra=null;
+  document.getElementById('se-lookup-msg').textContent='Fullt Name, Rang, Eintrittsdatum und Ausbildungen automatisch aus dem Mitarbeiterverzeichnis.';
+  document.getElementById('se-lookup-msg').style.color='var(--mu)';
   _sePhotoData=u.photo||'';
   if(_sePhotoData){
     document.getElementById('se-photo-preview').src=_sePhotoData;
@@ -1542,6 +1561,29 @@ function openSelfEdit(){
   document.getElementById('selfedit-modal').classList.add('show');
 }
 function closeSelfEdit(){document.getElementById('selfedit-modal').classList.remove('show');}
+
+function dmyToIso(str){
+  if(!str)return'';
+  if(str.includes('.'))return str.split('.').reverse().join('-');
+  return str;
+}
+
+function lookupDirectoryForSelf(){
+  const id=gv('se-passid').trim();
+  const msgEl=document.getElementById('se-lookup-msg');
+  if(!id){msgEl.textContent='Bitte zuerst deine Pass-ID eingeben.';msgEl.style.color='var(--re)';return;}
+  const m=MA.find(x=>x.id===id);
+  if(!m){msgEl.textContent='Keine Person mit dieser ID im Mitarbeiterverzeichnis gefunden.';msgEl.style.color='var(--re)';return;}
+  sv2('se-name',m.name||gv('se-name'));
+  _seImportedExtra={
+    passId:m.id,
+    position:m.rank||'',
+    hireDate:dmyToIso(m.date),
+    trainings:parseAusbList(m.ausb).map(n=>({name:n,passed:true}))
+  };
+  msgEl.innerHTML=`Ubernommen: <b style="color:var(--tx)">${m.name}</b> · ${m.rank} · ${_seImportedExtra.trainings.length} Ausbildung(en). Jetzt "Speichern" klicken.`;
+  msgEl.style.color='var(--gr)';
+}
 
 function resizeImageToDataUrl(file,maxSize,cb){
   const reader=new FileReader();
@@ -1575,6 +1617,12 @@ async function saveSelfProfile(){
   msgEl.textContent='Speichert ...';msgEl.style.color='var(--mu)';
   try{
     const data={name:gv('se-name').trim(),phone:gv('se-phone').trim(),bio:gv('se-bio').trim(),photo:_sePhotoData||''};
+    if(_seImportedExtra){
+      data.passId=_seImportedExtra.passId;
+      data.position=_seImportedExtra.position;
+      data.hireDate=_seImportedExtra.hireDate;
+      data.trainings=_seImportedExtra.trainings;
+    }
     await saveProfile(currentUser,data);
     currentProfile={...currentProfile,...data};
     currentName=data.name||currentUser;
@@ -1769,9 +1817,28 @@ function openOfficialEdit(username){
   _oeTrainings=(p.trainings||[]).map(t=>({...t}));
   renderOfficialTrainingList();
   document.getElementById('oe-msg').textContent='';
+  document.getElementById('oe-lookup-msg').textContent='Lupe klicken um Rang, Eintrittsdatum und Ausbildungen aus dem Mitarbeiterverzeichnis zu ubernehmen.';
+  document.getElementById('oe-lookup-msg').style.color='var(--mu)';
   document.getElementById('officialedit-modal').classList.add('show');
 }
 function closeOfficialEdit(){document.getElementById('officialedit-modal').classList.remove('show');}
+
+function lookupDirectoryForOfficial(){
+  const id=gv('oe-passid').trim();
+  const msgEl=document.getElementById('oe-lookup-msg');
+  if(!id){msgEl.textContent='Bitte zuerst eine Pass-ID eingeben.';msgEl.style.color='var(--re)';return;}
+  const m=MA.find(x=>x.id===id);
+  if(!m){msgEl.textContent='Keine Person mit dieser ID im Mitarbeiterverzeichnis gefunden.';msgEl.style.color='var(--re)';return;}
+  sv2('oe-position',m.rank||'');
+  document.getElementById('oe-hiredate').value=dmyToIso(m.date);
+  const found=parseAusbList(m.ausb);
+  found.forEach(name=>{
+    if(!_oeTrainings.find(t=>t.name.toLowerCase()===name.toLowerCase())) _oeTrainings.push({name,passed:true});
+  });
+  renderOfficialTrainingList();
+  msgEl.innerHTML=`Ubernommen: <b style="color:var(--tx)">${m.name}</b> · ${m.rank} · ${found.length} Ausbildung(en) erganzt.`;
+  msgEl.style.color='var(--gr)';
+}
 
 function addOfficialTrainingRow(){
   const name=gv('oe-train-name').trim();
@@ -2024,28 +2091,52 @@ function absLine(){
 }
 
 // --- TABLE ---
+function parseAusbList(str){
+  if(!str)return[];
+  return str.split(/[,;\/|]+/).map(s=>s.trim()).filter(Boolean);
+}
 function buildMA(){
   const s=(maPage-1)*PER,sl=filtered.slice(s,s+PER);
-  document.getElementById('ma-body').innerHTML=sl.map(m=>`<tr>
+  document.getElementById('ma-body').innerHTML=sl.map(m=>{
+    const trains=parseAusbList(m.ausb);
+    const safeId=String(m.id).replace(/[^a-zA-Z0-9_-]/g,'_');
+    return `<tr>
     <td style="color:var(--mu);font-size:11px">${m.id}</td>
     <td style="font-weight:bold">${m.name}</td>
     <td><span class="rb ${rankCls(m.rank)}">${m.rank}</span></td>
     <td style="color:var(--g)">${m.dn||'--'}</td>
     <td style="color:var(--mu);font-size:11px">${m.div||'--'}</td>
     <td style="color:var(--mu);font-size:10px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${m.abt||''}">${m.abt||'--'}</td>
-    <td style="color:#3a8fd4;font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${m.ausb||''}">${m.ausb||'--'}</td>
+    <td style="color:#3a8fd4;font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${m.ausb||''}">
+      ${m.ausb?`<span style="cursor:pointer;border-bottom:1px dotted #3a8fd4" onclick="maExpandTrainings('${safeId}')">${m.ausb}</span>`:'--'}
+    </td>
     <td style="color:${m.strike==='0/3'?'var(--gr)':'var(--re)'}">${m.strike||'0/3'}</td>
     <td style="color:var(--mu);font-size:11px;white-space:nowrap">${m.date||'--'}</td>
     <td style="text-align:center;white-space:nowrap">
+      ${trains.length?`<button class="btn sm" style="color:var(--bl);border-color:rgba(58,143,212,.35)" onclick="maExpandTrainings('${safeId}')" title="Ausbildungen anzeigen"><i class="ti ti-school"></i></button>`:''}
       <button class="btn sm bl" onclick="openEdit('${m.id}')" title="Bearbeiten"><i class="ti ti-edit"></i></button>
       <button class="btn sm ng" onclick="delMA('${m.id}')" title="Loschen"><i class="ti ti-trash"></i></button>
-    </td></tr>`).join('');
+    </td></tr>
+    <tr id="ma-exp-${safeId}" style="display:none">
+      <td colspan="10" style="background:var(--p2);padding:10px 14px;border-bottom:1px solid var(--bd);">
+        <div style="font-size:10px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Ausbildungen / Schulungen — ${m.name}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${trains.length?trains.map(t=>`<span class="train-badge train-pass">${t}</span>`).join(''):'<span style="font-size:11px;color:var(--mu)">Keine Ausbildungen hinterlegt.</span>'}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
   const cnt=document.getElementById('ma-count');
   if(cnt)cnt.textContent=`${Math.min(s+1,filtered.length)}-${Math.min(s+PER,filtered.length)} von ${filtered.length}`;
   const b=document.getElementById('ma-badge');if(b)b.textContent=MA.length+' AGENTEN';
   const dc=document.getElementById('dash-count');if(dc)dc.textContent=MA.length;
   const cc=document.getElementById('cfg-count');if(cc)cc.textContent=MA.length;
   buildPgr();
+}
+function maExpandTrainings(safeId){
+  const row=document.getElementById('ma-exp-'+safeId);
+  if(!row)return;
+  row.style.display=row.style.display==='none'?'table-row':'none';
 }
 function buildPgr(){
   const total=Math.ceil(filtered.length/PER),pgr=document.getElementById('ma-pgr');if(!pgr)return;
