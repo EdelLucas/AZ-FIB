@@ -147,7 +147,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <span class="dg" id="cloud-dot" style="background:var(--mu)"></span>
     <span id="cloud-status" style="color:var(--mu)">OFFLINE</span>
     &nbsp;&nbsp;
-    <span id="user-chip" style="color:var(--g);"></span>
+    <span id="user-chip" style="color:var(--g);cursor:pointer;" onclick="goToAccountSystem()" title="Klicken fur Benutzerverwaltung"></span>
     &nbsp;
     <button class="btn sm ng" onclick="doLogout()" title="Abmelden"><i class="ti ti-logout"></i></button>
     &nbsp;&nbsp;
@@ -1162,6 +1162,23 @@ function showApp(){
 function hasRole(r){
   if(!currentRoles)return false;
   return currentRoles.includes('admin')||currentRoles.includes(r);
+}
+
+// Von der Topbar-Anzeige ("Name · Rollen") direkt zur Benutzerverwaltung springen
+function goToAccountSystem(){
+  if(!hasRole('admin')){
+    showToast('Nur Admins haben Zugriff auf die Benutzerverwaltung');
+    return;
+  }
+  sv('cfg',null);
+  setTimeout(()=>{
+    const panel=document.getElementById('admin-panel');
+    if(panel){
+      panel.scrollIntoView({behavior:'smooth',block:'start'});
+      panel.style.outline='1px solid var(--g)';
+      setTimeout(()=>{panel.style.outline='';},1200);
+    }
+  },50);
 }
 
 // Sidebar + Module nach Rolle ein-/ausblenden
