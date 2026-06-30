@@ -2260,6 +2260,7 @@ function findMAById(id){
 }
 
 async function doLogin(){
+  _authResolved = true; // verhindert dass parallel laufende initAuth() noch eingreift
   const id = gv('li-id').trim();
   const pw = gv('li-pw');
   const errEl = document.getElementById('login-err');
@@ -2336,6 +2337,7 @@ function finishLogin(){
 }
 
 function doLogout(){
+  _authResolved = false;
   CURRENT_USER = null;
   try{ sessionStorage.removeItem('fib_session'); }catch(e){}
   document.getElementById('access-denied').classList.add('hide');
@@ -2384,6 +2386,7 @@ function setupLookup(){
 }
 
 async function doSetup(){
+  _authResolved = true; // verhindert dass parallel laufende initAuth() noch eingreift
   const id = gv('su-id').trim();
   const p1 = gv('su-pw1');
   const p2 = gv('su-pw2');
@@ -2529,6 +2532,8 @@ function bootApp(){
 }
 
 // Beim Laden: Login-relevante Daten vorbereiten und ggf. Sitzung wiederherstellen
+var _authResolved = false; // wird true sobald Login/Setup manuell abgeschlossen wurde
+
 (async function initAuth(){
   await syncFromSheet();
   // Falls Sheet noch nicht geladen ist, kurz erneut versuchen
@@ -2537,6 +2542,9 @@ function bootApp(){
     await syncFromSheet();
   }
   await loadAccessData();
+
+  // Falls der Nutzer in der Zwischenzeit bereits manuell eingeloggt wurde (Setup/Login), nicht mehr eingreifen
+  if(_authResolved) return;
 
   // Kein Login angelegt -> Ersteinrichtung anzeigen
   if(Object.keys(LOGINS).length===0){
@@ -2550,6 +2558,7 @@ function bootApp(){
   if(restored && restored.id){
     const ma=findMAById(restored.id);
     const login=LOGINS[restored.id];
+    if(_authResolved) return;
     if(ma && login){
       CURRENT_USER = {id:restored.id, name:ma.name, dept:login.dept, rank:ma.rank};
       const perms = resolvePerms(CURRENT_USER.dept);
