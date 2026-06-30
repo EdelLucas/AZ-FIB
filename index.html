@@ -931,7 +931,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       </div>
     </div>
     <div class="pan" style="background:var(--p2);">
-      <div class="pan-h"><div class="pan-t">[ Ausbildungen / Schulungen ]</div></div>
+      <div class="pan-h"><div class="pan-t" id="mp-train-title">[ Ausbildungen / Schulungen ]</div></div>
       <div class="pan-b">
         <table class="tbl"><thead><tr><th>Name</th><th style="text-align:right">Status</th></tr></thead>
           <tbody id="mp-trainings"></tbody>
@@ -1037,7 +1037,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
         </div>
       </div>
       <div class="pan" style="background:var(--p2);">
-        <div class="pan-h"><div class="pan-t">[ Ausbildungen / Schulungen ]</div></div>
+        <div class="pan-h"><div class="pan-t" id="pm-train-title">[ Ausbildungen / Schulungen ]</div></div>
         <div class="pan-b">
           <table class="tbl"><thead><tr><th>Name</th><th style="text-align:right">Status</th></tr></thead>
             <tbody id="pm-trainings"></tbody>
@@ -1513,6 +1513,13 @@ function trainRowsHtml(trainings){
 }
 
 // ===================== MEIN PROFIL =====================
+function liveTrainingsFromDirectory(passId){
+  if(!passId)return null;
+  const m=MA.find(x=>x.id===passId);
+  if(!m)return null;
+  return (m.trainings&&m.trainings.length)?m.trainings:parseAusbList(m.ausb).map(n=>({name:n,passed:true}));
+}
+
 async function renderMyProfile(){
   if(!currentUser)return;
   const u=currentProfile||{};
@@ -1531,9 +1538,12 @@ async function renderMyProfile(){
     <div class="profile-info-row"><i class="ti ti-id-badge"></i> @${currentUser}</div>
     <div class="profile-info-row"><i class="ti ti-phone"></i> ${u.phone||'--'}</div>
     <div class="profile-info-row"><i class="ti ti-shield-lock"></i> ${(currentRoles||[]).join(', ')||'--'}</div>`;
-  const trains=u.trainings||[];
+  const liveTrains=liveTrainingsFromDirectory(u.passId);
+  const trains=liveTrains||u.trainings||[];
   document.getElementById('mp-trainings').innerHTML=trainRowsHtml(trains);
   document.getElementById('mp-trainings-empty').style.display=trains.length?'none':'block';
+  const titleEl=document.getElementById('mp-train-title');
+  if(titleEl) titleEl.textContent = liveTrains ? '[ Ausbildungen / Schulungen — live aus Verzeichnis ]' : '[ Ausbildungen / Schulungen ]';
 }
 
 let _sePhotoData='';
@@ -1683,11 +1693,14 @@ async function openProfileModal(username){
     <div class="profile-info-row"><i class="ti ti-phone"></i> ${p.phone||'--'}</div>
     <div class="profile-info-row"><i class="ti ti-shield-lock"></i> ${(u.roles||[]).join(', ')||'--'}</div>
     ${u.mustChange?'<div class="profile-info-row" style="color:#f0a500"><i class="ti ti-alert-triangle" style="color:#f0a500"></i> Temporares Passwort — noch nicht geandert</div>':''}`;
-  const trains=p.trainings||[];
+  const liveTrains=liveTrainingsFromDirectory(p.passId);
+  const trains=liveTrains||p.trainings||[];
   const tbody=document.getElementById('pm-trainings');
   const empty=document.getElementById('pm-trainings-empty');
   if(!trains.length){tbody.innerHTML='';empty.style.display='block';}
   else{empty.style.display='none';tbody.innerHTML=trainRowsHtml(trains);}
+  const pmTitleEl=document.getElementById('pm-train-title');
+  if(pmTitleEl) pmTitleEl.textContent = liveTrains ? '[ Ausbildungen / Schulungen — live aus Verzeichnis ]' : '[ Ausbildungen / Schulungen ]';
   document.getElementById('pm-codebox').innerHTML='';
   document.getElementById('profile-modal').classList.add('show');
 }
