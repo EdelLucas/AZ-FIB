@@ -117,6 +117,37 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 .role-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 7px;border-radius:2px;border:1px solid var(--gd);background:var(--gg);color:var(--g);cursor:pointer;}
 .role-chip input{accent-color:var(--g);}
 .userrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap;}
+/* PROFIL-KARTEN (Benutzerverwaltung) */
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;}
+.profile-card{background:var(--p2);border:1px solid var(--bd);border-radius:6px;padding:12px;cursor:pointer;transition:.15s;display:flex;gap:10px;align-items:center;}
+.profile-card:hover{border-color:var(--gd);background:var(--gg);}
+.avatar{width:46px;height:46px;border-radius:50%;border:2px solid var(--gd);object-fit:cover;flex-shrink:0;background:var(--p1);}
+.avatar-ph{width:46px;height:46px;border-radius:50%;border:2px solid var(--gd);flex-shrink:0;background:var(--p1);display:flex;align-items:center;justify-content:center;color:var(--g);font-size:15px;font-weight:bold;}
+.pc-name{font-size:12px;color:var(--tx);font-weight:bold;}
+.pc-pos{font-size:10px;color:var(--mu);margin-top:1px;}
+.pc-roles{margin-top:5px;display:flex;gap:3px;flex-wrap:wrap;}
+.role-tag{font-size:9px;padding:1px 6px;border-radius:2px;border:1px solid var(--gd);background:var(--gg);color:var(--g);}
+/* PROFIL-DETAIL-MODAL */
+.profile-header{display:flex;align-items:center;gap:16px;padding:18px;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.02));border:1px solid var(--gd);border-radius:7px;margin-bottom:14px;flex-wrap:wrap;}
+.profile-header .avatar,.profile-header .avatar-ph{width:74px;height:74px;font-size:24px;}
+.profile-header-name{font-size:16px;color:var(--tx);font-weight:bold;}
+.profile-header-pos{font-size:11px;color:var(--mu);margin-top:2px;}
+.profile-header-dates{display:flex;gap:18px;margin-left:auto;flex-wrap:wrap;}
+.profile-header-dates div{text-align:center;}
+.profile-header-dates .v{font-size:13px;color:var(--g);font-weight:bold;}
+.profile-header-dates .l{font-size:9px;color:var(--mu);letter-spacing:.06em;text-transform:uppercase;margin-top:1px;}
+.profile-cols{display:grid;grid-template-columns:1fr 1.4fr;gap:12px;}
+.profile-info-row{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--tx);padding:6px 0;border-bottom:1px solid rgba(30,42,58,.5);}
+.profile-info-row i{color:var(--mu);font-size:14px;width:16px;text-align:center;}
+.train-badge{font-size:9px;padding:2px 8px;border-radius:2px;display:inline-block;}
+.train-pass{background:rgba(46,204,113,.12);color:var(--gr);border:1px solid rgba(46,204,113,.3);}
+.train-fail{background:rgba(231,76,60,.12);color:var(--re);border:1px solid rgba(231,76,60,.3);}
+.train-row-input{display:flex;gap:6px;align-items:center;margin-bottom:5px;}
+.photo-upload-row{display:flex;align-items:center;gap:12px;margin-bottom:9px;}
+@media(max-width:768px){.profile-cols{grid-template-columns:1fr;}.profile-header-dates{margin-left:0;}}
+/* PASSWORT-WECHSEL (Pflicht beim ersten Login mit temporaerem Passwort) */
+#pwchange-screen{position:fixed;inset:0;background:var(--bg);z-index:550;display:none;align-items:center;justify-content:center;}
+#pwchange-screen.show{display:flex;}
 </style>
 </head>
 <body>
@@ -134,6 +165,22 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <div class="login-err" id="login-err"></div>
     <button class="btn ok" id="login-btn" onclick="doLogin()" style="width:100%;justify-content:center;margin-top:14px;"><i class="ti ti-login"></i> ANMELDEN</button>
     <div class="login-foot">Zugang nur fur autorisiertes FIB-Personal.<br>Kein Account? Wende dich an die Systemadministration.</div>
+  </div>
+</div>
+
+<!-- PFLICHT-PASSWORTWECHSEL (bei temporaerem Passwort) -->
+<div id="pwchange-screen">
+  <div class="login-box">
+    <div class="login-emblem"><i class="ti ti-key"></i></div>
+    <div class="login-title">NEUES PASSWORT ERFORDERLICH</div>
+    <div class="login-sub">Dein Passwort ist nur ubergangsweise gultig</div>
+    <div class="fl">Neues Passwort</div>
+    <input class="fi" id="pwchange-new" type="password" placeholder="min. 6 Zeichen" style="margin-bottom:9px;" autocomplete="new-password">
+    <div class="fl">Neues Passwort bestatigen</div>
+    <input class="fi" id="pwchange-confirm" type="password" placeholder="••••••••" autocomplete="new-password">
+    <div class="login-err" id="pwchange-err"></div>
+    <button class="btn ok" id="pwchange-btn" onclick="submitPasswordChange()" style="width:100%;justify-content:center;margin-top:14px;"><i class="ti ti-device-floppy"></i> PASSWORT SETZEN</button>
+    <div class="login-foot">Nach dem Setzen wird dieses Passwort in diesem Browser sofort aktiv. Damit es dauerhaft (auch auf anderen Geraten) gilt, muss ein Admin den angezeigten Code auf GitHub einpflegen.</div>
   </div>
 </div>
 
@@ -866,27 +913,11 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
           Rollen steuern welche Module ein Account sieht:
           <b style="color:var(--tx)">HR</b> = Personal-Module, <b style="color:var(--tx)">FIBCO</b> = FIBCO Fallakte,
           <b style="color:var(--tx)">CID</b> = CID Beweise, <b style="color:var(--tx)">Admin</b> = alles inkl. Benutzerverwaltung.<br>
-          Kein Backend — neue Accounts mussen als Code-Zeile auf GitHub eingefugt werden (Anleitung unten beim Generieren).
+          Kein Backend — neue/geanderte Accounts mussen als Code-Zeile auf GitHub eingefugt werden (Anleitung steht beim Generieren dabei).
         </div>
-        <div class="edit-card" style="grid-template-columns:1fr 1fr;margin-bottom:9px;">
-          <div class="ec-row"><span class="ec-lbl">Zugangskennung</span><input class="fi ec-inp" id="adm-email" placeholder="z.B. jschmidt"></div>
-          <div class="ec-row"><span class="ec-lbl">Passwort</span><input class="fi ec-inp" id="adm-pass" placeholder="min. 6 Zeichen"></div>
-          <div class="ec-row"><span class="ec-lbl">Anzeigename</span><input class="fi ec-inp" id="adm-name" placeholder="Vor- u. Nachname"></div>
-          <div class="ec-row"><span class="ec-lbl">Rollen</span>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:4px;">
-              <label class="role-chip"><input type="checkbox" value="hr" class="adm-role"> HR</label>
-              <label class="role-chip"><input type="checkbox" value="fibco" class="adm-role"> FIBCO</label>
-              <label class="role-chip"><input type="checkbox" value="cid" class="adm-role"> CID</label>
-              <label class="role-chip"><input type="checkbox" value="admin" class="adm-role"> Admin</label>
-            </div>
-          </div>
-        </div>
-        <button class="btn ok sm" onclick="adminCreateUser()"><i class="ti ti-code"></i> Code generieren</button>
-        <div class="hint" id="adm-create-msg"></div>
-
-        <div class="pl" style="margin-top:16px;">Bestehende Accounts (im Code hinterlegt)</div>
-        <div id="adm-userlist" style="margin-top:6px;"></div>
-        <div class="hint">Zum Entfernen eines Accounts dessen Zeile im <code>USERS</code>-Array auf GitHub loschen und committen.</div>
+        <button class="btn ok sm" onclick="openCreateUser()"><i class="ti ti-user-plus"></i> Neuen Account anlegen</button>
+        <div class="pl" style="margin-top:16px;">Bestehende Accounts — Klick fur Profil, Passwort-Reset &amp; Bearbeiten</div>
+        <div id="adm-userlist" class="profile-grid" style="margin-top:8px;"></div>
       </div>
     </div>
   </div>
@@ -952,6 +983,102 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <button class="btn ng sm" onclick="closeModal()">Abbrechen</button>
       <button class="btn ok" onclick="saveModal()"><i class="ti ti-device-floppy"></i> Speichern</button>
     </div>
+  </div>
+</div>
+
+<!-- PROFIL-DETAIL-MODAL (Account ansehen) -->
+<div class="modal-bg" id="profile-modal">
+  <div class="modal" style="width:min(760px,96vw);">
+    <h2 style="display:flex;align-items:center;justify-content:space-between;">
+      <span>Account-Profil</span>
+      <button class="btn ng sm" onclick="closeProfileModal()"><i class="ti ti-x"></i></button>
+    </h2>
+    <div class="profile-header" id="pm-header"></div>
+    <div class="profile-cols">
+      <div class="pan" style="background:var(--p2);">
+        <div class="pan-h"><div class="pan-t">[ Über die Person ]</div></div>
+        <div class="pan-b">
+          <div id="pm-bio" style="font-size:11px;color:var(--mu);line-height:1.7;margin-bottom:10px;"></div>
+          <div id="pm-info"></div>
+        </div>
+      </div>
+      <div class="pan" style="background:var(--p2);">
+        <div class="pan-h"><div class="pan-t">[ Ausbildungen / Schulungen ]</div></div>
+        <div class="pan-b">
+          <table class="tbl"><thead><tr><th>Name</th><th style="text-align:right">Status</th></tr></thead>
+            <tbody id="pm-trainings"></tbody>
+          </table>
+          <div class="kl-empty" id="pm-trainings-empty" style="display:none;">Keine Schulungen hinterlegt.</div>
+        </div>
+      </div>
+    </div>
+    <div class="brow" style="margin-top:14px;">
+      <button class="btn bl sm" id="pm-edit-btn" onclick="openEditUser()"><i class="ti ti-edit"></i> Profil bearbeiten</button>
+      <button class="btn sm" style="border-color:#f0a500;color:#f0a500;" id="pm-temppass-btn" onclick="adminIssueTempPassword()"><i class="ti ti-key"></i> Temporares Passwort vergeben</button>
+      <button class="btn ng sm" id="pm-delete-btn" onclick="adminDeleteUserPrompt()"><i class="ti ti-trash"></i> Account loschen</button>
+    </div>
+    <div class="hint" id="pm-codebox"></div>
+  </div>
+</div>
+
+<!-- ACCOUNT ANLEGEN / BEARBEITEN MODAL -->
+<div class="modal-bg" id="useredit-modal">
+  <div class="modal" style="width:min(640px,96vw);">
+    <h2 id="ue-title">Account anlegen</h2>
+    <input type="hidden" id="ue-editing-username">
+    <div class="photo-upload-row">
+      <img id="ue-photo-preview" class="avatar" style="display:none;">
+      <div id="ue-photo-ph" class="avatar-ph">?</div>
+      <div>
+        <input type="file" accept="image/*" id="ue-photo-file" onchange="handlePhotoUpload(this)" style="font-size:11px;">
+        <div class="hint">Wird automatisch verkleinert. Foto landet als Text (Base64) im Code — klein halten!</div>
+      </div>
+    </div>
+    <div class="ir">
+      <div><div class="fl">Zugangskennung *</div><input class="fi" id="ue-username" placeholder="z.B. jschmidt"></div>
+      <div><div class="fl">Anzeigename *</div><input class="fi" id="ue-name" placeholder="Vor- u. Nachname"></div>
+    </div>
+    <div class="ir">
+      <div><div class="fl">Passwort <span id="ue-pass-req">*</span></div><input class="fi" id="ue-pass" placeholder="min. 6 Zeichen"></div>
+      <div><div class="fl">Rollen *</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:4px;">
+          <label class="role-chip"><input type="checkbox" value="hr" class="ue-role"> HR</label>
+          <label class="role-chip"><input type="checkbox" value="fibco" class="ue-role"> FIBCO</label>
+          <label class="role-chip"><input type="checkbox" value="cid" class="ue-role"> CID</label>
+          <label class="role-chip"><input type="checkbox" value="admin" class="ue-role"> Admin</label>
+        </div>
+      </div>
+    </div>
+    <label class="role-chip" style="margin-bottom:11px;display:inline-flex;">
+      <input type="checkbox" id="ue-mustchange"> Passwort ist nur ubergangsweise — Person muss es beim ersten Login andern
+    </label>
+    <div class="ir3">
+      <div><div class="fl">ID / Pass-Nr.</div><input class="fi" id="ue-passid" placeholder="z.B. 170940"></div>
+      <div><div class="fl">Telefon</div><input class="fi" id="ue-phone" placeholder="z.B. 18-79-931"></div>
+      <div><div class="fl">Position / Rang</div><input class="fi" id="ue-position" placeholder="z.B. 24. Chief of Staff"></div>
+    </div>
+    <div class="ir">
+      <div><div class="fl">Eingestellt am</div><input class="fi" type="date" id="ue-hiredate"></div>
+      <div><div class="fl">Letzte Beforderung</div><input class="fi" type="date" id="ue-lastpromo"></div>
+    </div>
+    <div style="margin-bottom:11px;">
+      <div class="fl">Uber mich</div>
+      <textarea class="fi" id="ue-bio" rows="2" placeholder="Kurzer Text uber die Person ..." style="resize:vertical;"></textarea>
+    </div>
+    <div style="margin-bottom:6px;">
+      <div class="fl">Ausbildungen / Schulungen</div>
+      <div class="train-row-input">
+        <input class="fi" id="ue-train-name" placeholder="z.B. Grundausbildung" style="flex:1;">
+        <select class="fi" id="ue-train-status" style="max-width:140px;"><option value="1">Bestanden</option><option value="0">Nicht absolviert</option></select>
+        <button class="btn sm ok" onclick="addTrainingRow()"><i class="ti ti-plus"></i></button>
+      </div>
+      <div id="ue-train-list"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px;">
+      <button class="btn ng sm" onclick="closeEditUserModal()">Abbrechen</button>
+      <button class="btn ok sm" onclick="submitUserForm()"><i class="ti ti-code"></i> Code generieren</button>
+    </div>
+    <div class="hint" id="ue-msg"></div>
   </div>
 </div>
 </div><!-- /app-root -->
@@ -1078,20 +1205,27 @@ async function initFirebase() {
 }
 
 // ===================== LOGIN (Accounts direkt im Code, ueber GitHub verwaltet) =====================
-// Die Accounts (Zugangskennung, Passwort-Hash, Rollen) stehen unten im USERS-Array.
-// Kein Firebase, kein Backend -- du verwaltest Accounts, indem du diese Datei direkt
-// auf GitHub bearbeitest (Stift-Symbol -> aendern -> "Commit changes"). Wenn die Seite
-// per GitHub Pages gehostet wird, ist die Aenderung nach ca. 30-60 Sek. live.
+// Die Accounts (Zugangskennung, Passwort-Hash, Rollen, Profil-Infos) stehen unten im
+// USERS-Array. Kein Firebase, kein Backend -- du verwaltest Accounts, indem du diese
+// Datei direkt auf GitHub bearbeitest (Stift-Symbol -> aendern -> "Commit changes").
+// Wenn die Seite per GitHub Pages gehostet wird, ist die Aenderung nach ca. 30-60 Sek. live.
 //
 // Achtung: Wer den Quelltext der Seite oeffnet ("Seitenquelltext anzeigen"), sieht die
 // Passwort-Hashes. Das reicht als Zugangshuerde (Link/Repo nicht oeffentlich bekannt),
 // ist aber KEINE belastbare Sicherheit fuer wirklich sensible Daten.
 //
-// Neuen Nutzer anlegen:
-//   1) Als Admin einloggen -> Einstellungen -> Benutzerverwaltung -> Daten eingeben -> "Code generieren"
-//   2) Die erzeugte Zeile kopieren
-//   3) Auf GitHub: Datei index.html oeffnen -> Stift-Symbol (Bearbeiten) -> Zeile ins
-//      USERS-Array unten einfuegen -> "Commit changes"
+// TEMPORAERE PASSWOERTER: Setzt ein Admin beim Anlegen/Bearbeiten "mustChange":true,
+// muss die Person beim naechsten Login sofort ein neues Passwort vergeben. Da es kein
+// echtes Backend gibt, wird das neue Passwort als lokaler "Override" in diesem Browser
+// gespeichert (localStorage) und greift dort sofort. Damit es dauerhaft -- auch auf
+// anderen Geraeten -- gilt, muss ein Admin den danach angezeigten Code-Schnipsel auf
+// GitHub einpflegen (passHash ersetzen, mustChange entfernen).
+//
+// Neuen Nutzer anlegen / bearbeiten:
+//   Als Admin einloggen -> Einstellungen -> Benutzerverwaltung -> Karte anklicken oder
+//   "Neuen Account anlegen" -> Formular ausfuellen -> "Code generieren" -> erzeugte
+//   Zeile auf GitHub ins USERS-Array einfuegen (neu) bzw. die bestehende Zeile damit
+//   ersetzen (Bearbeiten) -> committen.
 //
 // Allerersten Admin-Account anlegen (Bootstrap):
 //   1) Browser-Konsole oeffnen (F12 -> Console)
@@ -1101,12 +1235,15 @@ async function initFirebase() {
 const USERS = [
   // Beispiel-Admin -- Zugangskennung "admin", Passwort "fib2026" -- BITTE AENDERN!
   { username:'admin', name:'Administrator', roles:['admin'],
-    passHash:'15221d5e748afa63d8ad7b6110dba4b9fbf27f995b25964abb0f5ae1d889d478' },
+    passHash:'15221d5e748afa63d8ad7b6110dba4b9fbf27f995b25964abb0f5ae1d889d478',
+    mustChange:false, photo:'', passId:'', phone:'', position:'', hireDate:'', lastPromo:'',
+    bio:'', trainings:[] },
 ];
 
 let currentUser = null;   // Username (string) des eingeloggten Nutzers
 let currentRoles = [];    // z.B. ['hr','fibco']
 let currentName = '';
+let _pendingLoginUser = null; // Username, der gerade durch den Pflicht-Passwortwechsel muss
 
 async function fibHash(str){
   const enc=new TextEncoder().encode(str);
@@ -1114,6 +1251,14 @@ async function fibHash(str){
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 window.fibHash = fibHash; // damit man es bei Bedarf in der Browser-Konsole nutzen kann
+
+// --- Lokale Passwort-Overrides (fuer "ich habe mein temporaeres Passwort schon geaendert") ---
+function getOverrides(){try{return JSON.parse(localStorage.getItem('fib_pw_overrides')||'{}');}catch(e){return{};}}
+function setOverride(username,hash){
+  const o=getOverrides();o[username]=hash;
+  try{localStorage.setItem('fib_pw_overrides',JSON.stringify(o));}catch(e){}
+}
+function findUser(username){return USERS.find(u=>u.username.toLowerCase()===username.toLowerCase());}
 
 // --- LOGIN / LOGOUT ---
 async function doLogin(){
@@ -1125,9 +1270,19 @@ async function doLogin(){
   if(!user||!pass){errEl.textContent='Bitte Zugangskennung und Passwort eingeben.';return;}
   btn.disabled=true;btn.textContent='Anmelden ...';
   const hash=await fibHash(pass);
-  const found=USERS.find(u=>u.username.toLowerCase()===user && u.passHash===hash);
+  const found=findUser(user);
   btn.disabled=false;btn.innerHTML='<i class="ti ti-login"></i> ANMELDEN';
   if(!found){errEl.textContent='Zugangskennung oder Passwort falsch.';return;}
+  const overrides=getOverrides();
+  const effectiveHash=overrides[found.username]||found.passHash;
+  if(hash!==effectiveHash){errEl.textContent='Zugangskennung oder Passwort falsch.';return;}
+  // Wenn noch kein lokaler Override existiert UND der Account als "muss geaendert werden" markiert ist
+  if(found.mustChange && !overrides[found.username]){
+    _pendingLoginUser=found.username;
+    document.getElementById('login-screen').classList.add('hide');
+    document.getElementById('pwchange-screen').classList.add('show');
+    return;
+  }
   currentUser=found.username;currentRoles=found.roles;currentName=found.name;
   try{localStorage.setItem('fib_session',JSON.stringify({u:found.username}));}catch(e){}
   showApp();
@@ -1144,7 +1299,7 @@ function tryRestoreSession(){
     const raw=localStorage.getItem('fib_session');
     if(!raw)return false;
     const s=JSON.parse(raw);
-    const found=USERS.find(u=>u.username===s.u);
+    const found=findUser(s.u);
     if(!found)return false;
     currentUser=found.username;currentRoles=found.roles;currentName=found.name;
     showApp();
@@ -1153,10 +1308,31 @@ function tryRestoreSession(){
 }
 function showApp(){
   document.getElementById('login-screen').classList.add('hide');
+  document.getElementById('pwchange-screen').classList.remove('show');
   document.getElementById('app-root').classList.remove('hide');
   applyRoleVisibility();
   startAppData();
   sv('dash',null);
+}
+
+// Pflicht-Passwortwechsel abschicken (bei temporaerem Passwort)
+async function submitPasswordChange(){
+  const p1=gv('pwchange-new'),p2=gv('pwchange-confirm');
+  const errEl=document.getElementById('pwchange-err');
+  errEl.textContent='';
+  if(!p1||p1.length<6){errEl.textContent='Mindestens 6 Zeichen verwenden.';return;}
+  if(p1!==p2){errEl.textContent='Passwörter stimmen nicht überein.';return;}
+  const found=findUser(_pendingLoginUser);
+  if(!found){errEl.textContent='Fehler — bitte neu anmelden.';return;}
+  const hash=await fibHash(p1);
+  setOverride(found.username,hash);
+  currentUser=found.username;currentRoles=found.roles;currentName=found.name;
+  try{localStorage.setItem('fib_session',JSON.stringify({u:found.username}));}catch(e){}
+  showToast('Passwort geandert — in diesem Browser sofort aktiv');
+  showApp();
+  setTimeout(()=>{
+    alert('Dein neues Passwort gilt sofort auf diesem Gerat/Browser.\n\nDamit es dauerhaft (z.B. auch auf anderen Geraten) gilt, gib einem Admin bitte folgenden Hash zur Aktualisierung auf GitHub (Feld "passHash" bei deinem Account, "mustChange" dabei auf false setzen):\n\n'+hash);
+  },300);
 }
 
 function hasRole(r){
@@ -1194,34 +1370,262 @@ function applyRoleVisibility(){
   if(chip) chip.textContent=(currentName||currentUser||'')+' · '+(currentRoles.join(', ')||'--');
 }
 
-// --- ADMIN: Benutzerverwaltung (generiert Code-Snippet zum Einfuegen auf GitHub) ---
-async function adminCreateUser(){
-  if(!hasRole('admin')){showToast('Keine Berechtigung');return;}
-  const username=gv('adm-email').trim();
-  const pass=gv('adm-pass');
-  const name=gv('adm-name').trim();
-  const roles=Array.from(document.querySelectorAll('.adm-role:checked')).map(c=>c.value);
-  const msgEl=document.getElementById('adm-create-msg');
-  if(!username||!pass){msgEl.textContent='Zugangskennung und Passwort sind Pflicht.';msgEl.style.color='var(--re)';return;}
-  if(pass.length<6){msgEl.textContent='Passwort sollte min. 6 Zeichen haben.';msgEl.style.color='var(--re)';return;}
-  if(!roles.length){msgEl.textContent='Mindestens eine Rolle wahlen.';msgEl.style.color='var(--re)';return;}
-  if(USERS.find(u=>u.username.toLowerCase()===username.toLowerCase())){msgEl.textContent='Zugangskennung bereits vergeben.';msgEl.style.color='var(--re)';return;}
-  const hash=await fibHash(pass);
-  const snippet=`  { username:'${username}', name:'${name.replace(/'/g,"\\'")}', roles:${JSON.stringify(roles)}, passHash:'${hash}' },`;
-  msgEl.innerHTML='Code generiert — auf GitHub die Datei <code>index.html</code> oeffnen, Stift-Symbol klicken, diese Zeile in das <b style="color:var(--tx)">USERS</b>-Array einfugen und committen:'+
-    `<textarea class="fi" rows="3" style="margin-top:6px;font-size:10px;" readonly onclick="this.select()">${snippet}</textarea>`;
-  msgEl.style.color='var(--g)';
-  showToast('Code generiert — siehe unten');
+// ===================== BENUTZERVERWALTUNG: Profil-Karten =====================
+function initials(name){
+  if(!name)return'?';
+  return name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join('').toUpperCase();
+}
+
+function avatarHtml(u,size){
+  size=size||'';
+  if(u.photo) return `<img src="${u.photo}" class="avatar"${size?` style="width:${size}px;height:${size}px;"`:''}>`;
+  return `<div class="avatar-ph"${size?` style="width:${size}px;height:${size}px;"`:''}>${initials(u.name||u.username)}</div>`;
 }
 
 function renderUserList(){
   const box=document.getElementById('adm-userlist');
   if(!box)return;
   if(!USERS.length){box.innerHTML='<div class="kl-empty">Keine Accounts im Code hinterlegt.</div>';return;}
-  box.innerHTML=USERS.map(u=>`<div class="userrow">
-    <div><b style="color:var(--tx)">${u.name||u.username}</b> <span style="color:var(--mu);font-size:11px">@${u.username}</span><br>
-    <span style="font-size:10px;color:var(--g)">${u.roles.join(', ')||'--'}</span></div>
+  box.innerHTML=USERS.map(u=>`
+    <div class="profile-card" onclick="openProfileModal('${u.username}')">
+      ${avatarHtml(u)}
+      <div>
+        <div class="pc-name">${u.name||u.username}</div>
+        <div class="pc-pos">${u.position||('@'+u.username)}</div>
+        <div class="pc-roles">${(u.roles||[]).map(r=>`<span class="role-tag">${r}</span>`).join('')||'<span class="role-tag">--</span>'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function openProfileModal(username){
+  const u=findUser(username);
+  if(!u)return;
+  document.getElementById('profile-modal').dataset.username=username;
+  document.getElementById('pm-header').innerHTML=`
+    ${avatarHtml(u)}
+    <div>
+      <div class="profile-header-name">${u.name||u.username} ${u.passId?`(ID: ${u.passId})`:''}</div>
+      <div class="profile-header-pos">${u.position||'--'}</div>
+    </div>
+    <div class="profile-header-dates">
+      <div><div class="v">${fmtD(u.hireDate)||'--'}</div><div class="l">Eingestellt am</div></div>
+      <div><div class="v">${fmtD(u.lastPromo)||'--'}</div><div class="l">Letzte Beforderung</div></div>
+    </div>`;
+  document.getElementById('pm-bio').textContent=u.bio||'Keine Beschreibung hinterlegt.';
+  document.getElementById('pm-info').innerHTML=`
+    <div class="profile-info-row"><i class="ti ti-id-badge"></i> @${u.username}</div>
+    <div class="profile-info-row"><i class="ti ti-phone"></i> ${u.phone||'--'}</div>
+    <div class="profile-info-row"><i class="ti ti-shield-lock"></i> ${(u.roles||[]).join(', ')||'--'}</div>
+    ${u.mustChange?'<div class="profile-info-row" style="color:#f0a500"><i class="ti ti-alert-triangle" style="color:#f0a500"></i> Temporares Passwort — noch nicht geandert</div>':''}`;
+  const trains=u.trainings||[];
+  const tbody=document.getElementById('pm-trainings');
+  const empty=document.getElementById('pm-trainings-empty');
+  if(!trains.length){tbody.innerHTML='';empty.style.display='block';}
+  else{
+    empty.style.display='none';
+    tbody.innerHTML=trains.map(t=>`<tr><td>${t.name}</td><td style="text-align:right"><span class="train-badge ${t.passed?'train-pass':'train-fail'}">${t.passed?'BESTANDEN':'NICHT ABSOLVIERT'}</span></td></tr>`).join('');
+  }
+  document.getElementById('pm-codebox').textContent='';
+  document.getElementById('profile-modal').classList.add('show');
+}
+function closeProfileModal(){document.getElementById('profile-modal').classList.remove('show');}
+document.getElementById('profile-modal').addEventListener('click',function(e){if(e.target===this)closeProfileModal();});
+document.getElementById('useredit-modal').addEventListener('click',function(e){if(e.target===this)closeEditUserModal();});
+
+// Code-Hinweis-Box im Profil-Modal anzeigen (nach Temp-Passwort/Loeschen-Aktionen)
+function showCodeReminder(username,_unused,isDelete){
+  const box=document.getElementById('pm-codebox');
+  if(!box)return;
+  if(isDelete){
+    box.innerHTML='Zum endgultigen Entfernen: Die Zeile von <b style="color:var(--tx)">'+username+'</b> im <code>USERS</code>-Array auf GitHub loschen und committen.';
+  }
+}
+
+// --- TEMPORAERES PASSWORT VERGEBEN (Admin) ---
+async function adminIssueTempPassword(){
+  const username=document.getElementById('profile-modal').dataset.username;
+  const u=findUser(username);
+  if(!u)return;
+  const newPass=prompt('Temporares Passwort fur "'+(u.name||u.username)+'" eingeben (min. 6 Zeichen):');
+  if(newPass===null)return;
+  if(newPass.length<6){showToast('Passwort zu kurz (min. 6 Zeichen)');return;}
+  const hash=await fibHash(newPass);
+  const snippet=buildUserSnippet({...u,passHash:hash,mustChange:true});
+  const box=document.getElementById('pm-codebox');
+  box.innerHTML='Temporares Passwort: <b style="color:var(--g)">'+newPass+'</b> (gib es der Person, sie muss es beim Login andern).<br>'+
+    'Auf GitHub die bestehende Zeile von <b style="color:var(--tx)">'+u.username+'</b> im <code>USERS</code>-Array durch diese ersetzen und committen:'+
+    `<textarea class="fi" rows="4" style="margin-top:6px;font-size:10px;" readonly onclick="this.select()">${snippet}</textarea>`+
+    '<div style="margin-top:4px;color:#f0a500">Solange das nicht committet ist, gilt fur die Person weiterhin ihr altes Passwort.</div>';
+  showToast('Temporares Passwort erzeugt — Code unten kopieren');
+}
+
+async function adminDeleteUserPrompt(){
+  const username=document.getElementById('profile-modal').dataset.username;
+  if(username===currentUser){showToast('Du kannst deinen eigenen Account hier nicht loschen');return;}
+  if(!confirm('Account "'+username+'" wirklich entfernen?'))return;
+  showCodeReminder(username,null,true);
+  showToast('Hinweis zum Entfernen siehe unten im Profil');
+}
+
+// ===================== ACCOUNT ANLEGEN / BEARBEITEN =====================
+let _ueTrainings=[]; // temporaere Trainingsliste waehrend das Formular offen ist
+let _uePhotoData='';
+
+function openCreateUser(){
+  document.getElementById('ue-title').textContent='Account anlegen';
+  document.getElementById('ue-editing-username').value='';
+  ['ue-username','ue-name','ue-pass','ue-passid','ue-phone','ue-position','ue-bio'].forEach(id=>sv2(id,''));
+  document.getElementById('ue-hiredate').value='';
+  document.getElementById('ue-lastpromo').value='';
+  document.querySelectorAll('.ue-role').forEach(c=>c.checked=false);
+  document.getElementById('ue-mustchange').checked=false;
+  document.getElementById('ue-username').disabled=false;
+  document.getElementById('ue-pass-req').textContent='*';
+  document.getElementById('ue-pass').placeholder='min. 6 Zeichen';
+  _ueTrainings=[];_uePhotoData='';
+  renderTrainingList();
+  document.getElementById('ue-photo-preview').style.display='none';
+  document.getElementById('ue-photo-ph').style.display='flex';
+  document.getElementById('ue-photo-ph').textContent='?';
+  document.getElementById('ue-msg').textContent='';
+  document.getElementById('useredit-modal').classList.add('show');
+}
+
+function openEditUser(){
+  const username=document.getElementById('profile-modal').dataset.username;
+  const u=findUser(username);
+  if(!u)return;
+  closeProfileModal();
+  document.getElementById('ue-title').textContent='Profil bearbeiten — '+(u.name||u.username);
+  document.getElementById('ue-editing-username').value=u.username;
+  sv2('ue-username',u.username);
+  document.getElementById('ue-username').disabled=true; // Zugangskennung nicht aenderbar (ist die Doc-Kennung)
+  sv2('ue-name',u.name||'');
+  sv2('ue-pass','');
+  document.getElementById('ue-pass-req').textContent='(leer lassen = unverandert)';
+  document.getElementById('ue-pass').placeholder='nur ausfullen zum Andern';
+  sv2('ue-passid',u.passId||'');
+  sv2('ue-phone',u.phone||'');
+  sv2('ue-position',u.position||'');
+  document.getElementById('ue-hiredate').value=u.hireDate||'';
+  document.getElementById('ue-lastpromo').value=u.lastPromo||'';
+  sv2('ue-bio',u.bio||'');
+  document.querySelectorAll('.ue-role').forEach(c=>{c.checked=(u.roles||[]).includes(c.value);});
+  document.getElementById('ue-mustchange').checked=!!u.mustChange;
+  _ueTrainings=(u.trainings||[]).map(t=>({...t}));
+  _uePhotoData=u.photo||'';
+  renderTrainingList();
+  if(_uePhotoData){
+    document.getElementById('ue-photo-preview').src=_uePhotoData;
+    document.getElementById('ue-photo-preview').style.display='block';
+    document.getElementById('ue-photo-ph').style.display='none';
+  } else {
+    document.getElementById('ue-photo-preview').style.display='none';
+    document.getElementById('ue-photo-ph').style.display='flex';
+    document.getElementById('ue-photo-ph').textContent=initials(u.name||u.username);
+  }
+  document.getElementById('ue-msg').textContent='';
+  document.getElementById('useredit-modal').classList.add('show');
+}
+
+function closeEditUserModal(){document.getElementById('useredit-modal').classList.remove('show');}
+
+function addTrainingRow(){
+  const name=gv('ue-train-name').trim();
+  if(!name){showToast('Trainingsname eingeben');return;}
+  const passed=gv('ue-train-status')==='1';
+  _ueTrainings.push({name,passed});
+  sv2('ue-train-name','');
+  renderTrainingList();
+}
+function removeTrainingRow(i){_ueTrainings.splice(i,1);renderTrainingList();}
+function renderTrainingList(){
+  const box=document.getElementById('ue-train-list');
+  if(!_ueTrainings.length){box.innerHTML='<div class="hint">Noch keine Schulungen hinzugefugt.</div>';return;}
+  box.innerHTML=_ueTrainings.map((t,i)=>`<div class="train-row-input">
+    <span style="flex:1;font-size:11px;">${t.name}</span>
+    <span class="train-badge ${t.passed?'train-pass':'train-fail'}">${t.passed?'BESTANDEN':'NICHT ABSOLVIERT'}</span>
+    <button class="btn sm ng" onclick="removeTrainingRow(${i})"><i class="ti ti-x"></i></button>
   </div>`).join('');
+}
+
+// Foto auswaehlen -> verkleinern -> als Base64 zwischenspeichern
+function handlePhotoUpload(input){
+  const file=input.files&&input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const img=new Image();
+    img.onload=function(){
+      const MAX=120;
+      let w=img.width,h=img.height;
+      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      _uePhotoData=canvas.toDataURL('image/jpeg',0.7);
+      document.getElementById('ue-photo-preview').src=_uePhotoData;
+      document.getElementById('ue-photo-preview').style.display='block';
+      document.getElementById('ue-photo-ph').style.display='none';
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// Baut den vollstaendigen JS-Objekt-Code fuer einen Nutzer (zum Einfuegen/Ersetzen auf GitHub)
+function buildUserSnippet(u){
+  const esc=s=>(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  const trainLit=JSON.stringify(u.trainings||[]).replace(/"name"/g,'name').replace(/"passed"/g,'passed').replace(/"/g,"'");
+  return `  { username:'${esc(u.username)}', name:'${esc(u.name)}', roles:${JSON.stringify(u.roles)}, passHash:'${u.passHash}',
+    mustChange:${u.mustChange?'true':'false'}, photo:'${u.photo||''}',
+    passId:'${esc(u.passId)}', phone:'${esc(u.phone)}', position:'${esc(u.position)}',
+    hireDate:'${u.hireDate||''}', lastPromo:'${u.lastPromo||''}',
+    bio:'${esc(u.bio)}', trainings:${trainLit} },`;
+}
+
+async function submitUserForm(){
+  if(!hasRole('admin')){showToast('Keine Berechtigung');return;}
+  const editingUsername=gv('ue-editing-username');
+  const isEdit=!!editingUsername;
+  const username=isEdit?editingUsername:gv('ue-username').trim();
+  const pass=gv('ue-pass');
+  const name=gv('ue-name').trim();
+  const roles=Array.from(document.querySelectorAll('.ue-role:checked')).map(c=>c.value);
+  const mustChange=document.getElementById('ue-mustchange').checked;
+  const msgEl=document.getElementById('ue-msg');
+  if(!username||!name){msgEl.textContent='Zugangskennung und Name sind Pflicht.';msgEl.style.color='var(--re)';return;}
+  if(!roles.length){msgEl.textContent='Mindestens eine Rolle wahlen.';msgEl.style.color='var(--re)';return;}
+  if(!isEdit && USERS.find(u=>u.username.toLowerCase()===username.toLowerCase())){msgEl.textContent='Zugangskennung bereits vergeben.';msgEl.style.color='var(--re)';return;}
+  if(!isEdit && (!pass||pass.length<6)){msgEl.textContent='Passwort: min. 6 Zeichen.';msgEl.style.color='var(--re)';return;}
+  if(isEdit && pass && pass.length<6){msgEl.textContent='Neues Passwort: min. 6 Zeichen (oder Feld leer lassen).';msgEl.style.color='var(--re)';return;}
+
+  let passHash;
+  if(isEdit){
+    const existing=findUser(username);
+    passHash = pass ? await fibHash(pass) : existing.passHash;
+  } else {
+    passHash = await fibHash(pass);
+  }
+
+  const userObj={
+    username,name,roles,passHash,mustChange,
+    photo:_uePhotoData||'',
+    passId:gv('ue-passid').trim(),
+    phone:gv('ue-phone').trim(),
+    position:gv('ue-position').trim(),
+    hireDate:document.getElementById('ue-hiredate').value||'',
+    lastPromo:document.getElementById('ue-lastpromo').value||'',
+    bio:gv('ue-bio').trim(),
+    trainings:_ueTrainings
+  };
+  const snippet=buildUserSnippet(userObj);
+  msgEl.innerHTML=(isEdit
+      ? 'Code generiert — auf GitHub die <b style="color:var(--tx)">bestehende Zeile</b> von <b>'+username+'</b> im USERS-Array durch diese hier ersetzen und committen:'
+      : 'Code generiert — auf GitHub diese Zeile neu in das <b style="color:var(--tx)">USERS</b>-Array einfugen und committen:')+
+    `<textarea class="fi" rows="4" style="margin-top:6px;font-size:10px;" readonly onclick="this.select()">${snippet}</textarea>`;
+  msgEl.style.color='var(--g)';
+  showToast('Code generiert — siehe unten');
 }
 
 // Einmaliges Laden + danach Live-Listener starten
