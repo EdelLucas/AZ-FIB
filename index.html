@@ -172,6 +172,33 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
   <button class="btn ng sm" onclick="doLogout()" style="margin-top:8px;"><i class="ti ti-logout"></i> Zurück zum Login</button>
 </div>
 
+<!-- ERSTEINRICHTUNG / ADMIN-SETUP -->
+<div class="login-screen hide" id="setup-screen">
+  <div class="login-box" style="width:min(420px,92vw);">
+    <div class="login-emblem"><i class="ti ti-shield-check"></i></div>
+    <div class="login-title">ERSTEINRICHTUNG</div>
+    <div class="login-sub">Es existiert noch kein Admin-Zugang. Lege dich selbst als ersten Administrator an.</div>
+    <div class="login-err" id="setup-err"></div>
+    <div style="margin-bottom:11px;">
+      <div class="fl">Deine Reisepass-ID</div>
+      <input class="fi" id="su-id" placeholder="z.B. 17450" oninput="setupLookup()">
+      <div id="su-found" style="font-size:11px;margin-top:5px;"></div>
+    </div>
+    <div style="margin-bottom:11px;">
+      <div class="fl">Neues Passwort</div>
+      <input class="fi" id="su-pw1" type="password" placeholder="Mind. 6 Zeichen">
+    </div>
+    <div style="margin-bottom:16px;">
+      <div class="fl">Passwort bestätigen</div>
+      <input class="fi" id="su-pw2" type="password" placeholder="Wiederholen" onkeydown="if(event.key==='Enter')doSetup()">
+    </div>
+    <button class="btn ok" style="width:100%;justify-content:center;padding:9px;" onclick="doSetup()"><i class="ti ti-shield-check"></i> Als Administrator anlegen</button>
+    <div style="font-size:10px;color:var(--mu);text-align:center;margin-top:14px;">
+      Dieser Screen verschwindet automatisch, sobald der erste Login angelegt wurde.
+    </div>
+  </div>
+</div>
+
 <div class="root">
 <div class="topbar">
   <div class="topbar-brand">FEDERAL INVESTIGATION BUREAU &#10022; GRANDRP DE01 &#10022; PERSONALABTEILUNG</div>
@@ -2337,7 +2364,54 @@ sv = function(name, el){
   _origSv(name, el);
 };
 
-// ===================== ZUGRIFFSVERWALTUNG UI =====================
+function setupLookup(){
+  const id = gv('su-id').trim();
+  const el = document.getElementById('su-found');
+  if(!el) return;
+  if(!id){ el.innerHTML=''; return; }
+  const ma = findMAById(id);
+  if(ma) el.innerHTML = `<span style="color:var(--gr)"><i class="ti ti-check"></i> ${ma.name} · ${ma.rank}</span>`;
+  else el.innerHTML = `<span style="color:var(--re)"><i class="ti ti-x"></i> Pass-ID nicht im Mitarbeiterverzeichnis gefunden</span>`;
+}
+
+async function doSetup(){
+  const id = gv('su-id').trim();
+  const p1 = gv('su-pw1');
+  const p2 = gv('su-pw2');
+  const errEl = document.getElementById('setup-err');
+  errEl.classList.remove('show');
+
+  if(!id){ errEl.textContent='Bitte deine Pass-ID eingeben.'; errEl.classList.add('show'); return; }
+  if(MA.length===0) await syncFromSheet();
+  const ma = findMAById(id);
+  if(!ma){ errEl.textContent='Pass-ID nicht im Mitarbeiterverzeichnis gefunden.'; errEl.classList.add('show'); return; }
+  if(!p1 || p1.length<6){ errEl.textContent='Passwort muss mind. 6 Zeichen lang sein.'; errEl.classList.add('show'); return; }
+  if(p1!==p2){ errEl.textContent='Passwörter stimmen nicht überein.'; errEl.classList.add('show'); return; }
+
+  if(!fbReady) await initFirebase();
+  // Sicherheits-Check: falls inzwischen doch schon ein Login existiert, abbrechen
+  await loadAccessData();
+  if(Object.keys(LOGINS).length>0){
+    errEl.textContent='Es wurde bereits ein Zugang angelegt. Bitte normal einloggen.';
+    errEl.classList.add('show');
+    setTimeout(()=>{ document.getElementById('setup-screen').classList.add('hide'); document.getElementById('login-screen').classList.remove('hide'); }, 1800);
+    return;
+  }
+
+  LOGINS[id] = {dept:'admin', pwSet:true, pwHash:simpleHash(p1)};
+  if(Object.keys(DEPT_PERMS).length===0) DEPT_PERMS = {...DEFAULT_DEPT_PERMS};
+  await saveAccessData();
+
+  CURRENT_USER = {id, name:ma.name, dept:'admin', rank:ma.rank, perms:DEFAULT_DEPT_PERMS.admin};
+  try{ sessionStorage.setItem('fib_session', JSON.stringify(CURRENT_USER)); }catch(e){}
+
+  document.getElementById('setup-screen').classList.add('hide');
+  applyPermissions();
+  bootApp();
+  showToast('Administrator-Zugang erstellt');
+}
+
+
 function zgRenderDeptTable(){
   const wrap = document.getElementById('zg-dept-table');
   if(!wrap) return;
@@ -2449,6 +2523,14 @@ function bootApp(){
 (async function initAuth(){
   await syncFromSheet();
   await loadAccessData();
+
+  // Kein Login angelegt -> Ersteinrichtung anzeigen
+  if(Object.keys(LOGINS).length===0){
+    document.getElementById('login-screen').classList.add('hide');
+    document.getElementById('setup-screen').classList.remove('hide');
+    return;
+  }
+
   let restored=null;
   try{ const s=sessionStorage.getItem('fib_session'); if(s) restored=JSON.parse(s); }catch(e){}
   if(restored && restored.id){
