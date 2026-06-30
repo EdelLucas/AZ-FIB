@@ -1575,13 +1575,15 @@ function lookupDirectoryForSelf(){
   const m=MA.find(x=>x.id===id);
   if(!m){msgEl.textContent='Keine Person mit dieser ID im Mitarbeiterverzeichnis gefunden.';msgEl.style.color='var(--re)';return;}
   sv2('se-name',m.name||gv('se-name'));
+  const trains=(m.trainings&&m.trainings.length)?m.trainings.map(t=>({...t})):parseAusbList(m.ausb).map(n=>({name:n,passed:true}));
   _seImportedExtra={
     passId:m.id,
     position:m.rank||'',
     hireDate:dmyToIso(m.date),
-    trainings:parseAusbList(m.ausb).map(n=>({name:n,passed:true}))
+    trainings:trains
   };
-  msgEl.innerHTML=`Ubernommen: <b style="color:var(--tx)">${m.name}</b> · ${m.rank} · ${_seImportedExtra.trainings.length} Ausbildung(en). Jetzt "Speichern" klicken.`;
+  const passCount=trains.filter(t=>t.passed).length;
+  msgEl.innerHTML=`Ubernommen: <b style="color:var(--tx)">${m.name}</b> · ${m.rank} · ${passCount}/${trains.length} Ausbildungen bestanden. Jetzt "Speichern" klicken.`;
   msgEl.style.color='var(--gr)';
 }
 
@@ -1831,12 +1833,14 @@ function lookupDirectoryForOfficial(){
   if(!m){msgEl.textContent='Keine Person mit dieser ID im Mitarbeiterverzeichnis gefunden.';msgEl.style.color='var(--re)';return;}
   sv2('oe-position',m.rank||'');
   document.getElementById('oe-hiredate').value=dmyToIso(m.date);
-  const found=parseAusbList(m.ausb);
-  found.forEach(name=>{
-    if(!_oeTrainings.find(t=>t.name.toLowerCase()===name.toLowerCase())) _oeTrainings.push({name,passed:true});
+  const found=(m.trainings&&m.trainings.length)?m.trainings:parseAusbList(m.ausb).map(n=>({name:n,passed:true}));
+  found.forEach(t=>{
+    const existing=_oeTrainings.find(x=>x.name.toLowerCase()===t.name.toLowerCase());
+    if(existing) existing.passed=t.passed; else _oeTrainings.push({...t});
   });
   renderOfficialTrainingList();
-  msgEl.innerHTML=`Ubernommen: <b style="color:var(--tx)">${m.name}</b> · ${m.rank} · ${found.length} Ausbildung(en) erganzt.`;
+  const passCount=found.filter(t=>t.passed).length;
+  msgEl.innerHTML=`Ubernommen: <b style="color:var(--tx)">${m.name}</b> · ${m.rank} · ${passCount}/${found.length} Ausbildungen bestanden.`;
   msgEl.style.color='var(--gr)';
 }
 
@@ -1992,6 +1996,24 @@ async function syncFromSheet() {
     // Spalten laut Sheet (0-basiert, Buchstabe → Index):
     // A=0,B=1,C=2,D=3,E=4,F=5,G=6,H=7,I=8,J=9,K=10,L=11,M=12,N=13,O=14,P=15,Q=16,R=17,S=18
     // B=ID(1), C=Name(2), D=Ranks(3), E=DN(4), H=Division's(7), K=Strike(10), L=Invite Date(11), M=Last Rank(12), P=Abt1(15), Q=Abt2(16)
+    // Schulungs-Hakchen (T=19,U=20,W=22,X=23,Y=24,Z=25,AA=26,AB=27; V=21 ist eine versteckte Spalte):
+    // T=GA, U=EVS, W=AKS, X=TST, Y=VHF/EL, Z=JUR, AA=UC, AB=FTK
+
+    const TRAIN_COLS = [
+      {idx:19, name:'GA'},
+      {idx:20, name:'EVS'},
+      {idx:22, name:'AKS'},
+      {idx:23, name:'TST'},
+      {idx:24, name:'VHF/EL'},
+      {idx:25, name:'JUR'},
+      {idx:26, name:'UC'},
+      {idx:27, name:'FTK'},
+    ];
+    function isChecked(val){
+      if(!val)return false;
+      const v=val.trim().toUpperCase();
+      return v==='TRUE'||v==='WAHR'||v==='JA'||v==='X'||v==='1';
+    }
 
     // Header steht in Zeile 9 (Index 8), Daten ab Zeile 10 (Index 9)
     // Wir suchen die Header-Zeile dynamisch (enthält "ID" und "Name")
@@ -2016,6 +2038,7 @@ async function syncFromSheet() {
       const abt1 = (r[15]||'').trim();
       const abt2 = (r[16]||'').trim();
       const abt  = [abt1, abt2].filter(Boolean).join(' | ');
+      const trainings = TRAIN_COLS.map(tc => ({name:tc.name, passed:isChecked(r[tc.idx])}));
 
       newMA.push({
         id,
@@ -2026,6 +2049,7 @@ async function syncFromSheet() {
         strike: (r[10]||'0/3').trim(),
         date:   (r[11]||'').trim(),
         ausb:   (r[12]||'').trim(), // Last Rank als Ausbildung
+        trainings,
         abt,
         status: 'Aktiv',
         notes:  ''
@@ -2098,7 +2122,8 @@ function parseAusbList(str){
 function buildMA(){
   const s=(maPage-1)*PER,sl=filtered.slice(s,s+PER);
   document.getElementById('ma-body').innerHTML=sl.map(m=>{
-    const trains=parseAusbList(m.ausb);
+    const trains=(m.trainings&&m.trainings.length)?m.trainings:parseAusbList(m.ausb).map(n=>({name:n,passed:true}));
+    const passCount=trains.filter(t=>t.passed).length;
     const safeId=String(m.id).replace(/[^a-zA-Z0-9_-]/g,'_');
     return `<tr>
     <td style="color:var(--mu);font-size:11px">${m.id}</td>
@@ -2107,8 +2132,8 @@ function buildMA(){
     <td style="color:var(--g)">${m.dn||'--'}</td>
     <td style="color:var(--mu);font-size:11px">${m.div||'--'}</td>
     <td style="color:var(--mu);font-size:10px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${m.abt||''}">${m.abt||'--'}</td>
-    <td style="color:#3a8fd4;font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${m.ausb||''}">
-      ${m.ausb?`<span style="cursor:pointer;border-bottom:1px dotted #3a8fd4" onclick="maExpandTrainings('${safeId}')">${m.ausb}</span>`:'--'}
+    <td style="color:#3a8fd4;font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+      ${trains.length?`<span style="cursor:pointer;border-bottom:1px dotted #3a8fd4" onclick="maExpandTrainings('${safeId}')">${passCount}/${trains.length} bestanden</span>`:'--'}
     </td>
     <td style="color:${m.strike==='0/3'?'var(--gr)':'var(--re)'}">${m.strike||'0/3'}</td>
     <td style="color:var(--mu);font-size:11px;white-space:nowrap">${m.date||'--'}</td>
@@ -2121,7 +2146,7 @@ function buildMA(){
       <td colspan="10" style="background:var(--p2);padding:10px 14px;border-bottom:1px solid var(--bd);">
         <div style="font-size:10px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Ausbildungen / Schulungen — ${m.name}</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          ${trains.length?trains.map(t=>`<span class="train-badge train-pass">${t}</span>`).join(''):'<span style="font-size:11px;color:var(--mu)">Keine Ausbildungen hinterlegt.</span>'}
+          ${trains.length?trains.map(t=>`<span class="train-badge ${t.passed?'train-pass':'train-fail'}">${t.name}</span>`).join(''):'<span style="font-size:11px;color:var(--mu)">Keine Ausbildungen hinterlegt.</span>'}
         </div>
       </td>
     </tr>`;
