@@ -754,6 +754,22 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div id="fc-empty" class="kl-empty" style="display:none;">Keine Fallakten vorhanden.</div>
     </div>
   </div>
+
+  <div class="pan">
+    <div class="pan-h">
+      <div class="pan-t">[ Mitglieder der Abteilung ]</div>
+      <span style="font-size:10px;color:var(--mu)" id="dm-fibco-count"></span>
+    </div>
+    <div class="pan-b" style="padding-bottom:6px;">
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Pass-ID</th><th>Name</th><th>Rang</th><th>DN</th><th>Abteilungen</th></tr></thead>
+          <tbody id="dm-fibco-body"></tbody>
+        </table>
+      </div>
+      <div id="dm-fibco-empty" class="kl-empty" style="display:none;">Keine Mitglieder gefunden.</div>
+    </div>
+  </div>
 </div>
 
 <!-- CID BEWEISE -->
@@ -837,6 +853,22 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div id="cid-empty" class="kl-empty" style="display:none;">Keine Einträge vorhanden.</div>
     </div>
   </div>
+
+  <div class="pan">
+    <div class="pan-h">
+      <div class="pan-t">[ Mitglieder der Abteilung ]</div>
+      <span style="font-size:10px;color:var(--mu)" id="dm-cid-count"></span>
+    </div>
+    <div class="pan-b" style="padding-bottom:6px;">
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Pass-ID</th><th>Name</th><th>Rang</th><th>DN</th><th>Abteilungen</th></tr></thead>
+          <tbody id="dm-cid-body"></tbody>
+        </table>
+      </div>
+      <div id="dm-cid-empty" class="kl-empty" style="display:none;">Keine Mitglieder gefunden.</div>
+    </div>
+  </div>
 </div>
 
 <!-- TD AUSBILDUNG -->
@@ -870,6 +902,22 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
         <div class="kl-empty" id="td-train-empty" style="display:none;">Keine Ausbildungen hinterlegt.</div>
       </div>
       <input type="hidden" id="td-passid">
+    </div>
+  </div>
+
+  <div class="pan">
+    <div class="pan-h">
+      <div class="pan-t">[ Mitglieder der Abteilung ]</div>
+      <span style="font-size:10px;color:var(--mu)" id="dm-td-count"></span>
+    </div>
+    <div class="pan-b" style="padding-bottom:6px;">
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Pass-ID</th><th>Name</th><th>Rang</th><th>DN</th><th>Abteilungen</th></tr></thead>
+          <tbody id="dm-td-body"></tbody>
+        </table>
+      </div>
+      <div id="dm-td-empty" class="kl-empty" style="display:none;">Keine Mitglieder gefunden.</div>
     </div>
   </div>
 </div>
@@ -940,6 +988,22 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div class="kl-empty" id="cl-empty" style="display:none;">Noch keine Log-Eintrage vorhanden.</div>
     </div>
   </div>
+
+  <div class="pan">
+    <div class="pan-h">
+      <div class="pan-t">[ Mitglieder der Abteilung ]</div>
+      <span style="font-size:10px;color:var(--mu)" id="dm-cirg-count"></span>
+    </div>
+    <div class="pan-b" style="padding-bottom:6px;">
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Pass-ID</th><th>Name</th><th>Rang</th><th>DN</th><th>Abteilungen</th></tr></thead>
+          <tbody id="dm-cirg-body"></tbody>
+        </table>
+      </div>
+      <div id="dm-cirg-empty" class="kl-empty" style="display:none;">Keine Mitglieder gefunden.</div>
+    </div>
+  </div>
 </div>
 
 <!-- LAW AKTENSYSTEM -->
@@ -1002,6 +1066,22 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
         </table>
       </div>
       <div id="lw-empty" class="kl-empty" style="display:none;">Keine Akten vorhanden.</div>
+    </div>
+  </div>
+
+  <div class="pan">
+    <div class="pan-h">
+      <div class="pan-t">[ Mitglieder der Abteilung ]</div>
+      <span style="font-size:10px;color:var(--mu)" id="dm-law-count"></span>
+    </div>
+    <div class="pan-b" style="padding-bottom:6px;">
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Pass-ID</th><th>Name</th><th>Rang</th><th>DN</th><th>Abteilungen</th></tr></thead>
+          <tbody id="dm-law-body"></tbody>
+        </table>
+      </div>
+      <div id="dm-law-empty" class="kl-empty" style="display:none;">Keine Mitglieder gefunden.</div>
     </div>
   </div>
 </div>
@@ -1724,6 +1804,32 @@ function getTrainingsForId(passId){
   const base=m?((m.trainings&&m.trainings.length)?m.trainings:parseAusbList(m.ausb).map(n=>({name:n,passed:true}))):[];
   return mergeTrainings(base,passId);
 }
+
+// ===================== ABTEILUNGS-MITGLIEDERLISTEN =====================
+// Findet alle Personen aus dem Mitarbeiterverzeichnis, deren "Abteilungen"-Feld den
+// gegebenen Abteilungs-Code enthaelt (z.B. "FIBCO", "CID", "TD", "CIRG", "LAW").
+// Wortgrenzen-Suche, damit "TD" nicht faelschlich in anderen Wortern anschlagt.
+function deptMembers(code){
+  const re=new RegExp('\\b'+code.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i');
+  return MA.filter(m=>m.abt && re.test(m.abt));
+}
+function renderDeptMembers(prefix, code){
+  const body=document.getElementById('dm-'+prefix+'-body');
+  const empty=document.getElementById('dm-'+prefix+'-empty');
+  const count=document.getElementById('dm-'+prefix+'-count');
+  if(!body)return;
+  const list=deptMembers(code);
+  if(count) count.textContent=list.length+' Mitglieder';
+  if(!list.length){body.innerHTML='';if(empty)empty.style.display='block';return;}
+  if(empty)empty.style.display='none';
+  body.innerHTML=list.map(m=>`<tr>
+    <td style="color:var(--mu);font-size:11px">${m.id}</td>
+    <td style="font-weight:bold">${m.name}</td>
+    <td><span class="rb ${rankCls(m.rank)}">${m.rank}</span></td>
+    <td style="color:var(--g)">${m.dn||'--'}</td>
+    <td style="color:var(--mu);font-size:11px">${m.abt||'--'}</td>
+  </tr>`).join('');
+}
 function liveTrainingsFromDirectory(passId){
   if(!passId)return null;
   const m=MA.find(x=>x.id===passId);
@@ -2320,6 +2426,9 @@ async function syncFromSheet() {
       applyMaOrder();
       filtered = [...MA];
       buildMA();
+      if(typeof renderDeptMembers==='function'){
+        ['fibco','cid','td','cirg','law'].forEach(p=>renderDeptMembers(p,p.toUpperCase()));
+      }
       const dc = document.getElementById('dash-count'); if(dc) dc.textContent = MA.length;
       const cc = document.getElementById('cfg-count');  if(cc) cc.textContent = MA.length;
       const b  = document.getElementById('ma-badge');   if(b)  b.textContent  = MA.length + ' AGENTEN';
@@ -3484,8 +3593,11 @@ function sv(name,el){
   if(name==='kl')klRender();
   if(name==='profil')renderMyProfile();
   if(name==='benutzer')renderUserList();
-  if(name==='cirg'){cirgRenderEvents();cirgFillEventSelects();cirgRenderLogs();}
-  if(name==='law')lawRender();
+  if(name==='fibco')renderDeptMembers('fibco','FIBCO');
+  if(name==='cid')renderDeptMembers('cid','CID');
+  if(name==='td')renderDeptMembers('td','TD');
+  if(name==='cirg'){cirgRenderEvents();cirgFillEventSelects();cirgRenderLogs();renderDeptMembers('cirg','CIRG');}
+  if(name==='law'){lawRender();renderDeptMembers('law','LAW');}
 }
 function setCol(h){
   document.documentElement.style.setProperty('--g',h);
