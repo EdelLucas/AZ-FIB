@@ -1101,7 +1101,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <div class="absbox">
       <div class="abtitle"><i class="ti ti-id-badge"></i> Aus Mitarbeiterverzeichnis ubernehmen</div>
       <div style="display:flex;gap:8px;">
-        <input class="fi bl" id="se-passid" placeholder="Deine Pass-ID, z.B. 170940" style="max-width:220px;">
+        <input class="fi bl" id="se-passid" placeholder="Deine Pass-ID, z.B. 170940" style="max-width:220px;" onblur="lookupDirectoryForSelf()" onkeydown="if(event.key==='Enter'){event.preventDefault();lookupDirectoryForSelf();}">
         <button class="btn sm bl" onclick="lookupDirectoryForSelf()"><i class="ti ti-search"></i> Laden</button>
       </div>
       <div class="hint" id="se-lookup-msg">Fullt Name, Rang, Eintrittsdatum und Ausbildungen automatisch aus dem Mitarbeiterverzeichnis.</div>
@@ -1138,7 +1138,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <div class="ir3">
       <div><div class="fl">ID / Pass-Nr.</div>
         <div style="display:flex;gap:6px;">
-          <input class="fi" id="oe-passid" placeholder="z.B. 170940">
+          <input class="fi" id="oe-passid" placeholder="z.B. 170940" onblur="lookupDirectoryForOfficial()" onkeydown="if(event.key==='Enter'){event.preventDefault();lookupDirectoryForOfficial();}">
           <button class="btn sm bl" onclick="lookupDirectoryForOfficial()" title="Aus Mitarbeiterverzeichnis ubernehmen"><i class="ti ti-search"></i></button>
         </div>
       </div>
@@ -1527,18 +1527,28 @@ function liveTrainingsFromDirectory(passId){
   if(!m)return null;
   return (m.trainings&&m.trainings.length)?m.trainings:parseAusbList(m.ausb).map(n=>({name:n,passed:true}));
 }
+// Liefert Position + Eintrittsdatum live aus dem Verzeichnis (wie bei Trainings) -- oder null wenn keine ID / kein Treffer
+function liveDirectoryInfo(passId){
+  if(!passId)return null;
+  const m=MA.find(x=>x.id===passId);
+  if(!m)return null;
+  return {position:m.rank||'', hireDate:dmyToIso(m.date)};
+}
 
 async function renderMyProfile(){
   if(!currentUser)return;
   const u=currentProfile||{};
+  const liveInfo=liveDirectoryInfo(u.passId);
+  const position=(liveInfo&&liveInfo.position)||u.position||'';
+  const hireDate=(liveInfo&&liveInfo.hireDate)||u.hireDate||'';
   document.getElementById('mp-header').innerHTML=`
     ${avatarHtml(u.name||currentUser,u.photo)}
     <div>
       <div class="profile-header-name">${u.name||currentUser} ${u.passId?`(ID: ${u.passId})`:''}</div>
-      <div class="profile-header-pos">${u.position||'--'}</div>
+      <div class="profile-header-pos">${position||'--'}${liveInfo?' <span style="font-size:9px;color:var(--g)">(live)</span>':''}</div>
     </div>
     <div class="profile-header-dates">
-      <div><div class="v">${fmtD(u.hireDate)||'--'}</div><div class="l">Eingestellt am</div></div>
+      <div><div class="v">${fmtD(hireDate)||'--'}</div><div class="l">Eingestellt am</div></div>
       <div><div class="v">${fmtD(u.lastPromo)||'--'}</div><div class="l">Letzte Beforderung</div></div>
     </div>`;
   document.getElementById('mp-bio').textContent=u.bio||'Noch keine Beschreibung — klick auf "Bearbeiten".';
@@ -1589,7 +1599,7 @@ function dmyToIso(str){
 function lookupDirectoryForSelf(){
   const id=gv('se-passid').trim();
   const msgEl=document.getElementById('se-lookup-msg');
-  if(!id){msgEl.textContent='Bitte zuerst deine Pass-ID eingeben.';msgEl.style.color='var(--re)';return;}
+  if(!id)return; // leeres Feld beim Verlassen -> kein Fehler, einfach nichts tun
   const m=MA.find(x=>x.id===id);
   if(!m){msgEl.textContent='Keine Person mit dieser ID im Mitarbeiterverzeichnis gefunden.';msgEl.style.color='var(--re)';return;}
   sv2('se-name',m.name||gv('se-name'));
@@ -1685,14 +1695,17 @@ async function openProfileModal(username){
   document.getElementById('profile-modal').dataset.username=username;
   const p=_allProfilesCache[username.toLowerCase()] || await loadProfile(username);
   _allProfilesCache[username.toLowerCase()]=p;
+  const liveInfo=liveDirectoryInfo(p.passId);
+  const position=(liveInfo&&liveInfo.position)||p.position||'';
+  const hireDate=(liveInfo&&liveInfo.hireDate)||p.hireDate||'';
   document.getElementById('pm-header').innerHTML=`
     ${avatarHtml(p.name||u.username,p.photo)}
     <div>
       <div class="profile-header-name">${p.name||u.username} ${p.passId?`(ID: ${p.passId})`:''}</div>
-      <div class="profile-header-pos">${p.position||'--'}</div>
+      <div class="profile-header-pos">${position||'--'}${liveInfo?' <span style="font-size:9px;color:var(--g)">(live)</span>':''}</div>
     </div>
     <div class="profile-header-dates">
-      <div><div class="v">${fmtD(p.hireDate)||'--'}</div><div class="l">Eingestellt am</div></div>
+      <div><div class="v">${fmtD(hireDate)||'--'}</div><div class="l">Eingestellt am</div></div>
       <div><div class="v">${fmtD(p.lastPromo)||'--'}</div><div class="l">Letzte Beforderung</div></div>
     </div>`;
   document.getElementById('pm-bio').textContent=p.bio||'Noch keine Beschreibung hinterlegt.';
@@ -1849,7 +1862,7 @@ function closeOfficialEdit(){document.getElementById('officialedit-modal').class
 function lookupDirectoryForOfficial(){
   const id=gv('oe-passid').trim();
   const msgEl=document.getElementById('oe-lookup-msg');
-  if(!id){msgEl.textContent='Bitte zuerst eine Pass-ID eingeben.';msgEl.style.color='var(--re)';return;}
+  if(!id)return; // leeres Feld beim Verlassen -> kein Fehler, einfach nichts tun
   const m=MA.find(x=>x.id===id);
   if(!m){msgEl.textContent='Keine Person mit dieser ID im Mitarbeiterverzeichnis gefunden.';msgEl.style.color='var(--re)';return;}
   sv2('oe-position',m.rank||'');
