@@ -21,6 +21,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
 .sb-title{font-size:12px;color:var(--g);font-weight:bold;letter-spacing:.1em;}
 .sb-sub{font-size:10px;color:var(--mu);margin-top:2px;}
 .nv{padding:5px 0;}.nl{font-size:10px;color:var(--mu);letter-spacing:.12em;padding:4px 13px;text-transform:uppercase;}
+.nl-sub{font-size:9px;color:var(--gd);letter-spacing:.1em;padding:6px 13px 2px;text-transform:uppercase;opacity:.8;}
 .ni{padding:7px 13px;cursor:pointer;font-size:12px;color:var(--mu);display:flex;align-items:center;gap:8px;border-left:2px solid transparent;transition:.15s;user-select:none;}
 .ni:hover,.ni.act{color:var(--g);background:var(--gg);border-left-color:var(--g);}
 .ni i{font-size:14px;opacity:.75;}
@@ -216,19 +217,23 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
     <div class="ni" onclick="sv('ma',this)"><i class="ti ti-users"></i><span>Mitarbeiterverz.</span></div>
     <div class="ni" onclick="sv('kl',this)"><i class="ti ti-shield-lock"></i><span>Klassifizierung</span></div>
   </div>
-  <div class="nv"><div class="nl">Personal</div>
+  <div class="nv"><div class="nl">Abteilungen</div>
+    <div class="nl-sub">HR</div>
     <div class="ni" data-roles="hr" onclick="sv('rang',this)"><i class="ti ti-award"></i><span>Ranganpassung</span></div>
     <div class="ni" data-roles="hr" onclick="sv('ein',this)"><i class="ti ti-user-plus"></i><span>Einstellung</span></div>
     <div class="ni" data-roles="hr" onclick="sv('kue',this)"><i class="ti ti-user-minus"></i><span>Kündigung</span></div>
     <div class="ni" data-roles="hr" onclick="sv('san',this)"><i class="ti ti-gavel"></i><span>Sanktion</span></div>
     <div class="ni" data-roles="hr" onclick="sv('pa',this)"><i class="ti ti-id-badge"></i><span>Personalakte</span></div>
     <div class="ni" data-roles="hr" onclick="sv('az',this)"><i class="ti ti-file-certificate"></i><span>AZ-System</span></div>
-  </div>
-  <div class="nv"><div class="nl">Abteilungen</div>
+    <div class="nl-sub">FIBCO</div>
     <div class="ni" data-roles="fibco" onclick="sv('fibco',this)"><i class="ti ti-folder-open"></i><span>FIBCO Fallakte</span></div>
+    <div class="nl-sub">CID</div>
     <div class="ni" data-roles="cid" onclick="sv('cid',this)"><i class="ti ti-microscope"></i><span>CID Beweise</span></div>
+    <div class="nl-sub">TD</div>
     <div class="ni" data-roles="td" onclick="sv('td',this)"><i class="ti ti-school"></i><span>TD Ausbildung</span></div>
+    <div class="nl-sub">CIRG</div>
     <div class="ni" data-roles="cirg" onclick="sv('cirg',this)"><i class="ti ti-siren"></i><span>CIRG Events</span></div>
+    <div class="nl-sub">LAW</div>
     <div class="ni" data-roles="law" onclick="sv('law',this)"><i class="ti ti-scale"></i><span>LAW Aktensystem</span></div>
   </div>
   <div class="nv"><div class="nl">Account</div>
@@ -2147,6 +2152,7 @@ async function cloudLoad() {
         if (Array.isArray(d.cirgEvents)) CIRG_EVENTS = d.cirgEvents;
         if (Array.isArray(d.cirgLogs))   CIRG_LOGS   = d.cirgLogs;
         if (Array.isArray(d.lawCases))   LAW_CASES   = d.lawCases;
+        if (Array.isArray(d.maOrder))    MA_ORDER    = d.maOrder;
       }
       klRender();
       fcRender();
@@ -2155,7 +2161,8 @@ async function cloudLoad() {
       if(typeof cirgRenderEvents==='function') cirgRenderEvents();
       if(typeof cirgRenderLogs==='function') cirgRenderLogs();
       if(typeof lawRender==='function') lawRender();
-      buildMA(); // Extra-Trainings koennen die Ausbildungsanzeige im Verzeichnis beeinflussen
+      if(typeof applyMaOrder==='function'){applyMaOrder();filterMA();}
+      else buildMA();
       setCloudStatus('ok');
     }, (err) => {
       console.error('onSnapshot error:', err);
@@ -2180,7 +2187,7 @@ async function cloudPush() {
     setCloudStatus('saving');
     await window._fbSet(window._fbDoc(), {
       kl: KL_DATA, fc: FC_DATA, cid: CID_DATA,
-      extraTrainings: EXTRA_TRAININGS, cirgEvents: CIRG_EVENTS, cirgLogs: CIRG_LOGS, lawCases: LAW_CASES
+      extraTrainings: EXTRA_TRAININGS, cirgEvents: CIRG_EVENTS, cirgLogs: CIRG_LOGS, lawCases: LAW_CASES, maOrder: MA_ORDER
     });
     setCloudStatus('ok');
     setTimeout(() => { _isPushing = false; }, 500);
@@ -2310,6 +2317,7 @@ async function syncFromSheet() {
 
     if (newMA.length > 0) {
       MA = newMA;
+      applyMaOrder();
       filtered = [...MA];
       buildMA();
       const dc = document.getElementById('dash-count'); if(dc) dc.textContent = MA.length;
@@ -2378,8 +2386,9 @@ function buildMA(){
     const trains=mergeTrainings(baseTrains,m.id);
     const passCount=trains.filter(t=>t.passed).length;
     const safeId=String(m.id).replace(/[^a-zA-Z0-9_-]/g,'_');
-    return `<tr>
-    <td style="color:var(--mu);font-size:11px">${m.id}</td>
+    const midSafe=String(m.id).replace(/'/g,"\\'");
+    return `<tr draggable="true" data-mid="${midSafe}" class="ma-drag-row" style="cursor:grab;">
+    <td style="color:var(--mu);font-size:11px"><span style="color:var(--mu);font-size:14px;vertical-align:middle;margin-right:5px;cursor:grab" title="Ziehen zum Sortieren">⠿</span>${m.id}</td>
     <td style="font-weight:bold">${m.name}</td>
     <td><span class="rb ${rankCls(m.rank)}">${m.rank}</span></td>
     <td style="color:var(--g)">${m.dn||'--'}</td>
@@ -2410,6 +2419,7 @@ function buildMA(){
   const dc=document.getElementById('dash-count');if(dc)dc.textContent=MA.length;
   const cc=document.getElementById('cfg-count');if(cc)cc.textContent=MA.length;
   buildPgr();
+  maInitDrag();
 }
 function maExpandTrainings(safeId){
   const row=document.getElementById('ma-exp-'+safeId);
@@ -2424,6 +2434,78 @@ function buildPgr(){
   pgr.innerHTML=h+'<button onclick="maGo(maPage+1)">&#x203a;</button>';
 }
 function maGo(p){const t=Math.ceil(filtered.length/PER);maPage=Math.max(1,Math.min(p,t));buildMA();}
+
+// Sortiert MA anhand der gespeicherten Reihenfolge (MA_ORDER). Neue/unbekannte IDs
+// (z.B. neu aus dem Sheet) werden hinten angehangt, in ihrer bisherigen Reihenfolge.
+function applyMaOrder(){
+  if(!MA_ORDER||!MA_ORDER.length)return;
+  const byId={};
+  MA.forEach(m=>{byId[m.id]=m;});
+  const ordered=[];
+  MA_ORDER.forEach(id=>{if(byId[id]){ordered.push(byId[id]);delete byId[id];}});
+  MA.forEach(m=>{if(byId[m.id])ordered.push(m);}); // Rest in urspruenglicher Reihenfolge anhangen
+  MA=ordered;
+}
+function saveMaOrder(){
+  MA_ORDER=MA.map(m=>m.id);
+  cloudPush();
+}
+
+function maInitDrag(){
+  const rows=document.querySelectorAll('.ma-drag-row');
+  let dragSrc=null;
+
+  rows.forEach(row=>{
+    row.addEventListener('dragstart',function(e){
+      dragSrc=this;
+      this.style.opacity='0.4';
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain', this.dataset.mid);
+    });
+    row.addEventListener('dragend',function(){
+      this.style.opacity='1';
+      document.querySelectorAll('.ma-drag-row').forEach(r=>{r.style.borderTop='';r.style.borderBottom='';});
+    });
+    row.addEventListener('dragover',function(e){
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      document.querySelectorAll('.ma-drag-row').forEach(r=>{r.style.borderTop='';r.style.borderBottom='';});
+      const rect=this.getBoundingClientRect();
+      const mid=rect.top+rect.height/2;
+      if(e.clientY<mid) this.style.borderTop='2px solid var(--g)';
+      else this.style.borderBottom='2px solid var(--g)';
+    });
+    row.addEventListener('dragleave',function(){
+      this.style.borderTop='';
+      this.style.borderBottom='';
+    });
+    row.addEventListener('drop',function(e){
+      e.preventDefault();
+      if(dragSrc===this)return;
+      const fromId=e.dataTransfer.getData('text/plain');
+      const toId=this.dataset.mid;
+      if(!fromId||!toId||fromId===toId)return;
+
+      const fromIdx=MA.findIndex(m=>String(m.id)===fromId);
+      let toIdx=MA.findIndex(m=>String(m.id)===toId);
+      if(fromIdx===-1||toIdx===-1)return;
+
+      const rect=this.getBoundingClientRect();
+      const insertAfter=e.clientY>=(rect.top+rect.height/2);
+
+      const item=MA.splice(fromIdx,1)[0];
+      toIdx=MA.findIndex(m=>String(m.id)===toId); // Index nach dem Entfernen neu ermitteln
+      let newIdx=insertAfter?toIdx+1:toIdx;
+      newIdx=Math.max(0,Math.min(newIdx,MA.length));
+      MA.splice(newIdx,0,item);
+
+      saveMaOrder();
+      filterMA();
+      showToast('Reihenfolge gespeichert');
+    });
+  });
+}
+
 function filterMA(){
   const q=gv('ma-search').toLowerCase(),f=gv('ma-filter');
   filtered=MA.filter(m=>{
@@ -2546,6 +2628,7 @@ let EXTRA_TRAININGS={}; // { [Pass-ID]: [{name,passed}, ...] } -- von TD zusaetz
 let CIRG_EVENTS=[];     // [{id,name,desc,date}]
 let CIRG_LOGS=[];       // [{id,eventId,eventName,text,author,ts}]
 let LAW_CASES=[];       // [{id,mandant,akteId,datum,status,sachverhalt,notizen,erstellt}]
+let MA_ORDER=[];        // Reihenfolge (Pass-IDs) fur manuell sortiertes Mitarbeiterverzeichnis
 let KL_ORGA='Alle';
 
 function klLoad(){try{const d=localStorage.getItem('fib_kl');if(d)KL_DATA=JSON.parse(d);}catch(e){}}
