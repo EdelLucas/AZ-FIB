@@ -1730,7 +1730,7 @@ function liveDirectoryInfo(passId){
   if(!passId)return null;
   const m=MA.find(x=>x.id===passId);
   if(!m)return null;
-  return {position:m.rank||'', hireDate:dmyToIso(m.date)};
+  return {position:m.rank||'', hireDate:dmyToIso(m.date), lastPromo:dmyToIso(m.lastPromo)};
 }
 
 async function renderMyProfile(){
@@ -1739,6 +1739,7 @@ async function renderMyProfile(){
   const liveInfo=liveDirectoryInfo(u.passId);
   const position=(liveInfo&&liveInfo.position)||u.position||'';
   const hireDate=(liveInfo&&liveInfo.hireDate)||u.hireDate||'';
+  const lastPromo=(liveInfo&&liveInfo.lastPromo)||u.lastPromo||'';
   document.getElementById('mp-header').innerHTML=`
     ${avatarHtml(u.name||currentUser,u.photo)}
     <div>
@@ -1747,7 +1748,7 @@ async function renderMyProfile(){
     </div>
     <div class="profile-header-dates">
       <div><div class="v">${fmtD(hireDate)||'--'}</div><div class="l">Eingestellt am</div></div>
-      <div><div class="v">${fmtD(u.lastPromo)||'--'}</div><div class="l">Letzte Beforderung</div></div>
+      <div><div class="v">${fmtD(lastPromo)||'--'}</div><div class="l">Letzte Beforderung</div></div>
     </div>`;
   document.getElementById('mp-bio').textContent=u.bio||'Noch keine Beschreibung — klick auf "Bearbeiten".';
   document.getElementById('mp-info').innerHTML=`
@@ -1806,6 +1807,7 @@ function lookupDirectoryForSelf(){
     passId:m.id,
     position:m.rank||'',
     hireDate:dmyToIso(m.date),
+    lastPromo:dmyToIso(m.lastPromo),
     trainings:trains
   };
   const passCount=trains.filter(t=>t.passed).length;
@@ -1849,6 +1851,7 @@ async function saveSelfProfile(){
       data.passId=_seImportedExtra.passId;
       data.position=_seImportedExtra.position;
       data.hireDate=_seImportedExtra.hireDate;
+      data.lastPromo=_seImportedExtra.lastPromo;
       data.trainings=_seImportedExtra.trainings;
     }
     await saveProfile(currentUser,data);
@@ -1896,6 +1899,7 @@ async function openProfileModal(username){
   const liveInfo=liveDirectoryInfo(p.passId);
   const position=(liveInfo&&liveInfo.position)||p.position||'';
   const hireDate=(liveInfo&&liveInfo.hireDate)||p.hireDate||'';
+  const lastPromo=(liveInfo&&liveInfo.lastPromo)||p.lastPromo||'';
   document.getElementById('pm-header').innerHTML=`
     ${avatarHtml(p.name||u.username,p.photo)}
     <div>
@@ -1904,7 +1908,7 @@ async function openProfileModal(username){
     </div>
     <div class="profile-header-dates">
       <div><div class="v">${fmtD(hireDate)||'--'}</div><div class="l">Eingestellt am</div></div>
-      <div><div class="v">${fmtD(p.lastPromo)||'--'}</div><div class="l">Letzte Beforderung</div></div>
+      <div><div class="v">${fmtD(lastPromo)||'--'}</div><div class="l">Letzte Beforderung</div></div>
     </div>`;
   document.getElementById('pm-bio').textContent=p.bio||'Noch keine Beschreibung hinterlegt.';
   document.getElementById('pm-info').innerHTML=`
@@ -2065,6 +2069,7 @@ function lookupDirectoryForOfficial(){
   if(!m){msgEl.textContent='Keine Person mit dieser ID im Mitarbeiterverzeichnis gefunden.';msgEl.style.color='var(--re)';return;}
   sv2('oe-position',m.rank||'');
   document.getElementById('oe-hiredate').value=dmyToIso(m.date);
+  document.getElementById('oe-lastpromo').value=dmyToIso(m.lastPromo);
   const found=(m.trainings&&m.trainings.length)?m.trainings:parseAusbList(m.ausb).map(n=>({name:n,passed:true}));
   found.forEach(t=>{
     const existing=_oeTrainings.find(x=>x.name.toLowerCase()===t.name.toLowerCase());
@@ -2237,9 +2242,11 @@ async function syncFromSheet() {
     const csv = await res.text();
     const rows = csv.split('\n');
 
-    // Spalten laut Sheet (0-basiert, Buchstabe → Index):
+    // Spalten laut Sheet (0-basiert, Buchstabe → Index) -- verifiziert anhand des echten Sheets:
     // A=0,B=1,C=2,D=3,E=4,F=5,G=6,H=7,I=8,J=9,K=10,L=11,M=12,N=13,O=14,P=15,Q=16,R=17,S=18
-    // B=ID(1), C=Name(2), D=Ranks(3), E=DN(4), H=Division's(7), K=Strike(10), L=Invite Date(11), M=Last Rank(12), P=Abt1(15), Q=Abt2(16)
+    // B=ID(1), C=Name(2), D=Ranks(3), F=DN(5), I=Division's(8), K=Strike(10),
+    // M=Invite Date(12), N=Last Rank(13) -- ist ein DATUM (letzte Beforderung, nicht Text!),
+    // Q=Abt1(16), R=Abt2(17)
     // Schulungs-Hakchen (T=19,U=20,W=22,X=23,Y=24,Z=25,AA=26,AB=27; V=21 ist eine versteckte Spalte):
     // T=GA, U=EVS, W=AKS, X=TST, Y=VHF/EL, Z=JUR, AA=UC, AB=FTK
 
@@ -2279,20 +2286,21 @@ async function syncFromSheet() {
       const name = (r[2]||'').trim();
       if (!id && !name) continue; // Leere Zeile überspringen
 
-      const abt1 = (r[15]||'').trim();
-      const abt2 = (r[16]||'').trim();
+      const abt1 = (r[16]||'').trim();
+      const abt2 = (r[17]||'').trim();
       const abt  = [abt1, abt2].filter(Boolean).join(' | ');
       const trainings = TRAIN_COLS.map(tc => ({name:tc.name, passed:isChecked(r[tc.idx])}));
 
       newMA.push({
         id,
         name,
-        rank:   (r[3] ||'').trim(),
-        dn:     (r[4] ||'').trim(),
-        div:    (r[7] ||'').trim(),
-        strike: (r[10]||'0/3').trim(),
-        date:   (r[11]||'').trim(),
-        ausb:   (r[12]||'').trim(), // Last Rank als Ausbildung
+        rank:     (r[3] ||'').trim(),
+        dn:       (r[5] ||'').trim(),
+        div:      (r[8] ||'').trim(),
+        strike:   (r[10]||'0/3').trim(),
+        date:     (r[12]||'').trim(),  // Invite Date -> Eintrittsdatum
+        lastPromo:(r[13]||'').trim(),  // Last Rank -> Datum der letzten Beforderung
+        ausb:     '',
         trainings,
         abt,
         status: 'Aktiv',
