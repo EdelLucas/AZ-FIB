@@ -571,6 +571,10 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
           <input class="fi" id="kl-tel" placeholder="z.B. 555-1234">
         </div>
       </div>
+      <div style="margin-bottom:11px;">
+        <div class="fl">Info</div>
+        <textarea class="fi" id="kl-info" rows="2" placeholder="Zusatzliche Infos, Notizen ..." style="resize:vertical;"></textarea>
+      </div>
       <div class="brow" style="margin-top:4px;">
         <button class="btn ok" onclick="klAdd()"><i class="ti ti-plus"></i> Eintrag hinzufugen</button>
       </div>
@@ -603,7 +607,7 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div style="overflow-x:auto;">
         <table class="tbl" id="kl-tbl">
           <thead><tr>
-            <th>Orga</th><th>Name</th><th>Pass-ID</th><th>Rang</th><th>Telefon</th><th style="text-align:center">Aktion</th>
+            <th>Orga</th><th>Name</th><th>Pass-ID</th><th>Rang</th><th>Telefon</th><th>Info</th><th style="text-align:center">Aktion</th>
           </tr></thead>
           <tbody id="kl-body"></tbody>
         </table>
@@ -633,6 +637,10 @@ html,body{height:100%;background:var(--bg);font-family:'Courier New',monospace;f
       <div><div class="fl">Pass-ID</div><input class="fi" id="kl-edit-id" placeholder="z.B. 12345"></div>
       <div><div class="fl">Rang</div><input class="fi" id="kl-edit-rang" placeholder="z.B. Officer I"></div>
       <div><div class="fl">Telefonnummer</div><input class="fi" id="kl-edit-tel" placeholder="z.B. 555-1234"></div>
+    </div>
+    <div style="margin-bottom:11px;">
+      <div class="fl">Info</div>
+      <textarea class="fi" id="kl-edit-info" rows="2" placeholder="Zusatzliche Infos, Notizen ..." style="resize:vertical;"></textarea>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px;">
       <button class="btn ng sm" onclick="klCloseModal()">Abbrechen</button>
@@ -2308,7 +2316,7 @@ function klLoad(){try{const d=localStorage.getItem('fib_kl');if(d)KL_DATA=JSON.p
 function klSave(){cloudPush();}
 
 function klAdd(){
-  const orga=gv('kl-orga'),name=gv('kl-name').trim(),id=gv('kl-id').trim(),rang=gv('kl-rang').trim(),tel=gv('kl-tel').trim();
+  const orga=gv('kl-orga'),name=gv('kl-name').trim(),id=gv('kl-id').trim(),rang=gv('kl-rang').trim(),tel=gv('kl-tel').trim(),info=gv('kl-info').trim();
   if(!orga||!name){showToast('Orga und Name sind Pflichtfelder!');return;}
 
   // Duplikat-Prüfung: gleicher Name UND gleiche Orga
@@ -2326,10 +2334,10 @@ function klAdd(){
 
   // Orga-Tab auf die neue Orga setzen
   const savedOrga = orga;
-  KL_DATA.push({orga,name,id,rang,tel});
+  KL_DATA.push({orga,name,id,rang,tel,info});
   klSave();
   // Formular leeren aber Orga behalten
-  sv2('kl-name','');sv2('kl-id','');sv2('kl-rang','');sv2('kl-tel','');
+  sv2('kl-name','');sv2('kl-id','');sv2('kl-rang','');sv2('kl-tel','');sv2('kl-info','');
   // Tab auf die eingetragene Orga wechseln
   const tab = document.querySelector(`#kl-orga-tabs .orga-tab[data-orga="${savedOrga}"]`);
   if(tab) klSwitch(tab);
@@ -2355,7 +2363,7 @@ function klSwitch(el){
 function klRender(){
   const q=(gv('kl-search')||'').toLowerCase();
   let list=KL_ORGA==='Alle'?KL_DATA:KL_DATA.filter(e=>e.orga===KL_ORGA);
-  if(q)list=list.filter(e=>(e.name||'').toLowerCase().includes(q)||(e.id||'').includes(q)||(e.rang||'').toLowerCase().includes(q)||(e.tel||'').includes(q));
+  if(q)list=list.filter(e=>(e.name||'').toLowerCase().includes(q)||(e.id||'').includes(q)||(e.rang||'').toLowerCase().includes(q)||(e.tel||'').includes(q)||(e.info||'').toLowerCase().includes(q));
 
   const body=document.getElementById('kl-body');
   const empty=document.getElementById('kl-empty');
@@ -2383,6 +2391,7 @@ function klRender(){
         <td style="color:var(--mu);font-size:11px">${e.id||'--'}</td>
         <td style="font-size:11px">${e.rang||'--'}</td>
         <td style="color:var(--bl);font-size:11px">${e.tel||'--'}</td>
+        <td style="color:var(--mu);font-size:10px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(e.info||'').replace(/"/g,'&quot;')}">${e.info||'--'}</td>
         <td style="text-align:center;white-space:nowrap">
           <div style="display:flex;gap:3px;justify-content:center;">
             <button class="btn sm bl" onclick="klCopyName('${nameSafe}')" title="Name kopieren"><i class="ti ti-user"></i></button>
@@ -2484,6 +2493,7 @@ function klOpenEdit(ri){
   document.getElementById('kl-edit-id').value=e.id||'';
   document.getElementById('kl-edit-rang').value=e.rang||'';
   document.getElementById('kl-edit-tel').value=e.tel||'';
+  document.getElementById('kl-edit-info').value=e.info||'';
   document.getElementById('kl-modal').classList.add('show');
 }
 
@@ -2498,7 +2508,8 @@ function klSaveModal(){
     orga,name,
     id:document.getElementById('kl-edit-id').value.trim(),
     rang:document.getElementById('kl-edit-rang').value.trim(),
-    tel:document.getElementById('kl-edit-tel').value.trim()
+    tel:document.getElementById('kl-edit-tel').value.trim(),
+    info:document.getElementById('kl-edit-info').value.trim()
   };
   klSave();klRender();klCloseModal();showToast('Eintrag gespeichert');
 }
@@ -2517,7 +2528,7 @@ function klCopyList(orga){
     const emoji=emoji_map[org]||'⚪';
     out+=`${emoji} **${org}**\n`;
     groups[org].forEach(e=>{
-      out+=`${e.name} | ${e.rang||'--'} | ID: ${mask(e.id)} | Tel: ${mask(e.tel)}\n`;
+      out+=`${e.name} | ${e.rang||'--'} | ID: ${mask(e.id)} | Tel: ${mask(e.tel)}${e.info?` | ${e.info}`:''}\n`;
     });
     out+='\n';
   });
